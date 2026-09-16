@@ -1,10 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 import { LotesService } from '../../../core/services/lotes.service';
 import { ProductosService } from '../../../core/services/productos.service';
 import { SucursalesService } from '../../../core/services/sucursales.service';
@@ -14,17 +9,19 @@ import { MovimientoInventario, Sucursal } from '../../../core/models/lote.models
 
 @Component({
   selector: 'app-lote-salida-form',
-  imports: [ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './lote-salida-form.html',
   styleUrl: './lote-salida-form.scss',
 })
 export class LoteSalidaForm implements OnInit {
+  @Output() guardado = new EventEmitter<void>();
+  @Output() cancelado = new EventEmitter<void>();
+
   private readonly fb = inject(FormBuilder);
   private readonly lotesService = inject(LotesService);
   private readonly productosService = inject(ProductosService);
   private readonly sucursalesService = inject(SucursalesService);
   private readonly authService = inject(AuthService);
-  private readonly dialogRef = inject(MatDialogRef<LoteSalidaForm, boolean>);
 
   protected readonly usuario = this.authService.currentUser;
 
@@ -52,12 +49,8 @@ export class LoteSalidaForm implements OnInit {
     return this.usuario()?.rol === 'ADMIN';
   }
 
-  protected cancelar(): void {
-    this.dialogRef.close(false);
-  }
-
   protected cerrarConResultado(): void {
-    this.dialogRef.close(true);
+    this.guardado.emit();
   }
 
   protected onSubmit(): void {

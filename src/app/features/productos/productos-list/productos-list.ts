@@ -1,24 +1,22 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatButtonModule } from '@angular/material/button';
+import { ToastService } from '../../../shared/toast/toast.service';
+import { Modal } from '../../../shared/modal/modal';
 import { ProductosService } from '../../../core/services/productos.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Producto } from '../../../core/models/producto.models';
-import { ProductoForm, ProductoFormData } from '../producto-form/producto-form';
+import { ProductoForm } from '../producto-form/producto-form';
 
 @Component({
   selector: 'app-productos-list',
-  imports: [FormsModule, MatButtonModule],
+  imports: [FormsModule, Modal, ProductoForm],
   templateUrl: './productos-list.html',
   styleUrl: './productos-list.scss',
 })
 export class ProductosList implements OnInit {
   private readonly productosService = inject(ProductosService);
   private readonly authService = inject(AuthService);
-  private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly toastService = inject(ToastService);
 
   protected readonly usuario = this.authService.currentUser;
   protected readonly productos = signal<Producto[]>([]);
@@ -27,6 +25,8 @@ export class ProductosList implements OnInit {
   protected readonly limit = 20;
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+
+  protected readonly productoEnEdicion = signal<number | null | undefined>(undefined);
 
   protected q = '';
   protected estado: '' | 'ACTIVO' | 'INACTIVO' = '';
@@ -46,24 +46,35 @@ export class ProductosList implements OnInit {
   }
 
   protected abrirCrear(): void {
-    this.abrirFormulario(null, 'Producto creado correctamente.');
+    this.productoEnEdicion.set(null);
   }
 
   protected abrirEditar(producto: Producto): void {
-    this.abrirFormulario(producto.productoId, 'Producto actualizado correctamente.');
+    this.productoEnEdicion.set(producto.productoId);
+  }
+
+  protected cerrarFormulario(): void {
+    this.productoEnEdicion.set(undefined);
+  }
+
+  protected onGuardado(): void {
+    const esCreacion = this.productoEnEdicion() === null;
+    this.cerrarFormulario();
+    this.cargar();
+    this.toastService.show(esCreacion ? 'Producto creado correctamente.' : 'Producto actualizado correctamente.');
   }
 
   protected desactivar(producto: Producto): void {
     this.productosService.desactivar(producto.productoId).subscribe(() => {
       this.cargar();
-      this.avisar('Producto desactivado correctamente.');
+      this.toastService.show('Producto desactivado correctamente.');
     });
   }
 
   protected activar(producto: Producto): void {
     this.productosService.activar(producto.productoId).subscribe(() => {
       this.cargar();
-      this.avisar('Producto activado correctamente.');
+      this.toastService.show('Producto activado correctamente.');
     });
   }
 
@@ -73,25 +84,6 @@ export class ProductosList implements OnInit {
 
   protected totalPaginas(): number {
     return Math.max(1, Math.ceil(this.total() / this.limit));
-  }
-
-  private abrirFormulario(productoId: number | null, mensajeExito: string): void {
-    const ref = this.dialog.open<ProductoForm, ProductoFormData, boolean>(ProductoForm, {
-      width: '600px',
-      maxWidth: '95vw',
-      data: { productoId },
-    });
-
-    ref.afterClosed().subscribe((guardado) => {
-      if (guardado) {
-        this.cargar();
-        this.avisar(mensajeExito);
-      }
-    });
-  }
-
-  private avisar(mensaje: string): void {
-    this.snackBar.open(mensaje, 'Cerrar', { duration: 3000 });
   }
 
   private cargar(): void {

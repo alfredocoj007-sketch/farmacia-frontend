@@ -1,45 +1,27 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductosService } from '../../../core/services/productos.service';
 import { CategoriasProductoService } from '../../../core/services/categorias-producto.service';
 import { LaboratoriosService } from '../../../core/services/laboratorios.service';
 import { UnidadesMedidaService } from '../../../core/services/unidades-medida.service';
 import { CategoriaProducto, Laboratorio, UnidadMedida } from '../../../core/models/producto.models';
 
-export interface ProductoFormData {
-  productoId: number | null;
-}
-
 @Component({
   selector: 'app-producto-form',
-  imports: [
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatCheckboxModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
-  ],
+  imports: [ReactiveFormsModule],
   templateUrl: './producto-form.html',
   styleUrl: './producto-form.scss',
 })
 export class ProductoForm implements OnInit {
+  @Input() productoId: number | null = null;
+  @Output() guardado = new EventEmitter<void>();
+  @Output() cancelado = new EventEmitter<void>();
+
   private readonly fb = inject(FormBuilder);
   private readonly productosService = inject(ProductosService);
   private readonly categoriasService = inject(CategoriasProductoService);
   private readonly laboratoriosService = inject(LaboratoriosService);
   private readonly unidadesMedidaService = inject(UnidadesMedidaService);
-  private readonly dialogRef = inject(MatDialogRef<ProductoForm, boolean>);
-  private readonly data = inject<ProductoFormData>(MAT_DIALOG_DATA);
 
   protected readonly form = this.fb.group({
     nombre: ['', Validators.required],
@@ -69,15 +51,14 @@ export class ProductoForm implements OnInit {
     this.laboratoriosService.findAll().subscribe((l) => this.laboratorios.set(l));
     this.unidadesMedidaService.findAll().subscribe((u) => this.unidadesMedida.set(u));
 
-    const productoId = this.data.productoId;
-    if (!productoId) {
+    if (!this.productoId) {
       return;
     }
 
     this.modoEdicion.set(true);
     this.cargando.set(true);
 
-    this.productosService.findOne(productoId).subscribe({
+    this.productosService.findOne(this.productoId).subscribe({
       next: (producto) => {
         this.form.patchValue({
           nombre: producto.nombre,
@@ -99,10 +80,6 @@ export class ProductoForm implements OnInit {
         this.cargando.set(false);
       },
     });
-  }
-
-  protected cancelar(): void {
-    this.dialogRef.close(false);
   }
 
   protected onSubmit(): void {
@@ -130,13 +107,13 @@ export class ProductoForm implements OnInit {
     };
 
     const peticion = this.modoEdicion()
-      ? this.productosService.update(this.data.productoId!, payload)
+      ? this.productosService.update(this.productoId!, payload)
       : this.productosService.create(payload);
 
     peticion.subscribe({
       next: () => {
         this.guardando.set(false);
-        this.dialogRef.close(true);
+        this.guardado.emit();
       },
       error: (err) => {
         this.guardando.set(false);

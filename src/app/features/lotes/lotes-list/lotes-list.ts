@@ -1,25 +1,25 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatButtonModule } from '@angular/material/button';
+import { ToastService } from '../../../shared/toast/toast.service';
+import { Modal } from '../../../shared/modal/modal';
 import { LotesService } from '../../../core/services/lotes.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Lote } from '../../../core/models/lote.models';
 import { LoteEntradaForm } from '../lote-entrada-form/lote-entrada-form';
 import { LoteSalidaForm } from '../lote-salida-form/lote-salida-form';
 
+type ModalAbierto = 'entrada' | 'salida' | null;
+
 @Component({
   selector: 'app-lotes-list',
-  imports: [RouterLink, MatButtonModule],
+  imports: [RouterLink, Modal, LoteEntradaForm, LoteSalidaForm],
   templateUrl: './lotes-list.html',
   styleUrl: './lotes-list.scss',
 })
 export class LotesList implements OnInit {
   private readonly lotesService = inject(LotesService);
   private readonly authService = inject(AuthService);
-  private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly toastService = inject(ToastService);
 
   protected readonly usuario = this.authService.currentUser;
   protected readonly lotes = signal<Lote[]>([]);
@@ -28,6 +28,8 @@ export class LotesList implements OnInit {
   protected readonly limit = 20;
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+
+  protected readonly modalAbierto = signal<ModalAbierto>(null);
 
   ngOnInit(): void {
     this.cargar();
@@ -51,35 +53,27 @@ export class LotesList implements OnInit {
   }
 
   protected abrirEntrada(): void {
-    const ref = this.dialog.open<LoteEntradaForm, unknown, boolean>(LoteEntradaForm, {
-      width: '600px',
-      maxWidth: '95vw',
-    });
-
-    ref.afterClosed().subscribe((guardado) => {
-      if (guardado) {
-        this.cargar();
-        this.avisar('Entrada registrada correctamente.');
-      }
-    });
+    this.modalAbierto.set('entrada');
   }
 
   protected abrirSalida(): void {
-    const ref = this.dialog.open<LoteSalidaForm, unknown, boolean>(LoteSalidaForm, {
-      width: '600px',
-      maxWidth: '95vw',
-    });
-
-    ref.afterClosed().subscribe((guardado) => {
-      if (guardado) {
-        this.cargar();
-        this.avisar('Salida registrada correctamente.');
-      }
-    });
+    this.modalAbierto.set('salida');
   }
 
-  private avisar(mensaje: string): void {
-    this.snackBar.open(mensaje, 'Cerrar', { duration: 3000 });
+  protected cerrarModal(): void {
+    this.modalAbierto.set(null);
+  }
+
+  protected onEntradaGuardada(): void {
+    this.cerrarModal();
+    this.cargar();
+    this.toastService.show('Entrada registrada correctamente.');
+  }
+
+  protected onSalidaGuardada(): void {
+    this.cerrarModal();
+    this.cargar();
+    this.toastService.show('Salida registrada correctamente.');
   }
 
   private cargar(): void {

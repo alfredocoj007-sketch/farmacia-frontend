@@ -3,9 +3,19 @@
     <h2 class="text-lg font-semibold text-slate-800">Lotes e inventario</h2>
     <div class="flex gap-2">
       @if (esAdmin()) {
-        <button mat-flat-button color="primary" (click)="abrirEntrada()">+ Entrada de compra</button>
+        <button
+          (click)="abrirEntrada()"
+          class="rounded-md bg-sky-600 text-white text-sm font-medium px-4 py-2 hover:bg-sky-700"
+        >
+          + Entrada de compra
+        </button>
       }
-      <button mat-stroked-button (click)="abrirSalida()">− Registrar salida</button>
+      <button
+        (click)="abrirSalida()"
+        class="rounded-md bg-slate-700 text-white text-sm font-medium px-4 py-2 hover:bg-slate-800"
+      >
+        − Registrar salida
+      </button>
     </div>
   </div>
 
@@ -68,3 +78,15 @@
     }
   </div>
 </div>
+
+@if (modalAbierto() === 'entrada') {
+  <app-modal (cerrar)="cerrarModal()">
+    <app-lote-entrada-form (guardado)="onEntradaGuardada()" (cancelado)="cerrarModal()" />
+  </app-modal>
+}
+
+@if (modalAbierto() === 'salida') {
+  <app-modal (cerrar)="cerrarModal()">
+    <app-lote-salida-form (guardado)="onSalidaGuardada()" (cancelado)="cerrarModal()" />
+  </app-modal>
+}

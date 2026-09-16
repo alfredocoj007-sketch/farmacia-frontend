@@ -1,10 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 import { LotesService } from '../../../core/services/lotes.service';
 import { ProductosService } from '../../../core/services/productos.service';
 import { SucursalesService } from '../../../core/services/sucursales.service';
@@ -13,16 +8,18 @@ import { Sucursal } from '../../../core/models/lote.models';
 
 @Component({
   selector: 'app-lote-entrada-form',
-  imports: [ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './lote-entrada-form.html',
   styleUrl: './lote-entrada-form.scss',
 })
 export class LoteEntradaForm implements OnInit {
+  @Output() guardado = new EventEmitter<void>();
+  @Output() cancelado = new EventEmitter<void>();
+
   private readonly fb = inject(FormBuilder);
   private readonly lotesService = inject(LotesService);
   private readonly productosService = inject(ProductosService);
   private readonly sucursalesService = inject(SucursalesService);
-  private readonly dialogRef = inject(MatDialogRef<LoteEntradaForm, boolean>);
 
   protected readonly form = this.fb.group({
     productoId: [null as number | null, Validators.required],
@@ -43,10 +40,6 @@ export class LoteEntradaForm implements OnInit {
   ngOnInit(): void {
     this.productosService.findAll({ estado: 'ACTIVO', limit: 200 }).subscribe((r) => this.productos.set(r.data));
     this.sucursalesService.findAll().subscribe((sucursales) => this.sucursales.set(sucursales));
-  }
-
-  protected cancelar(): void {
-    this.dialogRef.close(false);
   }
 
   protected onSubmit(): void {
@@ -74,7 +67,7 @@ export class LoteEntradaForm implements OnInit {
       .subscribe({
         next: () => {
           this.guardando.set(false);
-          this.dialogRef.close(true);
+          this.guardado.emit();
         },
         error: (err) => {
           this.guardando.set(false);

@@ -1,6 +1,4 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { ProductosService } from '../../core/services/productos.service';
@@ -24,7 +22,7 @@ interface VencimientoProximo {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MatIconModule, MatProgressSpinnerModule],
+  imports: [],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

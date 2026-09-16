@@ -38,38 +38,55 @@
     </div>
 
     <!-- Mobile: hamburger menu -->
-    <button
-      mat-icon-button
-      class="sm:hidden shrink-0"
-      [matMenuTriggerFor]="menuMovil"
-      aria-label="Abrir menú"
-    >
-      <mat-icon>menu</mat-icon>
-    </button>
+    <div class="sm:hidden relative shrink-0" #menuMovil>
+      <button
+        (click)="alternarMenuMovil()"
+        class="w-9 h-9 flex items-center justify-center rounded-md hover:bg-slate-100"
+        aria-label="Abrir menú"
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75">
+          <path d="M2.5 5h15M2.5 10h15M2.5 15h15" stroke-linecap="round" />
+        </svg>
+      </button>
 
-    <mat-menu #menuMovil="matMenu">
-      <a mat-menu-item routerLink="/dashboard" routerLinkActive="text-sky-600">
-        <mat-icon>dashboard</mat-icon>
-        <span>Dashboard</span>
-      </a>
-      <a mat-menu-item routerLink="/productos" routerLinkActive="text-sky-600">
-        <mat-icon>inventory_2</mat-icon>
-        <span>Productos</span>
-      </a>
-      <a mat-menu-item routerLink="/lotes" routerLinkActive="text-sky-600">
-        <mat-icon>local_shipping</mat-icon>
-        <span>Lotes</span>
-      </a>
-      @if (usuario(); as u) {
-        <div class="px-4 py-2 text-xs text-slate-400 border-t border-slate-100">
-          {{ u.nombre }} · {{ u.rol }}
+      @if (menuMovilAbierto()) {
+        <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+          <a
+            routerLink="/dashboard"
+            routerLinkActive="text-sky-600"
+            (click)="cerrarMenuMovil()"
+            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+          >
+            Dashboard
+          </a>
+          <a
+            routerLink="/productos"
+            routerLinkActive="text-sky-600"
+            (click)="cerrarMenuMovil()"
+            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+          >
+            Productos
+          </a>
+          <a
+            routerLink="/lotes"
+            routerLinkActive="text-sky-600"
+            (click)="cerrarMenuMovil()"
+            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+          >
+            Lotes
+          </a>
+          @if (usuario(); as u) {
+            <div class="px-4 py-2 text-xs text-slate-400 border-t border-slate-100">{{ u.nombre }} · {{ u.rol }}</div>
+          }
+          <button
+            (click)="cerrarSesion()"
+            class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+          >
+            Cerrar sesión
+          </button>
         </div>
       }
-      <button mat-menu-item (click)="cerrarSesion()">
-        <mat-icon>logout</mat-icon>
-        <span>Cerrar sesión</span>
-      </button>
-    </mat-menu>
+    </div>
   </header>
 
   <main class="p-4 sm:p-6">
