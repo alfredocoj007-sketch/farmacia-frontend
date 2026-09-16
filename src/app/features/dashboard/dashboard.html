@@ -1,0 +1,35 @@
+<div class="min-h-screen bg-slate-100">
+  <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+    <h1 class="text-lg font-semibold text-slate-800">Farmacia</h1>
+    <div class="flex items-center gap-4">
+      @if (usuario(); as u) {
+        <span class="text-sm text-slate-600">{{ u.nombre }} · {{ u.rol }}</span>
+      }
+      <button
+        (click)="cerrarSesion()"
+        class="text-sm text-slate-600 hover:text-red-600"
+      >
+        Cerrar sesión
+      </button>
+    </div>
+  </header>
+
+  <main class="p-6">
+    <div class="bg-white rounded-lg shadow p-6 max-w-md">
+      <h2 class="font-medium text-slate-800 mb-3">Perfil (GET /auth/perfil)</h2>
+
+      @if (cargando()) {
+        <p class="text-sm text-slate-500">Cargando…</p>
+      } @else if (error()) {
+        <p class="text-sm text-red-600">{{ error() }}</p>
+      } @else if (perfil(); as p) {
+        <dl class="text-sm text-slate-600 space-y-1">
+          <div><dt class="inline font-medium">Usuario:</dt> <dd class="inline">{{ p.username }}</dd></div>
+          <div><dt class="inline font-medium">Rol:</dt> <dd class="inline">{{ p.rolNombre }}</dd></div>
+          <div><dt class="inline font-medium">Credencial ID:</dt> <dd class="inline">{{ p.credencialId }}</dd></div>
+          <div><dt class="inline font-medium">Empleado ID:</dt> <dd class="inline">{{ p.empleadoId }}</dd></div>
+        </dl>
+      }
+    </div>
+  </main>
+</div>
