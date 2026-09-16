@@ -2,6 +2,10 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProductosService } from '../../../core/services/productos.service';
+import { CategoriasProductoService } from '../../../core/services/categorias-producto.service';
+import { LaboratoriosService } from '../../../core/services/laboratorios.service';
+import { UnidadesMedidaService } from '../../../core/services/unidades-medida.service';
+import { CategoriaProducto, Laboratorio, UnidadMedida } from '../../../core/models/producto.models';
 
 @Component({
   selector: 'app-producto-form',
@@ -12,6 +16,9 @@ import { ProductosService } from '../../../core/services/productos.service';
 export class ProductoForm implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly productosService = inject(ProductosService);
+  private readonly categoriasService = inject(CategoriasProductoService);
+  private readonly laboratoriosService = inject(LaboratoriosService);
+  private readonly unidadesMedidaService = inject(UnidadesMedidaService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -24,6 +31,9 @@ export class ProductoForm implements OnInit {
     principioActivo: [''],
     presentacion: [''],
     concentracion: [''],
+    categoriaId: [null as number | null],
+    laboratorioId: [null as number | null],
+    unidadMedidaId: [null as number | null],
   });
 
   protected readonly modoEdicion = signal(false);
@@ -31,9 +41,17 @@ export class ProductoForm implements OnInit {
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
 
+  protected readonly categorias = signal<CategoriaProducto[]>([]);
+  protected readonly laboratorios = signal<Laboratorio[]>([]);
+  protected readonly unidadesMedida = signal<UnidadMedida[]>([]);
+
   private productoId: number | null = null;
 
   ngOnInit(): void {
+    this.categoriasService.findAll().subscribe((c) => this.categorias.set(c));
+    this.laboratoriosService.findAll().subscribe((l) => this.laboratorios.set(l));
+    this.unidadesMedidaService.findAll().subscribe((u) => this.unidadesMedida.set(u));
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (!idParam) {
       return;
@@ -54,6 +72,9 @@ export class ProductoForm implements OnInit {
           principioActivo: producto.principioActivo ?? '',
           presentacion: producto.presentacion ?? '',
           concentracion: producto.concentracion ?? '',
+          categoriaId: producto.categoria?.categoriaId ?? null,
+          laboratorioId: producto.laboratorio?.laboratorioId ?? null,
+          unidadMedidaId: producto.unidadMedida?.unidadMedidaId ?? null,
         });
         this.cargando.set(false);
       },
@@ -83,6 +104,9 @@ export class ProductoForm implements OnInit {
       principioActivo: valores.principioActivo || undefined,
       presentacion: valores.presentacion || undefined,
       concentracion: valores.concentracion || undefined,
+      categoriaId: valores.categoriaId ?? undefined,
+      laboratorioId: valores.laboratorioId ?? undefined,
+      unidadMedidaId: valores.unidadMedidaId ?? undefined,
     };
 
     const peticion = this.modoEdicion()

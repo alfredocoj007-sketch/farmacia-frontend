@@ -49,6 +49,9 @@ export interface ProductoPayload {
   principioActivo?: string;
   presentacion?: string;
   concentracion?: string;
+  categoriaId?: number;
+  laboratorioId?: number;
+  unidadMedidaId?: number;
 }
 
 export interface QueryProductos {
