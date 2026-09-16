@@ -3,19 +3,9 @@
     <h2 class="text-lg font-semibold text-slate-800">Lotes e inventario</h2>
     <div class="flex gap-2">
       @if (esAdmin()) {
-        <a
-          routerLink="/lotes/entrada"
-          class="rounded-md bg-sky-600 text-white text-sm font-medium px-4 py-2 hover:bg-sky-700"
-        >
-          + Entrada de compra
-        </a>
+        <button mat-flat-button color="primary" (click)="abrirEntrada()">+ Entrada de compra</button>
       }
-      <a
-        routerLink="/lotes/salida"
-        class="rounded-md bg-slate-700 text-white text-sm font-medium px-4 py-2 hover:bg-slate-800"
-      >
-        − Registrar salida
-      </a>
+      <button mat-stroked-button (click)="abrirSalida()">− Registrar salida</button>
     </div>
   </div>
 

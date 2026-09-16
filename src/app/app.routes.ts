@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -25,17 +24,6 @@ export const routes: Routes = [
       {
         path: 'lotes',
         loadComponent: () => import('./features/lotes/lotes-list/lotes-list').then((m) => m.LotesList),
-      },
-      {
-        path: 'lotes/entrada',
-        loadComponent: () =>
-          import('./features/lotes/lote-entrada-form/lote-entrada-form').then((m) => m.LoteEntradaForm),
-        canActivate: [roleGuard('ADMIN')],
-      },
-      {
-        path: 'lotes/salida',
-        loadComponent: () =>
-          import('./features/lotes/lote-salida-form/lote-salida-form').then((m) => m.LoteSalidaForm),
       },
       {
         path: 'lotes/:id',

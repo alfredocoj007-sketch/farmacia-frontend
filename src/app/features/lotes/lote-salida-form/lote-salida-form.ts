@@ -1,6 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
 import { LotesService } from '../../../core/services/lotes.service';
 import { ProductosService } from '../../../core/services/productos.service';
 import { SucursalesService } from '../../../core/services/sucursales.service';
@@ -10,7 +14,7 @@ import { MovimientoInventario, Sucursal } from '../../../core/models/lote.models
 
 @Component({
   selector: 'app-lote-salida-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule],
   templateUrl: './lote-salida-form.html',
   styleUrl: './lote-salida-form.scss',
 })
@@ -20,7 +24,7 @@ export class LoteSalidaForm implements OnInit {
   private readonly productosService = inject(ProductosService);
   private readonly sucursalesService = inject(SucursalesService);
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly dialogRef = inject(MatDialogRef<LoteSalidaForm, boolean>);
 
   protected readonly usuario = this.authService.currentUser;
 
@@ -46,6 +50,14 @@ export class LoteSalidaForm implements OnInit {
 
   protected esAdmin(): boolean {
     return this.usuario()?.rol === 'ADMIN';
+  }
+
+  protected cancelar(): void {
+    this.dialogRef.close(false);
+  }
+
+  protected cerrarConResultado(): void {
+    this.dialogRef.close(true);
   }
 
   protected onSubmit(): void {

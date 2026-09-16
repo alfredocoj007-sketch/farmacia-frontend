@@ -1,103 +1,68 @@
-<div class="max-w-lg">
-  <a routerLink="/lotes" class="text-sm text-slate-500 hover:text-slate-700">← Volver</a>
+<h2 mat-dialog-title>Entrada de compra</h2>
 
-  <h2 class="text-lg font-semibold text-slate-800 mt-4 mb-4">Entrada de compra</h2>
-
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="bg-white rounded-lg shadow p-6 space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-slate-700 mb-1">Producto</label>
-      <select
-        formControlName="productoId"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-      >
-        <option [ngValue]="null" disabled>Seleccioná un producto</option>
+<mat-dialog-content>
+  <form [formGroup]="form" class="grid gap-2 pt-2">
+    <mat-form-field appearance="outline">
+      <mat-label>Producto</mat-label>
+      <mat-select formControlName="productoId">
         @for (p of productos(); track p.productoId) {
-          <option [ngValue]="p.productoId">{{ p.nombre }} ({{ p.codigoProducto }})</option>
+          <mat-option [value]="p.productoId">{{ p.nombre }} ({{ p.codigoProducto }})</mat-option>
         }
-      </select>
-    </div>
+      </mat-select>
+    </mat-form-field>
 
-    <div>
-      <label class="block text-sm font-medium text-slate-700 mb-1">Sucursal</label>
-      <select
-        formControlName="sucursalId"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-      >
-        <option [ngValue]="null" disabled>Seleccioná una sucursal</option>
+    <mat-form-field appearance="outline">
+      <mat-label>Sucursal</mat-label>
+      <mat-select formControlName="sucursalId">
         @for (s of sucursales(); track s.sucursalId) {
-          <option [ngValue]="s.sucursalId">{{ s.nombre }}</option>
+          <mat-option [value]="s.sucursalId">{{ s.nombre }}</mat-option>
         }
-      </select>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Número de lote</mat-label>
+      <input matInput formControlName="numeroLote" />
+    </mat-form-field>
+
+    <div class="grid grid-cols-2 gap-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de vencimiento</mat-label>
+        <input matInput type="date" formControlName="fechaVencimiento" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de fabricación</mat-label>
+        <input matInput type="date" formControlName="fechaFabricacion" />
+      </mat-form-field>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium text-slate-700 mb-1">Número de lote</label>
-      <input
-        type="text"
-        formControlName="numeroLote"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-      />
+    <div class="grid grid-cols-2 gap-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Costo unitario</mat-label>
+        <input matInput type="number" step="0.01" formControlName="costoUnitario" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Cantidad</mat-label>
+        <input matInput type="number" step="0.001" formControlName="cantidad" />
+      </mat-form-field>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Fecha de vencimiento</label>
-        <input
-          type="date"
-          formControlName="fechaVencimiento"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Fecha de fabricación</label>
-        <input
-          type="date"
-          formControlName="fechaFabricacion"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Costo unitario</label>
-        <input
-          type="number"
-          step="0.01"
-          formControlName="costoUnitario"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Cantidad</label>
-        <input
-          type="number"
-          step="0.001"
-          formControlName="cantidad"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
-      </div>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-slate-700 mb-1">Observación (opcional)</label>
-      <input
-        type="text"
-        formControlName="observacion"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-      />
-    </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Observación (opcional)</mat-label>
+      <input matInput formControlName="observacion" />
+    </mat-form-field>
 
     @if (error()) {
       <p class="text-sm text-red-600">{{ error() }}</p>
     }
-
-    <button
-      type="submit"
-      [disabled]="guardando()"
-      class="w-full rounded-md bg-sky-600 text-white text-sm font-medium py-2 hover:bg-sky-700 disabled:opacity-60"
-    >
-      {{ guardando() ? 'Guardando…' : 'Registrar entrada' }}
-    </button>
   </form>
-</div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+  <button mat-flat-button color="primary" type="button" [disabled]="guardando()" (click)="onSubmit()">
+    {{ guardando() ? 'Guardando…' : 'Registrar entrada' }}
+  </button>
+</mat-dialog-actions>
