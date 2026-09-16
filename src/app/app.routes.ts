@@ -23,18 +23,6 @@ export const routes: Routes = [
           import('./features/productos/productos-list/productos-list').then((m) => m.ProductosList),
       },
       {
-        path: 'productos/nuevo',
-        loadComponent: () =>
-          import('./features/productos/producto-form/producto-form').then((m) => m.ProductoForm),
-        canActivate: [roleGuard('ADMIN')],
-      },
-      {
-        path: 'productos/:id/editar',
-        loadComponent: () =>
-          import('./features/productos/producto-form/producto-form').then((m) => m.ProductoForm),
-        canActivate: [roleGuard('ADMIN')],
-      },
-      {
         path: 'lotes',
         loadComponent: () => import('./features/lotes/lotes-list/lotes-list').then((m) => m.LotesList),
       },

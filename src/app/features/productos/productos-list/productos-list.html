@@ -2,12 +2,7 @@
   <div class="flex items-center justify-between mb-4">
     <h2 class="text-lg font-semibold text-slate-800">Productos</h2>
     @if (esAdmin()) {
-      <a
-        routerLink="/productos/nuevo"
-        class="rounded-md bg-sky-600 text-white text-sm font-medium px-4 py-2 hover:bg-sky-700"
-      >
-        + Nuevo producto
-      </a>
+      <button mat-flat-button color="primary" (click)="abrirCrear()">+ Nuevo producto</button>
     }
   </div>
 
@@ -77,9 +72,9 @@
               </td>
               @if (esAdmin()) {
                 <td class="px-4 py-2 space-x-3">
-                  <a [routerLink]="['/productos', producto.productoId, 'editar']" class="text-sky-600 hover:underline">
+                  <button (click)="abrirEditar(producto)" class="text-sky-600 hover:underline">
                     Editar
-                  </a>
+                  </button>
                   @if (producto.estado === 'ACTIVO') {
                     <button (click)="desactivar(producto)" class="text-red-600 hover:underline">
                       Desactivar
