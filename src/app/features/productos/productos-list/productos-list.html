@@ -1,0 +1,120 @@
+<div class="max-w-5xl">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold text-slate-800">Productos</h2>
+    @if (esAdmin()) {
+      <a
+        routerLink="/productos/nuevo"
+        class="rounded-md bg-sky-600 text-white text-sm font-medium px-4 py-2 hover:bg-sky-700"
+      >
+        + Nuevo producto
+      </a>
+    }
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-4 mb-4 flex flex-wrap gap-3 items-end">
+    <div>
+      <label class="block text-xs font-medium text-slate-500 mb-1">Buscar</label>
+      <input
+        type="text"
+        [(ngModel)]="q"
+        (keyup.enter)="buscar()"
+        placeholder="Nombre o código"
+        class="rounded-md border border-slate-300 px-3 py-1.5 text-sm w-56"
+      />
+    </div>
+    <div>
+      <label class="block text-xs font-medium text-slate-500 mb-1">Estado</label>
+      <select [(ngModel)]="estado" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm">
+        <option value="">Todos</option>
+        <option value="ACTIVO">Activo</option>
+        <option value="INACTIVO">Inactivo</option>
+      </select>
+    </div>
+    <button
+      (click)="buscar()"
+      class="rounded-md bg-slate-700 text-white text-sm font-medium px-4 py-1.5 hover:bg-slate-800"
+    >
+      Filtrar
+    </button>
+  </div>
+
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    @if (cargando()) {
+      <p class="text-sm text-slate-500 p-6">Cargando…</p>
+    } @else if (error()) {
+      <p class="text-sm text-red-600 p-6">{{ error() }}</p>
+    } @else if (productos().length === 0) {
+      <p class="text-sm text-slate-500 p-6">No hay productos que coincidan con la búsqueda.</p>
+    } @else {
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-slate-500 text-left">
+          <tr>
+            <th class="px-4 py-2 font-medium">Nombre</th>
+            <th class="px-4 py-2 font-medium">Código</th>
+            <th class="px-4 py-2 font-medium">Precio</th>
+            <th class="px-4 py-2 font-medium">Estado</th>
+            @if (esAdmin()) {
+              <th class="px-4 py-2 font-medium">Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (producto of productos(); track producto.productoId) {
+            <tr>
+              <td class="px-4 py-2 text-slate-800">{{ producto.nombre }}</td>
+              <td class="px-4 py-2 text-slate-600">{{ producto.codigoProducto }}</td>
+              <td class="px-4 py-2 text-slate-600">Q{{ producto.precioVenta }}</td>
+              <td class="px-4 py-2">
+                <span
+                  class="text-xs px-2 py-0.5 rounded-full"
+                  [class.bg-green-100]="producto.estado === 'ACTIVO'"
+                  [class.text-green-700]="producto.estado === 'ACTIVO'"
+                  [class.bg-slate-100]="producto.estado === 'INACTIVO'"
+                  [class.text-slate-500]="producto.estado === 'INACTIVO'"
+                >
+                  {{ producto.estado }}
+                </span>
+              </td>
+              @if (esAdmin()) {
+                <td class="px-4 py-2 space-x-3">
+                  <a [routerLink]="['/productos', producto.productoId, 'editar']" class="text-sky-600 hover:underline">
+                    Editar
+                  </a>
+                  @if (producto.estado === 'ACTIVO') {
+                    <button (click)="desactivar(producto)" class="text-red-600 hover:underline">
+                      Desactivar
+                    </button>
+                  } @else {
+                    <button (click)="activar(producto)" class="text-green-600 hover:underline">
+                      Activar
+                    </button>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 text-sm text-slate-500">
+        <span>Página {{ page() }} de {{ totalPaginas() }} · {{ total() }} productos</span>
+        <div class="space-x-2">
+          <button
+            (click)="cambiarPagina(-1)"
+            [disabled]="page() <= 1"
+            class="px-3 py-1 rounded border border-slate-300 disabled:opacity-40"
+          >
+            Anterior
+          </button>
+          <button
+            (click)="cambiarPagina(1)"
+            [disabled]="page() >= totalPaginas()"
+            class="px-3 py-1 rounded border border-slate-300 disabled:opacity-40"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
