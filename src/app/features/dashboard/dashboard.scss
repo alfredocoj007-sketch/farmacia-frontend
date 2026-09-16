@@ -1,0 +1,36 @@
+:host {
+  --chart-sequential: #2a78d6;
+  --chart-sequential-track: #e1e0d9;
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+  --ink-primary: #0b0b0b;
+  --ink-secondary: #52514e;
+  --ink-muted: #898781;
+}
+
+.bar-track {
+  background: var(--chart-sequential-track);
+}
+
+.bar-fill {
+  background: var(--chart-sequential);
+  border-radius: 0 4px 4px 0;
+  transition: filter 0.15s ease;
+}
+
+.bar-row:hover .bar-fill {
+  filter: brightness(1.12);
+}
+
+.stat-tile {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.stat-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(11, 11, 11, 0.08);
+}

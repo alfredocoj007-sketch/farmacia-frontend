@@ -1,8 +1,8 @@
 <div class="min-h-screen bg-slate-100">
-  <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-6">
-      <h1 class="text-lg font-semibold text-slate-800">Farmacia</h1>
-      <nav class="flex items-center gap-4 text-sm">
+  <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-6 min-w-0">
+      <h1 class="text-lg font-semibold text-slate-800 shrink-0">Farmacia</h1>
+      <nav class="hidden sm:flex items-center gap-4 text-sm">
         <a
           routerLink="/dashboard"
           routerLinkActive="text-sky-600 font-medium"
@@ -27,7 +27,8 @@
       </nav>
     </div>
 
-    <div class="flex items-center gap-4">
+    <!-- Desktop: usuario + logout inline -->
+    <div class="hidden sm:flex items-center gap-4 shrink-0">
       @if (usuario(); as u) {
         <span class="text-sm text-slate-600">{{ u.nombre }} · {{ u.rol }}</span>
       }
@@ -35,9 +36,43 @@
         Cerrar sesión
       </button>
     </div>
+
+    <!-- Mobile: hamburger menu -->
+    <button
+      mat-icon-button
+      class="sm:hidden shrink-0"
+      [matMenuTriggerFor]="menuMovil"
+      aria-label="Abrir menú"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <mat-menu #menuMovil="matMenu">
+      <a mat-menu-item routerLink="/dashboard" routerLinkActive="text-sky-600">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a mat-menu-item routerLink="/productos" routerLinkActive="text-sky-600">
+        <mat-icon>inventory_2</mat-icon>
+        <span>Productos</span>
+      </a>
+      <a mat-menu-item routerLink="/lotes" routerLinkActive="text-sky-600">
+        <mat-icon>local_shipping</mat-icon>
+        <span>Lotes</span>
+      </a>
+      @if (usuario(); as u) {
+        <div class="px-4 py-2 text-xs text-slate-400 border-t border-slate-100">
+          {{ u.nombre }} · {{ u.rol }}
+        </div>
+      }
+      <button mat-menu-item (click)="cerrarSesion()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </mat-menu>
   </header>
 
-  <main class="p-6">
+  <main class="p-4 sm:p-6">
     <router-outlet />
   </main>
 </div>

@@ -30,6 +30,7 @@
     } @else if (movimientos().length === 0) {
       <p class="text-sm text-slate-500 p-6">Este lote todavía no tiene movimientos.</p>
     } @else {
+      <div class="overflow-x-auto">
       <table class="w-full text-sm mt-2">
         <thead class="bg-slate-50 text-slate-500 text-left">
           <tr>
@@ -68,6 +69,7 @@
           }
         </tbody>
       </table>
+      </div>
     }
   </div>
 </div>

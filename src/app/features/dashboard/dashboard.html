@@ -1,16 +1,137 @@
-<div class="bg-white rounded-lg shadow p-6 max-w-md">
-  <h2 class="font-medium text-slate-800 mb-3">Perfil (GET /auth/perfil)</h2>
-
-  @if (cargando()) {
-    <p class="text-sm text-slate-500">Cargando…</p>
-  } @else if (error()) {
-    <p class="text-sm text-red-600">{{ error() }}</p>
-  } @else if (perfil(); as p) {
-    <dl class="text-sm text-slate-600 space-y-1">
-      <div><dt class="inline font-medium">Usuario:</dt> <dd class="inline">{{ p.username }}</dd></div>
-      <div><dt class="inline font-medium">Rol:</dt> <dd class="inline">{{ p.rolNombre }}</dd></div>
-      <div><dt class="inline font-medium">Credencial ID:</dt> <dd class="inline">{{ p.credencialId }}</dd></div>
-      <div><dt class="inline font-medium">Empleado ID:</dt> <dd class="inline">{{ p.empleadoId }}</dd></div>
-    </dl>
+<div class="max-w-6xl mx-auto space-y-6">
+  <!-- Saludo -->
+  @if (perfil(); as p) {
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center">
+        <mat-icon>waving_hand</mat-icon>
+      </div>
+      <div>
+        <h1 class="text-xl font-semibold text-slate-800">Hola, {{ p.username }}</h1>
+        <p class="text-sm text-slate-500">Rol: {{ p.rolNombre }}</p>
+      </div>
+    </div>
   }
+
+  @if (error()) {
+    <p class="text-sm text-red-600">{{ error() }}</p>
+  }
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="stat-tile bg-white rounded-xl shadow p-5 flex items-start justify-between">
+      <div>
+        <p class="text-xs font-medium text-slate-500">Total productos</p>
+        @if (cargandoKpis()) {
+          <div class="h-8 w-16 bg-slate-100 rounded animate-pulse mt-1"></div>
+        } @else {
+          <p class="text-2xl font-semibold text-slate-800 mt-1">{{ totalProductos() }}</p>
+        }
+      </div>
+      <div class="w-10 h-10 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+    </div>
+
+    <div class="stat-tile bg-white rounded-xl shadow p-5 flex items-start justify-between">
+      <div>
+        <p class="text-xs font-medium text-slate-500">Productos activos</p>
+        @if (cargandoKpis()) {
+          <div class="h-8 w-16 bg-slate-100 rounded animate-pulse mt-1"></div>
+        } @else {
+          <p class="text-2xl font-semibold text-slate-800 mt-1">{{ productosActivos() }}</p>
+          <p class="text-xs text-slate-400 mt-0.5">{{ productosInactivos() }} inactivos</p>
+        }
+      </div>
+      <div class="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center shrink-0">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+    </div>
+
+    <div class="stat-tile bg-white rounded-xl shadow p-5 flex items-start justify-between">
+      <div>
+        <p class="text-xs font-medium text-slate-500">Lotes registrados</p>
+        @if (cargandoKpis()) {
+          <div class="h-8 w-16 bg-slate-100 rounded animate-pulse mt-1"></div>
+        } @else {
+          <p class="text-2xl font-semibold text-slate-800 mt-1">{{ totalLotes() }}</p>
+        }
+      </div>
+      <div class="w-10 h-10 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
+        <mat-icon>local_shipping</mat-icon>
+      </div>
+    </div>
+
+    <div class="stat-tile bg-white rounded-xl shadow p-5 flex items-start justify-between">
+      <div>
+        <p class="text-xs font-medium text-slate-500">Stock disponible</p>
+        @if (cargandoKpis()) {
+          <div class="h-8 w-16 bg-slate-100 rounded animate-pulse mt-1"></div>
+        } @else {
+          <p class="text-2xl font-semibold text-slate-800 mt-1">{{ stockTotal() }}</p>
+          <p class="text-xs text-slate-400 mt-0.5">unidades en total</p>
+        }
+      </div>
+      <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+        <mat-icon>warehouse</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico + vencimientos -->
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+    <div class="lg:col-span-3 bg-white rounded-xl shadow p-5">
+      <h2 class="text-sm font-semibold text-slate-700 mb-4">Productos por categoría</h2>
+
+      @if (cargandoKpis()) {
+        <p class="text-sm text-slate-400">Cargando…</p>
+      } @else if (categorias().length === 0) {
+        <p class="text-sm text-slate-400">No hay productos activos todavía.</p>
+      } @else {
+        <div class="space-y-3">
+          @for (c of categorias(); track c.nombre) {
+            <div class="bar-row flex items-center gap-3" [attr.title]="c.nombre + ': ' + c.cantidad + ' productos'">
+              <span class="text-xs text-slate-600 w-28 shrink-0 truncate">{{ c.nombre }}</span>
+              <div class="bar-track flex-1 h-6 rounded-r-[4px] overflow-hidden">
+                <div class="bar-fill h-6" [style.width.%]="c.porcentaje"></div>
+              </div>
+              <span class="text-xs font-medium text-slate-700 w-6 text-right shrink-0">{{ c.cantidad }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="lg:col-span-2 bg-white rounded-xl shadow p-5">
+      <h2 class="text-sm font-semibold text-slate-700 mb-4">Próximos vencimientos</h2>
+
+      @if (cargandoKpis()) {
+        <p class="text-sm text-slate-400">Cargando…</p>
+      } @else if (vencimientos().length === 0) {
+        <p class="text-sm text-slate-400">No hay lotes con stock registrado.</p>
+      } @else {
+        <ul class="space-y-3">
+          @for (v of vencimientos(); track v.loteId) {
+            <li class="flex items-center gap-3">
+              <mat-icon
+                class="shrink-0"
+                [style.color]="'var(--status-' + colorEstado(v.diasParaVencer) + ')'"
+              >
+                {{ iconoEstado(v.diasParaVencer) }}
+              </mat-icon>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm text-slate-800 truncate">{{ v.producto }}</p>
+                <p class="text-xs text-slate-400">Lote {{ v.numeroLote }} · {{ v.stock }} unidades</p>
+              </div>
+              <span
+                class="text-xs font-medium shrink-0"
+                [style.color]="'var(--status-' + colorEstado(v.diasParaVencer) + ')'"
+              >
+                {{ textoEstado(v.diasParaVencer) }}
+              </span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
 </div>
