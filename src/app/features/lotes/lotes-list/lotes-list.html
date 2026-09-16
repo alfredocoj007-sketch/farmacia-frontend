@@ -1,0 +1,78 @@
+<div class="max-w-5xl">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold text-slate-800">Lotes e inventario</h2>
+    <div class="flex gap-2">
+      @if (esAdmin()) {
+        <a
+          routerLink="/lotes/entrada"
+          class="rounded-md bg-sky-600 text-white text-sm font-medium px-4 py-2 hover:bg-sky-700"
+        >
+          + Entrada de compra
+        </a>
+      }
+      <a
+        routerLink="/lotes/salida"
+        class="rounded-md bg-slate-700 text-white text-sm font-medium px-4 py-2 hover:bg-slate-800"
+      >
+        − Registrar salida
+      </a>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    @if (cargando()) {
+      <p class="text-sm text-slate-500 p-6">Cargando…</p>
+    } @else if (error()) {
+      <p class="text-sm text-red-600 p-6">{{ error() }}</p>
+    } @else if (lotes().length === 0) {
+      <p class="text-sm text-slate-500 p-6">No hay lotes registrados todavía.</p>
+    } @else {
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-slate-500 text-left">
+          <tr>
+            <th class="px-4 py-2 font-medium">Producto</th>
+            <th class="px-4 py-2 font-medium">N° de lote</th>
+            <th class="px-4 py-2 font-medium">Vencimiento</th>
+            <th class="px-4 py-2 font-medium">Stock total</th>
+            <th class="px-4 py-2 font-medium">Kardex</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (lote of lotes(); track lote.loteId) {
+            <tr>
+              <td class="px-4 py-2 text-slate-800">{{ lote.producto?.nombre }}</td>
+              <td class="px-4 py-2 text-slate-600">{{ lote.numeroLote }}</td>
+              <td class="px-4 py-2 text-slate-600">{{ lote.fechaVencimiento }}</td>
+              <td class="px-4 py-2 text-slate-600">{{ stockTotal(lote) }}</td>
+              <td class="px-4 py-2">
+                <a [routerLink]="['/lotes', lote.loteId]" class="text-sky-600 hover:underline">
+                  Ver movimientos
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 text-sm text-slate-500">
+        <span>Página {{ page() }} de {{ totalPaginas() }} · {{ total() }} lotes</span>
+        <div class="space-x-2">
+          <button
+            (click)="cambiarPagina(-1)"
+            [disabled]="page() <= 1"
+            class="px-3 py-1 rounded border border-slate-300 disabled:opacity-40"
+          >
+            Anterior
+          </button>
+          <button
+            (click)="cambiarPagina(1)"
+            [disabled]="page() >= totalPaginas()"
+            class="px-3 py-1 rounded border border-slate-300 disabled:opacity-40"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

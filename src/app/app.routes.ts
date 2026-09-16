@@ -34,6 +34,25 @@ export const routes: Routes = [
           import('./features/productos/producto-form/producto-form').then((m) => m.ProductoForm),
         canActivate: [roleGuard('ADMIN')],
       },
+      {
+        path: 'lotes',
+        loadComponent: () => import('./features/lotes/lotes-list/lotes-list').then((m) => m.LotesList),
+      },
+      {
+        path: 'lotes/entrada',
+        loadComponent: () =>
+          import('./features/lotes/lote-entrada-form/lote-entrada-form').then((m) => m.LoteEntradaForm),
+        canActivate: [roleGuard('ADMIN')],
+      },
+      {
+        path: 'lotes/salida',
+        loadComponent: () =>
+          import('./features/lotes/lote-salida-form/lote-salida-form').then((m) => m.LoteSalidaForm),
+      },
+      {
+        path: 'lotes/:id',
+        loadComponent: () => import('./features/lotes/lote-kardex/lote-kardex').then((m) => m.LoteKardex),
+      },
     ],
   },
   { path: '**', redirectTo: '' },
