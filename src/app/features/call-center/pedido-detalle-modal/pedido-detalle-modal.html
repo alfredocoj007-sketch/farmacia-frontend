@@ -1,0 +1,233 @@
+<div class="p-6 sm:p-7 space-y-6">
+  <!-- Header Modal -->
+  <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+    <div class="flex items-center space-x-3">
+      <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-500/20">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-slate-800">
+          Guía de Despacho & Coordinación #PED-{{ pedidoId }}
+        </h3>
+        <p class="text-xs text-slate-500">Trazabilidad de entrega a domicilio y preparación en sucursal</p>
+      </div>
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="flex flex-col items-center justify-center py-12 space-y-3">
+      <div class="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <p class="text-sm font-medium text-slate-500">Cargando guía de entrega...</p>
+    </div>
+  } @else if (error()) {
+    <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  } @else if (pedido()) {
+    <div class="space-y-6">
+      <!-- Stepper del Ciclo de Vida de la Entrega -->
+      <div class="rounded-2xl bg-slate-50 border border-slate-200/80 p-4">
+        <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-bold">
+          <!-- Paso 1 -->
+          <div
+            class="p-2 rounded-xl border transition"
+            [class.bg-sky-100]="pedido()!.estado === 'RECIBIDO'"
+            [class.border-sky-300]="pedido()!.estado === 'RECIBIDO'"
+            [class.text-sky-800]="pedido()!.estado === 'RECIBIDO'"
+            [class.bg-emerald-50]="pedido()!.estado !== 'RECIBIDO' && pedido()!.estado !== 'CANCELADO'"
+            [class.text-emerald-700]="pedido()!.estado !== 'RECIBIDO' && pedido()!.estado !== 'CANCELADO'"
+          >
+            <span class="block">1. RECIBIDO</span>
+            <span class="text-[10px] font-normal text-slate-500">Call Center</span>
+          </div>
+
+          <!-- Paso 2 -->
+          <div
+            class="p-2 rounded-xl border transition"
+            [class.bg-amber-100]="pedido()!.estado === 'EN_PREPARACION'"
+            [class.border-amber-300]="pedido()!.estado === 'EN_PREPARACION'"
+            [class.text-amber-800]="pedido()!.estado === 'EN_PREPARACION'"
+            [class.bg-emerald-50]="pedido()!.estado === 'EN_RUTA' || pedido()!.estado === 'ENTREGADO'"
+            [class.text-emerald-700]="pedido()!.estado === 'EN_RUTA' || pedido()!.estado === 'ENTREGADO'"
+            [class.text-slate-400]="pedido()!.estado === 'RECIBIDO'"
+          >
+            <span class="block">2. PREPARACIÓN</span>
+            <span class="text-[10px] font-normal text-slate-500">En Farmacia</span>
+          </div>
+
+          <!-- Paso 3 -->
+          <div
+            class="p-2 rounded-xl border transition"
+            [class.bg-blue-100]="pedido()!.estado === 'EN_RUTA'"
+            [class.border-blue-300]="pedido()!.estado === 'EN_RUTA'"
+            [class.text-blue-800]="pedido()!.estado === 'EN_RUTA'"
+            [class.bg-emerald-50]="pedido()!.estado === 'ENTREGADO'"
+            [class.text-emerald-700]="pedido()!.estado === 'ENTREGADO'"
+            [class.text-slate-400]="pedido()!.estado === 'RECIBIDO' || pedido()!.estado === 'EN_PREPARACION'"
+          >
+            <span class="block">3. EN RUTA</span>
+            <span class="text-[10px] font-normal text-slate-500">Repartidor</span>
+          </div>
+
+          <!-- Paso 4 -->
+          <div
+            class="p-2 rounded-xl border transition"
+            [class.bg-emerald-100]="pedido()!.estado === 'ENTREGADO'"
+            [class.border-emerald-300]="pedido()!.estado === 'ENTREGADO'"
+            [class.text-emerald-800]="pedido()!.estado === 'ENTREGADO'"
+            [class.text-slate-400]="pedido()!.estado !== 'ENTREGADO'"
+          >
+            <span class="block">4. ENTREGADO</span>
+            <span class="text-[10px] font-normal text-slate-500">Cliente Satisfecho</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjetas de Información: Cliente + Sucursal Preparadora -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <!-- Tarjeta Cliente -->
+        <div class="rounded-2xl border border-slate-200 p-4 space-y-2 bg-white">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Datos del Cliente y Entrega</span>
+          <div class="font-bold text-sm text-slate-800">{{ pedido()!.cliente?.nombre }}</div>
+          <div class="text-slate-600">📞 Teléfono: <strong>{{ pedido()!.cliente?.telefono }}</strong></div>
+          <div class="text-slate-600">📍 Dirección: <strong>{{ pedido()!.cliente?.direccion }}</strong></div>
+          @if (pedido()!.cliente?.referenciaDireccion) {
+            <p class="text-slate-500 italic bg-slate-50 p-2 rounded-lg mt-1">Ref: {{ pedido()!.cliente?.referenciaDireccion }}</p>
+          }
+        </div>
+
+        <!-- Tarjeta Sucursal Preparadora -->
+        <div class="rounded-2xl border border-blue-200 p-4 space-y-2 bg-blue-50/40">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-blue-800 block">Farmacia Asignada para Despacho</span>
+          <div class="font-bold text-sm text-slate-900">{{ pedido()!.sucursalPreparacion?.nombre }}</div>
+          <span class="inline-block px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-semibold text-[10px] uppercase">
+            {{ pedido()!.sucursalPreparacion?.tipoSucursal }}
+          </span>
+          <div class="text-slate-600 mt-1">📍 Ubicación: {{ pedido()!.sucursalPreparacion?.direccion }}</div>
+          <div class="text-slate-600">
+            ⏰ Estimado de Entrega:
+            <strong>{{ pedido()!.fechaEstimadaEntrega | date: 'dd/MM/yyyy HH:mm' }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desglose de Medicamentos -->
+      <div class="rounded-2xl border border-slate-200 overflow-hidden bg-white">
+        <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Medicamentos Despachados</span>
+          <span class="text-xs font-semibold text-slate-500">{{ pedido()!.detalles.length }} productos</span>
+        </div>
+
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50/50 text-slate-500 font-bold uppercase text-[10px] border-b border-slate-100">
+            <tr>
+              <th class="px-4 py-2.5">Medicamento / Fórmula</th>
+              <th class="px-4 py-2.5">Lote Asignado (FEFO)</th>
+              <th class="px-4 py-2.5 text-center">Cant.</th>
+              <th class="px-4 py-2.5 text-right">Precio</th>
+              <th class="px-4 py-2.5 text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (det of pedido()!.detalles; track det.pedidoDetalleId) {
+              <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-2.5">
+                  <span class="font-bold text-slate-800">{{ det.productoNombre }}</span>
+                  <span class="text-[11px] text-slate-400 block">{{ det.principioActivo || 'Medicamento' }}</span>
+                </td>
+                <td class="px-4 py-2.5 font-mono text-slate-600">
+                  <span class="bg-slate-100 px-2 py-0.5 rounded text-[11px]">{{ det.loteNumero }}</span>
+                </td>
+                <td class="px-4 py-2.5 text-center font-bold text-slate-800">{{ det.cantidad }}</td>
+                <td class="px-4 py-2.5 text-right text-slate-600">Q {{ det.precioUnitario | number: '1.2-2' }}</td>
+                <td class="px-4 py-2.5 text-right font-bold text-emerald-600">Q {{ det.subtotal | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot class="bg-slate-50 border-t border-slate-200 font-bold">
+            <tr>
+              <td colspan="4" class="px-4 py-3 text-right uppercase text-slate-700">
+                Total Cobrado ({{ pedido()!.metodoPago }}):
+              </td>
+              <td class="px-4 py-3 text-right text-emerald-700 text-sm">
+                Q {{ pedido()!.total | number: '1.2-2' }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Acciones de Estado de Entrega -->
+      <div class="rounded-2xl border border-slate-200 p-4 space-y-3 bg-white">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-700 block">Actualizar Estado de la Orden</span>
+
+        <div class="flex flex-wrap items-center gap-2">
+          @if (pedido()!.estado === 'RECIBIDO') {
+            <button
+              type="button"
+              (click)="avanzarEstado('EN_PREPARACION')"
+              [disabled]="actualizando()"
+              class="inline-flex items-center space-x-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white hover:bg-amber-600 transition"
+            >
+              <span>Empezar Preparación en Farmacia</span>
+            </button>
+          }
+
+          @if (pedido()!.estado === 'EN_PREPARACION') {
+            <button
+              type="button"
+              (click)="avanzarEstado('EN_RUTA')"
+              [disabled]="actualizando()"
+              class="inline-flex items-center space-x-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition"
+            >
+              <span>Despachar a Domicilio con Repartidor</span>
+            </button>
+          }
+
+          @if (pedido()!.estado === 'EN_RUTA') {
+            <div class="flex items-center space-x-2 w-full sm:w-auto">
+              <input
+                type="text"
+                [(ngModel)]="personaRecibeConfirmacion"
+                placeholder="Nombre de quien recibe"
+                class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 outline-none"
+              />
+              <button
+                type="button"
+                (click)="avanzarEstado('ENTREGADO')"
+                [disabled]="actualizando()"
+                class="inline-flex items-center space-x-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition"
+              >
+                <span>Confirmar Entrega al Cliente</span>
+              </button>
+            </div>
+          }
+
+          @if (pedido()!.estado !== 'ENTREGADO' && pedido()!.estado !== 'CANCELADO') {
+            <button
+              type="button"
+              (click)="avanzarEstado('CANCELADO')"
+              [disabled]="actualizando()"
+              class="inline-flex items-center space-x-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-100 transition ml-auto"
+            >
+              <span>Cancelar Orden</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Footer -->
+  <div class="flex items-center justify-end border-t border-slate-100 pt-4">
+    <button
+      type="button"
+      (click)="cerrar.emit()"
+      class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
+    >
+      Cerrar
+    </button>
+  </div>
+</div>
