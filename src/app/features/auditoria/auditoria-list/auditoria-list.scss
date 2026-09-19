@@ -1,0 +1,22 @@
+@media print {
+  // Ocultar botones de navegación, filtros y modales en impresión
+  button,
+  .p-1,
+  input,
+  select,
+  .overflow-x-auto::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .bg-white,
+  .bg-slate-50,
+  .bg-slate-900 {
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+}

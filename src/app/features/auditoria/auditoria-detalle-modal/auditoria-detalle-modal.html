@@ -1,0 +1,133 @@
+<div class="p-6 sm:p-7 space-y-6">
+  <!-- Cabecera del Detalle -->
+  <div class="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-sm shadow-md">
+        #{{ evento().auditoriaId }}
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h3 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
+            Evento Forense de Auditoría
+          </h3>
+          <span
+            class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            [class.bg-rose-100]="evento().operacion === 'DELETE' || evento().operacion === 'LOGIN_FALLIDO' || evento().operacion === 'ARQUEO_FALTANTE'"
+            [class.text-rose-800]="evento().operacion === 'DELETE' || evento().operacion === 'LOGIN_FALLIDO' || evento().operacion === 'ARQUEO_FALTANTE'"
+            [class.bg-amber-100]="evento().operacion === 'AJUSTE' || evento().operacion === 'EXCEPCION_MANUAL' || evento().operacion === 'AJUSTE_SALARIO'"
+            [class.text-amber-800]="evento().operacion === 'AJUSTE' || evento().operacion === 'EXCEPCION_MANUAL' || evento().operacion === 'AJUSTE_SALARIO'"
+            [class.bg-emerald-100]="evento().operacion === 'LOGIN' || evento().operacion === 'INSERT'"
+            [class.text-emerald-800]="evento().operacion === 'LOGIN' || evento().operacion === 'INSERT'"
+            [class.bg-sky-100]="evento().operacion === 'UPDATE' || evento().operacion === 'TRANSFERENCIA' || evento().operacion === 'ARQUEO'"
+            [class.text-sky-800]="evento().operacion === 'UPDATE' || evento().operacion === 'TRANSFERENCIA' || evento().operacion === 'ARQUEO'"
+          >
+            {{ evento().operacion }}
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Registrado el {{ evento().fechaEvento | date:'dd/MM/yyyy HH:mm:ss.sss' }}
+        </p>
+      </div>
+    </div>
+
+    <span class="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">
+      {{ evento().modulo || 'SISTEMA' }}
+    </span>
+  </div>
+
+  <!-- Matriz de Telemetría Técnica -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <!-- Tabla Afectada -->
+    <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+        Entidad / Tabla Afectada
+      </span>
+      <span class="text-xs font-mono font-bold text-slate-800 block">
+        {{ evento().tablaAfectada }}
+      </span>
+      <span class="text-[11px] text-slate-500">
+        ID Registro: {{ evento().registroId !== null ? '#' + evento().registroId : 'N/A' }}
+      </span>
+    </div>
+
+    <!-- Identidad del Usuario -->
+    <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+        Usuario Identificado
+      </span>
+      <span class="text-xs font-bold text-slate-800 block">
+        {{ evento().clientIdentifier || 'Desconocido' }}
+      </span>
+      <span class="text-[11px] text-slate-500 font-mono">
+        Usuario BD: {{ evento().usuarioBd || 'N/A' }}
+      </span>
+    </div>
+
+    <!-- Origen y Red -->
+    <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 sm:col-span-2 lg:col-span-1">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+        Red & Terminal Origen
+      </span>
+      <span class="text-xs font-mono font-bold text-slate-800 block">
+        IP: {{ evento().ipCliente || 'Local / Interna' }}
+      </span>
+      <span class="text-[11px] text-slate-500 truncate block">
+        Host: {{ evento().host || 'Desconocido' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Descripción Forense Completa -->
+  <div class="p-4 bg-slate-900 text-slate-100 rounded-2xl shadow-inner space-y-2">
+    <div class="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-2">
+      <span class="font-bold flex items-center gap-1.5 text-slate-300">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        Registro Inmutable de Bitácora
+      </span>
+      <span class="font-mono text-[11px] text-slate-500">ID-AUD-{{ evento().auditoriaId }}</span>
+    </div>
+    <p class="text-xs sm:text-sm font-mono leading-relaxed text-emerald-300 break-words whitespace-pre-wrap">
+      {{ evento().descripcion || 'Sin descripción complementaria disponible.' }}
+    </p>
+  </div>
+
+  <!-- Aviso de Inmutabilidad Legal -->
+  <div class="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl flex items-start gap-2.5 text-xs text-amber-900">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-600 shrink-0 mt-0.5">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    </svg>
+    <div class="leading-snug">
+      <span class="font-bold">Constancia de Integridad Forense:</span>
+      Este registro ha sido sellado con timestamp criptográfico en la base de datos Oracle XE. Las operaciones de auditoría son de solo lectura y no pueden ser alteradas por ningún usuario ni operador.
+    </div>
+  </div>
+
+  <!-- Botones de Acción -->
+  <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+    <button
+      type="button"
+      (click)="imprimirFicha()"
+      class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      Imprimir Constancia
+    </button>
+    <button
+      type="button"
+      (click)="cerrar.emit()"
+      class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer"
+    >
+      Cerrar
+    </button>
+  </div>
+</div>
