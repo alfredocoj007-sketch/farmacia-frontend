@@ -1,0 +1,475 @@
+<div class="p-6 sm:p-7 space-y-6">
+  @if (cargando()) {
+    <div class="py-12 text-center text-xs text-slate-400">
+      <div class="w-7 h-7 border-2 border-teal-600/20 border-t-teal-600 rounded-full animate-spin mx-auto mb-2"></div>
+      Cargando desglose de nómina...
+    </div>
+  } @else if (planilla(); as p) {
+    <!-- Encabezado del Modal con Resumen Contable -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-4">
+      <div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <span class="font-mono text-sm font-black text-slate-900">#PLANILLA-{{ p.planillaId }}</span>
+          @if (p.estado === 'PAGADA') {
+            <span class="px-3 py-1 rounded-xl bg-emerald-600 text-white font-extrabold text-xs tracking-wider flex items-center gap-1.5 shadow-sm shadow-emerald-600/20">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>PAGADA Y CERRADA</span>
+              <span class="text-emerald-100 font-mono text-[11px] font-normal">
+                · {{ p.fechaPago | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+            </span>
+
+            @if (p.cuentaOrigen) {
+              <span class="px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-900 text-[11px] font-semibold flex items-center gap-1.5 shadow-2xs">
+                <span>{{ p.metodoPago === 'EFECTIVO' ? '💵' : '🏦' }}</span>
+                <span>Origen: <strong class="font-bold">{{ p.cuentaOrigen }}</strong></span>
+              </span>
+            }
+          } @else if (p.estado === 'ABIERTA') {
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800">
+              ABIERTA (En Revisión)
+            </span>
+          } @else {
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-600">
+              {{ p.estado }}
+            </span>
+          }
+        </div>
+        <p class="text-xs text-slate-400 mt-1">
+          Período laboral del <strong class="text-slate-700">{{ p.fechaInicio | slice:0:10 }}</strong> al <strong class="text-slate-700">{{ p.fechaFin | slice:0:10 }}</strong> · {{ p.detalles.length }} colaboradores en nómina
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0 mr-8 flex-wrap">
+        @if (p.estado === 'PAGADA') {
+          <button
+            type="button"
+            (click)="imprimirNomina()"
+            [disabled]="generandoPdf()"
+            class="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+            title="Descargar o Imprimir Boletas de Pago en PDF (pdfmake)"
+          >
+            @if (generandoPdf()) {
+              <div class="w-3.5 h-3.5 border-2 border-slate-400 border-t-slate-800 rounded-full animate-spin"></div>
+              <span>Generando Boletas...</span>
+            } @else {
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              <span>Imprimir Boletas de Pago</span>
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="exportarReporteGeneral()"
+            class="px-3.5 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+            title="Descargar Planilla en Excel / CSV para Contabilidad e IGSS"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Exportar Reporte General
+          </button>
+        } @else if (p.estado === 'ABIERTA') {
+          <button
+            type="button"
+            (click)="abrirConfirmacionPago()"
+            [disabled]="procesando()"
+            class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-md shadow-emerald-600/20 disabled:opacity-50 transition-all cursor-pointer flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            Pagar y Cerrar Nómina
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (error()) {
+      <div class="p-3 bg-red-50 border border-red-200 text-xs text-red-700 rounded-xl flex items-center gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {{ error() }}
+      </div>
+    }
+
+    <!-- 3 Mini Tarjetas con Totales de la Planilla -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Masa Bruta (Devengado)</span>
+        <span class="text-xl font-black font-mono text-slate-800">Q {{ p.totalBruto.toLocaleString('es-GT', { minimumFractionDigits: 2 }) }}</span>
+        <span class="text-[10px] text-slate-400 block mt-0.5">Sueldo Base + Bonos + H.Extra</span>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/60">
+        <span class="text-[10px] uppercase font-bold text-amber-700 block tracking-wider">Retención IGSS Laboral (4.83%)</span>
+        <span class="text-xl font-black font-mono text-amber-900">Q {{ p.totalDescuentos.toLocaleString('es-GT', { minimumFractionDigits: 2 }) }}</span>
+        <span class="text-[10px] text-amber-700/80 block mt-0.5">Deducciones de ley para el seguro</span>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/70">
+        <span class="text-[10px] uppercase font-bold text-emerald-800 block tracking-wider">Líquido a Pagar (Neto)</span>
+        <span class="text-xl font-black font-mono text-emerald-950">Q {{ p.totalNeto.toLocaleString('es-GT', { minimumFractionDigits: 2 }) }}</span>
+        <span class="text-[10px] text-emerald-700 block mt-0.5">Total a transferir a colaboradores</span>
+      </div>
+    </div>
+
+    <!-- Formulario Inline de Edición de Línea de Nómina -->
+    @if (p.estado === 'ABIERTA' && detalleEnEdicion(); as det) {
+      <div class="p-4 bg-gradient-to-br from-amber-50 to-orange-50/60 border border-amber-200 rounded-2xl animate-fadeIn space-y-3.5 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs border-b border-amber-200/60 pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-amber-200/70 text-amber-800 flex items-center justify-center font-bold text-xs">
+              ⚡
+            </span>
+            <span class="font-bold text-amber-950">
+              Ajuste de Nómina: <strong>{{ det.nombreEmpleado }}</strong> · <span class="text-amber-800 font-medium">{{ det.puestoNombre }}</span>
+            </span>
+          </div>
+          <div class="flex items-center gap-3 text-[11px] flex-wrap">
+            <span class="text-slate-600 font-mono">Salario Período: <strong class="text-slate-800">Q {{ det.salarioBase.toFixed(2) }}</strong></span>
+            <span class="text-slate-400 hidden sm:inline">|</span>
+            <span class="text-sky-800 font-mono">Base Mensual: <strong class="text-sky-950">Q {{ sueldoBaseMensualCalculado.toFixed(2) }}</strong></span>
+            <span class="text-slate-400 hidden sm:inline">|</span>
+            <span class="text-amber-800 font-mono">Hora Normal (base 240h): <strong class="text-amber-950">Q {{ valorHoraNormal.toFixed(2) }}</strong></span>
+            <span class="text-slate-400 hidden sm:inline">|</span>
+            <span class="text-emerald-700 font-mono font-bold bg-emerald-100/60 px-2 py-0.5 rounded-md">Hora Extra (1.5x): Q {{ valorHoraExtra.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <!-- Banner explicativo legal de Horas Extras & IGSS -->
+        <div class="p-2.5 rounded-xl bg-white/80 border border-amber-200/80 text-[11px] text-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="font-bold text-amber-900">⚖️ Código de Trabajo (Guatemala):</span>
+            @if (esPlanillaQuincenal()) {
+              <span>Planilla Quincenal · Base Mensual: Q {{ sueldoBaseMensualCalculado.toFixed(2) }} ÷ 240 hrs = <strong>Q {{ valorHoraNormal.toFixed(2) }}/hr</strong> · Hora Extra (+50%): <strong>Q {{ valorHoraExtra.toFixed(2) }}/hr</strong>.</span>
+            } @else {
+              <span>Planilla Mensual · Base Mensual: Q {{ sueldoBaseMensualCalculado.toFixed(2) }} ÷ 240 hrs = <strong>Q {{ valorHoraNormal.toFixed(2) }}/hr</strong> · Hora Extra (+50%): <strong>Q {{ valorHoraExtra.toFixed(2) }}/hr</strong>.</span>
+            }
+          </div>
+          <div class="text-[10px] font-semibold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-lg shrink-0">
+            Base IGSS = Sueldo Base + Horas Extra (Bono Ley exento de IGSS)
+          </div>
+        </div>
+
+        <!-- Entradas interactivas de Horas Extras y Bonos -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">
+              Cantidad de Horas Extra (Hrs)
+            </label>
+            <div class="relative">
+              <input
+                type="number"
+                step="0.5"
+                min="0"
+                [(ngModel)]="cantidadHorasExtra"
+                (ngModelChange)="onCantidadHorasChange()"
+                placeholder="0"
+                class="w-full px-3 py-1.5 bg-white border border-amber-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              />
+              <span class="absolute right-3 top-1.5 text-[11px] text-slate-400 font-medium pointer-events-none">hrs</span>
+            </div>
+            <span class="text-[10px] text-slate-500 mt-0.5 block">
+              Multiplica × Q {{ valorHoraExtra.toFixed(2) }}
+            </span>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">
+              Total Horas Extra (Q)
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1.5 text-xs text-slate-400 font-mono pointer-events-none">Q</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                [(ngModel)]="editHorasExtra"
+                (ngModelChange)="onMontoHorasChange()"
+                class="w-full pl-7 pr-3 py-1.5 bg-white border border-amber-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              />
+            </div>
+            <span class="text-[10px] text-amber-700 font-medium mt-0.5 block">
+              Suma a la base afecta del IGSS (4.83%)
+            </span>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">
+              Bonificaciones Totales (Q)
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1.5 text-xs text-slate-400 font-mono pointer-events-none">Q</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                [(ngModel)]="editBonificaciones"
+                class="w-full pl-7 pr-3 py-1.5 bg-white border border-amber-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              />
+            </div>
+            <span class="text-[10px] text-slate-500 mt-0.5 block">
+              Incluye Bono Incentivo Dto. 37-2001
+            </span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2.5 border-t border-amber-200/60">
+          <button
+            type="button"
+            (click)="cancelarEdicionDetalle()"
+            class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            (click)="guardarEdicionDetalle()"
+            [disabled]="procesando()"
+            class="px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 shadow-md shadow-amber-600/20 disabled:opacity-50 transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Guardar Cambios / Recalcular
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Tabla Detallada de Nómina por Colaborador -->
+    <div class="border border-slate-200/80 rounded-2xl overflow-hidden shadow-xs">
+      <div class="overflow-x-auto max-h-[380px]">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold text-[10px] sticky top-0 z-10 border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3">Colaborador & Puesto</th>
+              <th class="px-3 py-3">Sucursal</th>
+              <th class="px-3 py-3 text-right">Sueldo Base</th>
+              <th class="px-3 py-3 text-right">Bono Ley (Q250)</th>
+              <th class="px-3 py-3 text-right">Horas Extra</th>
+              <th class="px-3 py-3 text-right text-amber-700">IGSS (4.83%)</th>
+              <th class="px-4 py-3 text-right text-emerald-800 font-bold">Líquido a Pagar</th>
+              @if (p.estado === 'ABIERTA') {
+                <th class="px-3 py-3 text-center">Acción</th>
+              } @else if (p.estado === 'PAGADA') {
+                <th class="px-3 py-3 text-center">Boleta PDF</th>
+              }
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (d of p.detalles; track d.planillaDetalleId) {
+              <tr class="hover:bg-slate-50/80 transition-colors">
+                <td class="px-4 py-3">
+                  <span class="font-bold text-slate-800 block">{{ d.nombreEmpleado }}</span>
+                  <span class="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                    <span>{{ d.puestoNombre }}</span>
+                    <span>·</span>
+                    <span class="font-mono">DPI: {{ d.dpi }}</span>
+                  </span>
+                </td>
+
+                <td class="px-3 py-3 text-slate-600 text-[11px]">
+                  {{ d.sucursalNombre }}
+                </td>
+
+                <td class="px-3 py-3 text-right font-mono text-slate-800">
+                  Q {{ d.salarioBase.toFixed(2) }}
+                </td>
+
+                <td class="px-3 py-3 text-right font-mono text-slate-600">
+                  Q {{ d.bonificaciones.toFixed(2) }}
+                </td>
+
+                <td class="px-3 py-3 text-right font-mono text-slate-600">
+                  Q {{ d.horasExtra.toFixed(2) }}
+                </td>
+
+                <td class="px-3 py-3 text-right font-mono text-amber-700 font-semibold">
+                  -Q {{ d.descuentos.toFixed(2) }}
+                </td>
+
+                <td class="px-4 py-3 text-right font-mono font-black text-emerald-700 text-sm">
+                  Q {{ d.totalPagar.toFixed(2) }}
+                </td>
+
+                @if (p.estado === 'ABIERTA') {
+                  <td class="px-3 py-3 text-center">
+                    <button
+                      (click)="abrirEdicionDetalle(d)"
+                      class="text-teal-600 hover:text-teal-800 font-semibold text-[11px] p-1 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
+                      title="Editar Horas Extra y Bonificaciones"
+                    >
+                      Ajustar
+                    </button>
+                  </td>
+                } @else if (p.estado === 'PAGADA') {
+                  <td class="px-3 py-3 text-center">
+                    <button
+                      (click)="descargarBoletaIndividual(d)"
+                      class="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-[11px] border border-teal-200/70 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                      title="Ver / Descargar Boleta de Pago Individual en PDF"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                      </svg>
+                      Recibo PDF
+                    </button>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación In-App para Pagar y Cerrar Nómina -->
+    @if (modalConfirmacionVisible()) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
+        <div class="bg-white rounded-3xl shadow-2xl border border-slate-200/80 max-w-md w-full p-6 text-center space-y-4 animate-scaleUp">
+          <!-- Icono de Alerta Destacado -->
+          <div class="w-14 h-14 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900">
+              ¿Confirmar Pago y Cierre de Nómina?
+            </h3>
+            <p class="text-xs sm:text-sm font-semibold text-slate-700 mt-2 leading-relaxed">
+              ¿Estás seguro? Una vez pagada, esta planilla no se podrá modificar.
+            </p>
+          </div>
+
+          <!-- Tarjeta de Resumen Pre-Liquidación -->
+          <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 text-left text-xs space-y-2">
+            <div class="flex items-center justify-between text-slate-500">
+              <span>Folio de Nómina:</span>
+              <span class="font-mono font-bold text-slate-800">#PLANILLA-{{ p.planillaId }}</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-500">
+              <span>Colaboradores en Nómina:</span>
+              <span class="font-bold text-slate-800">{{ p.detalles.length }} empleados</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-500">
+              <span>Período Laboral:</span>
+              <span class="font-mono text-slate-700">{{ p.fechaInicio | slice:0:10 }} al {{ p.fechaFin | slice:0:10 }}</span>
+            </div>
+            <div class="pt-2 border-t border-slate-200 flex items-center justify-between">
+              <span class="font-bold text-slate-700">Total Líquido a Transferir:</span>
+              <span class="font-mono font-black text-emerald-700 text-sm">
+                Q {{ p.totalNeto.toLocaleString('es-GT', { minimumFractionDigits: 2 }) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Selector de Origen de Fondos -->
+          <div class="text-left space-y-2 pt-1">
+            <label class="block text-xs font-bold text-slate-800 flex items-center justify-between">
+              <span>¿De qué cuenta sale el pago?</span>
+              <span class="text-[10px] text-teal-700 font-semibold uppercase tracking-wider">Origen de Fondos</span>
+            </label>
+
+            <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+              @for (op of opcionesOrigenFondos; track op.id) {
+                <label
+                  class="flex items-center gap-3 p-2.5 rounded-xl border transition-all cursor-pointer text-xs"
+                  [class.border-teal-500]="cuentaOrigenSeleccionada === op.cuenta"
+                  [class.bg-teal-50/60]="cuentaOrigenSeleccionada === op.cuenta"
+                  [class.shadow-xs]="cuentaOrigenSeleccionada === op.cuenta"
+                  [class.border-slate-200]="cuentaOrigenSeleccionada !== op.cuenta"
+                  [class.hover:bg-slate-50]="cuentaOrigenSeleccionada !== op.cuenta"
+                  (click)="seleccionarOrigenFondos(op.cuenta, op.metodo)"
+                >
+                  <input
+                    type="radio"
+                    name="origenFondos"
+                    [checked]="cuentaOrigenSeleccionada === op.cuenta"
+                    class="w-4 h-4 text-teal-600 focus:ring-teal-500 cursor-pointer"
+                  />
+                  <div class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-sm shrink-0 shadow-2xs">
+                    {{ op.icono }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <span class="block font-bold text-slate-800 text-[11px] truncate">
+                      {{ op.label }}
+                    </span>
+                    <span class="block text-[10px] text-slate-500">
+                      {{ op.tipo }}
+                    </span>
+                  </div>
+                  @if (cuentaOrigenSeleccionada === op.cuenta) {
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-teal-600 shrink-0">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  }
+                </label>
+              }
+            </div>
+          </div>
+
+          <!-- Advertencia de Inmutabilidad Legal -->
+          <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200/70 text-[11px] text-amber-900 flex items-center gap-2 text-left">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 text-amber-600">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Por auditoría legal e inmutabilidad contable, todos los registros quedarán sellados y no podrán ser modificados.</span>
+          </div>
+
+          <!-- Botones de Acción In-App -->
+          <div class="flex items-center gap-3 pt-2">
+            <button
+              type="button"
+              (click)="cancelarConfirmacionPago()"
+              [disabled]="procesando()"
+              class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              (click)="ejecutarPagoPlanilla()"
+              [disabled]="procesando()"
+              class="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-xs shadow-md shadow-emerald-600/20 disabled:opacity-50 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              @if (procesando()) {
+                <div class="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                <span>Sellando Nómina...</span>
+              } @else {
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Sí, Pagar y Cerrar</span>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

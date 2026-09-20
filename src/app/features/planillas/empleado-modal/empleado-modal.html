@@ -1,0 +1,218 @@
+<div class="p-6 sm:p-7 space-y-6">
+  <!-- Encabezado del Modal -->
+  <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-slate-900">
+          {{ empleadoAEditar ? 'Editar Colaborador' : 'Alta de Colaborador Farmacéutico' }}
+        </h2>
+        <p class="text-xs text-slate-400">
+          Gestión de personal y asignación en la red de farmacias y stands satélite
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="p-3 bg-red-50 border border-red-200 text-xs text-red-700 rounded-xl flex items-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Formulario -->
+  <form (ngSubmit)="guardar()" class="space-y-4">
+    <!-- Nombres y Apellidos -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Nombres *</label>
+        <input
+          type="text"
+          [(ngModel)]="nombre"
+          name="nombre"
+          required
+          placeholder="Ej: Juan Carlos"
+          class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-600 focus:outline-hidden"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Apellidos *</label>
+        <input
+          type="text"
+          [(ngModel)]="apellido"
+          name="apellido"
+          required
+          placeholder="Ej: Pérez Gómez"
+          class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-600 focus:outline-hidden"
+        />
+      </div>
+    </div>
+
+    <!-- DPI y Teléfono -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">
+          DPI / CUI (13 dígitos)
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="dpi"
+          name="dpi"
+          maxlength="13"
+          placeholder="Ej: 2981045610101"
+          class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-mono focus:bg-white focus:border-teal-600 focus:outline-hidden"
+        />
+        <span class="text-[10px] text-slate-400 mt-0.5 block">Exactamente 13 números según RENAP</span>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">
+          Teléfono Móvil (8 dígitos)
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="telefono"
+          name="telefono"
+          maxlength="8"
+          placeholder="Ej: 55442211"
+          class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-mono focus:bg-white focus:border-teal-600 focus:outline-hidden"
+        />
+        <span class="text-[10px] text-slate-400 mt-0.5 block">8 dígitos en Guatemala</span>
+      </div>
+    </div>
+
+    <!-- Puesto y Sucursal -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Puesto Laboral *</label>
+        <select
+          [(ngModel)]="puestoId"
+          name="puestoId"
+          required
+          class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-600 focus:outline-hidden"
+        >
+          @for (p of puestos(); track p.puestoId) {
+            <option [ngValue]="p.puestoId">{{ p.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Sucursal / Stand Asignado *</label>
+        <select
+          [(ngModel)]="sucursalId"
+          name="sucursalId"
+          required
+          class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-600 focus:outline-hidden"
+        >
+          @for (s of sucursales(); track s.sucursalId) {
+            <option [ngValue]="s.sucursalId">{{ s.nombre }} ({{ s.tipoSucursal || 'Farmacia' }})</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Fecha de Ingreso y Salario -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+          <span>Fecha de Ingreso / Inicio de Labores *</span>
+          @if (empleadoAEditar) {
+            <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 inline-flex items-center gap-1">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Inmutable por Auditoría
+            </span>
+          }
+        </label>
+        <input
+          type="date"
+          [(ngModel)]="fechaIngreso"
+          name="fechaIngreso"
+          [disabled]="!!empleadoAEditar"
+          [readonly]="!!empleadoAEditar"
+          [min]="!empleadoAEditar ? fechaMinima : null"
+          required
+          class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-600 focus:outline-hidden disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed disabled:border-slate-300"
+        />
+        @if (!empleadoAEditar) {
+          <span class="text-[10px] text-slate-400 mt-0.5 block">
+            Obligatoria. Por auditoría contable no se permiten fechas pasadas.
+          </span>
+        } @else {
+          <span class="text-[10px] text-amber-700 mt-0.5 block font-medium">
+            La fecha contractual de inicio no puede alterarse tras el registro para proteger el cálculo del IGSS y pasivos laborales.
+          </span>
+        }
+      </div>
+
+      @if (!empleadoAEditar) {
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Salario Base Inicial (Q) *</label>
+          <input
+            type="number"
+            step="0.01"
+            min="1"
+            [(ngModel)]="salarioActual"
+            name="salarioActual"
+            required
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-mono font-bold focus:bg-white focus:border-teal-600 focus:outline-hidden"
+          />
+        </div>
+      } @else {
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Estado Laboral</label>
+          <select
+            [(ngModel)]="estado"
+            name="estado"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-600 focus:outline-hidden"
+          >
+            <option value="ACTIVO">ACTIVO (En funciones)</option>
+            <option value="SUSPENDIDO">SUSPENDIDO (Permiso / IGSS)</option>
+            <option value="INACTIVO">INACTIVO (Baja)</option>
+          </select>
+        </div>
+      }
+    </div>
+
+    <!-- Acciones -->
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+      <button
+        type="button"
+        (click)="cerrar.emit()"
+        class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        [disabled]="procesando()"
+        class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 shadow-md shadow-teal-600/20 disabled:opacity-50 transition-all cursor-pointer flex items-center gap-2"
+      >
+        @if (procesando()) {
+          <div class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          <span>Guardando...</span>
+        } @else {
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>{{ empleadoAEditar ? 'Guardar Cambios' : 'Registrar Colaborador' }}</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,129 @@
+<div class="p-6 sm:p-7 space-y-6">
+  <!-- Encabezado del Modal -->
+  <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+          <line x1="12" y1="8" x2="12" y2="16"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-slate-900">Apertura & Cálculo de Planilla</h2>
+        <p class="text-xs text-slate-400">Genera la nómina salarial automática para todos los colaboradores activos</p>
+      </div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="p-3 bg-red-50 border border-red-200 text-xs text-red-700 rounded-xl flex items-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Banner de Legislación Laboral de Guatemala -->
+  <div class="p-4 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-xs space-y-1.5">
+    <div class="flex items-center gap-2 text-emerald-800 font-bold">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      Parámetros Legales de Cálculo Automático (Guatemala):
+    </div>
+    <ul class="text-emerald-700/90 list-disc list-inside space-y-0.5 pl-1">
+      <li><strong>Salario Base:</strong> Sueldo pactado según contrato y puesto de cada colaborador.</li>
+      <li><strong>Bonificación Ley:</strong> Q 250.00 fijos (Decreto 37-2001 del Congreso de la República).</li>
+      <li><strong>Retención IGSS Laboral:</strong> 4.83% sobre la base afecta (Salario Base + Horas Extra).</li>
+    </ul>
+  </div>
+
+  <!-- Formulario de Rango de Fechas -->
+  <form (ngSubmit)="generar()" class="space-y-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Fecha de Inicio del Período *</label>
+        <input
+          type="date"
+          [(ngModel)]="fechaInicio"
+          name="fechaInicio"
+          required
+          class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-600 focus:outline-hidden"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Fecha de Fin del Período *</label>
+        <input
+          type="date"
+          [(ngModel)]="fechaFin"
+          name="fechaFin"
+          required
+          class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-600 focus:outline-hidden"
+        />
+      </div>
+    </div>
+
+    @if (diasCiclo > 0) {
+      <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-700">Modalidad Detectada:</span>
+          <span
+            class="px-2.5 py-0.5 rounded-full font-bold text-[11px]"
+            [class.bg-sky-100]="esQuincenal"
+            [class.text-sky-800]="esQuincenal"
+            [class.bg-indigo-100]="!esQuincenal"
+            [class.text-indigo-800]="!esQuincenal"
+          >
+            {{ esQuincenal ? 'Quincenal (' + diasCiclo + ' días)' : 'Mensual Completa (' + diasCiclo + ' días)' }}
+          </span>
+        </div>
+        <span class="text-[11px] text-slate-500 font-medium">
+          {{ esQuincenal ? '50% Sueldo Base + Q125.00 Bono Ley' : '100% Sueldo Base + Q250.00 Bono Ley' }}
+        </span>
+      </div>
+    }
+
+    <div>
+      <label class="block text-xs font-bold text-slate-700 mb-1">Observación o Justificación del Ciclo</label>
+      <input
+        type="text"
+        [(ngModel)]="observacion"
+        name="observacion"
+        placeholder="Ej: Planilla Ordinaria de Farmacia y Stands correspondiente al mes en curso"
+        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-teal-600 focus:outline-hidden"
+      />
+    </div>
+
+    <!-- Acciones -->
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+      <button
+        type="button"
+        (click)="cerrar.emit()"
+        class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        [disabled]="procesando()"
+        class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 shadow-md shadow-teal-600/20 disabled:opacity-50 transition-all cursor-pointer flex items-center gap-2"
+      >
+        @if (procesando()) {
+          <div class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          <span>Calculando nómina...</span>
+        } @else {
+          <span class="w-4 h-4 rounded-full bg-white/25 text-white font-mono font-black flex items-center justify-center text-[10px] leading-none shrink-0 shadow-xs">
+            Q
+          </span>
+          <span>Generar y Liquidar Planilla</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>
