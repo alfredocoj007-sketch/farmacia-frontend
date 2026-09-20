@@ -1,0 +1,77 @@
+@if (confirmService.active(); as dialog) {
+  <div
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-fade-in"
+    (click)="confirmService.handleCancel()"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-2xl shadow-slate-950/20 border border-slate-100 max-w-sm w-full p-6 space-y-5 animate-scale-in"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Ícono distintivo según el tipo -->
+      <div class="flex items-start gap-3.5">
+        @if (dialog.tipo === 'danger') {
+          <div class="w-11 h-11 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shrink-0 shadow-xs">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+              <line x1="12" y1="2" x2="12" y2="12"></line>
+            </svg>
+          </div>
+        } @else if (dialog.tipo === 'warning') {
+          <div class="w-11 h-11 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0 shadow-xs">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+        } @else {
+          <div class="w-11 h-11 rounded-xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center shrink-0 shadow-xs">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+        }
+
+        <div class="space-y-1">
+          <h3 class="text-base font-bold text-slate-900 leading-snug">
+            {{ dialog.title }}
+          </h3>
+          @if (dialog.message) {
+            <p class="text-xs text-slate-500 leading-relaxed">
+              {{ dialog.message }}
+            </p>
+          }
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+        <button
+          type="button"
+          (click)="confirmService.handleCancel()"
+          class="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-all cursor-pointer"
+        >
+          {{ dialog.cancelText }}
+        </button>
+
+        <button
+          type="button"
+          (click)="confirmService.handleConfirm()"
+          [class.bg-rose-600]="dialog.tipo === 'danger'"
+          [class.hover:bg-rose-700]="dialog.tipo === 'danger'"
+          [class.bg-amber-600]="dialog.tipo === 'warning'"
+          [class.hover:bg-amber-700]="dialog.tipo === 'warning'"
+          [class.bg-sky-600]="dialog.tipo === 'primary' || dialog.tipo === 'info'"
+          [class.hover:bg-sky-700]="dialog.tipo === 'primary' || dialog.tipo === 'info'"
+          class="px-4 py-2 rounded-xl text-xs font-semibold text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+        >
+          {{ dialog.confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
