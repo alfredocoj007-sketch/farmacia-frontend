@@ -1,0 +1,159 @@
+<div class="p-6 sm:p-7 space-y-6">
+  <!-- Encabezado con padding derecho para la X -->
+  <div class="border-b border-slate-100 pb-4 pr-10">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200 shrink-0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-800 leading-tight">
+          Historial de Turnos y Auditoría · {{ codigoCaja }}
+        </h3>
+        <p class="text-xs text-slate-400 mt-0.5">
+          Registro de aperturas, cajeros responsables y arqueos de corte de caja realizados.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (cargando()) {
+    <div class="py-12 text-center text-slate-400 space-y-2">
+      <svg class="animate-spin w-8 h-8 text-slate-600 mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-xs">Cargando bitácora de cortes...</p>
+    </div>
+  } @else if (sesiones().length === 0) {
+    <div class="py-12 text-center text-slate-400 text-xs">
+      No hay sesiones de turno registradas para esta caja aún.
+    </div>
+  } @else {
+    <div class="overflow-x-auto border border-slate-200/80 rounded-2xl">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200/80">
+          <tr>
+            <th class="px-3.5 py-3">Sesión / Fechas</th>
+            <th class="px-3.5 py-3">Cajero</th>
+            <th class="px-3.5 py-3 text-right">Saldo Inicial</th>
+            <th class="px-3.5 py-3 text-right">Esperado</th>
+            <th class="px-3.5 py-3 text-right">Contado</th>
+            <th class="px-3.5 py-3 text-right">Diferencia</th>
+            <th class="px-3.5 py-3 text-center">Estado</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (s of sesionesPaginadas(); track s.sesionCajaId) {
+            <tr class="hover:bg-slate-50/70 transition-colors">
+              <td class="px-3.5 py-2.5">
+                <span class="font-bold font-mono text-slate-800">#TUR-{{ s.sesionCajaId }}</span>
+                <span class="text-[10px] text-slate-400 block mt-0.5">
+                  {{ s.fechaApertura | date: 'dd/MM/yy HH:mm' }}
+                </span>
+              </td>
+              <td class="px-3.5 py-2.5">
+                <span class="font-semibold text-slate-700 block">{{ s.cajeroApertura }}</span>
+                @if (s.cajeroCierre && s.cajeroCierre !== s.cajeroApertura) {
+                  <span class="text-[10px] text-slate-400 block">Cierre: {{ s.cajeroCierre }}</span>
+                }
+              </td>
+              <td class="px-3.5 py-2.5 text-right font-mono text-slate-700">
+                Q {{ s.saldoInicial.toFixed(2) }}
+              </td>
+              <td class="px-3.5 py-2.5 text-right font-mono text-slate-700">
+                {{ s.efectivoEsperado !== null ? ('Q ' + s.efectivoEsperado.toFixed(2)) : '—' }}
+              </td>
+              <td class="px-3.5 py-2.5 text-right font-mono text-slate-700">
+                {{ s.efectivoContado !== null ? ('Q ' + s.efectivoContado.toFixed(2)) : '—' }}
+              </td>
+              <td class="px-3.5 py-2.5 text-right font-mono">
+                @if (s.diferencia !== null) {
+                  <span
+                    class="font-bold text-xs"
+                    [class.text-emerald-700]="s.diferencia >= 0"
+                    [class.text-red-700]="s.diferencia < 0"
+                  >
+                    {{ s.diferencia > 0 ? '+' : '' }}Q {{ s.diferencia.toFixed(2) }}
+                  </span>
+                } @else {
+                  <span class="text-slate-400">—</span>
+                }
+              </td>
+              <td class="px-3.5 py-2.5 text-center">
+                @if (s.estado === 'ABIERTA') {
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    ABIERTA
+                  </span>
+                } @else {
+                  <span
+                    class="px-2 py-0.5 rounded-full text-[10px] font-bold border"
+                    [class.bg-slate-100]="s.diferencia === 0"
+                    [class.text-slate-700]="s.diferencia === 0"
+                    [class.border-slate-200]="s.diferencia === 0"
+                    [class.bg-emerald-50]="s.diferencia !== null && s.diferencia > 0"
+                    [class.text-emerald-700]="s.diferencia !== null && s.diferencia > 0"
+                    [class.border-emerald-200]="s.diferencia !== null && s.diferencia > 0"
+                    [class.bg-red-50]="s.diferencia !== null && s.diferencia < 0"
+                    [class.text-red-700]="s.diferencia !== null && s.diferencia < 0"
+                    [class.border-red-200]="s.diferencia !== null && s.diferencia < 0"
+                  >
+                    {{ s.diferencia === 0 ? 'CUADRADA' : (s.diferencia !== null && s.diferencia < 0 ? 'FALTANTE' : 'SOBRANTE') }}
+                  </span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Paginación Modal -->
+      @if (sesiones().length > limit) {
+        <div class="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+          <span>Página {{ page() }} de {{ totalPaginas() }}</span>
+          <div class="flex items-center gap-1.5">
+            <button
+              type="button"
+              (click)="cambiarPagina(-1)"
+              [disabled]="page() <= 1"
+              class="px-2.5 py-1 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Anterior
+            </button>
+            <button
+              type="button"
+              (click)="cambiarPagina(1)"
+              [disabled]="page() >= totalPaginas()"
+              class="px-2.5 py-1 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="flex justify-end pt-2">
+    <button
+      type="button"
+      (click)="cerrar.emit()"
+      class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors cursor-pointer"
+    >
+      Cerrar
+    </button>
+  </div>
+</div>

@@ -1,0 +1,219 @@
+<div class="p-6 sm:p-7 space-y-6">
+  <!-- Encabezado con padding derecho para la X -->
+  <div class="border-b border-slate-100 pb-4 pr-10">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200 shrink-0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-800 leading-tight">
+          Arqueo y Cierre de Turno · {{ codigoCaja }}
+        </h3>
+        <p class="text-xs text-slate-400 mt-0.5">
+          Auditoría de corte de caja: balance de efectivo físico vs movimientos del sistema.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (cargando()) {
+    <div class="py-12 text-center text-slate-400 space-y-2">
+      <svg class="animate-spin w-8 h-8 text-indigo-600 mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-xs">Consolidando balance contable de la sesión...</p>
+    </div>
+  } @else if (detalle(); as d) {
+    <form (ngSubmit)="submit()" class="space-y-5">
+      <!-- Panel de Balanza Contable Calculada por el Sistema -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80">
+        <!-- Saldo Inicial -->
+        <div>
+          <span class="text-[11px] font-semibold text-slate-400 block uppercase tracking-wider">Fondo Inicial</span>
+          <span class="text-sm font-bold text-slate-700 font-mono">Q {{ d.saldoInicial.toFixed(2) }}</span>
+          <span class="text-[10px] text-slate-400 block">Sencillo de apertura</span>
+        </div>
+
+        <!-- Flujo Efectivo Neto -->
+        <div>
+          <span class="text-[11px] font-semibold text-slate-400 block uppercase tracking-wider">Ventas Efectivo</span>
+          <span class="text-sm font-bold text-emerald-700 font-mono">+Q {{ d.desglose.ingresosEfectivo.toFixed(2) }}</span>
+          @if (d.desglose.egresosEfectivo > 0) {
+            <span class="text-[10px] text-red-600 block">-Q {{ d.desglose.egresosEfectivo.toFixed(2) }} egresos</span>
+          } @else {
+            <span class="text-[10px] text-slate-400 block">Sin egresos</span>
+          }
+        </div>
+
+        <!-- Efectivo Esperado Físico -->
+        <div class="bg-indigo-50/70 p-2.5 rounded-xl border border-indigo-100">
+          <span class="text-[11px] font-extrabold text-indigo-900 block uppercase tracking-wider">Efectivo Esperado</span>
+          <span class="text-base font-black text-indigo-700 font-mono">Q {{ d.efectivoEsperado.toFixed(2) }}</span>
+          <span class="text-[10px] text-indigo-600 block">Debe estar en cajón</span>
+        </div>
+      </div>
+
+      <!-- Métricas complementarias electrónicas -->
+      <div class="flex items-center justify-between px-3 py-2 bg-slate-100/70 rounded-xl text-xs text-slate-600">
+        <span class="flex items-center gap-1.5 font-medium">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+          Cobros electrónicos POS / Tarjetas:
+        </span>
+        <span class="font-bold font-mono text-slate-800">Q {{ d.desglose.ingresosTarjeta.toFixed(2) }}</span>
+      </div>
+
+      <!-- Sección de Conteo Físico Real -->
+      <div class="space-y-2 pt-1">
+        <label class="block text-xs font-bold text-slate-800 flex items-center justify-between">
+          <span>Efectivo Físico Contado en Caja (Billetes y Monedas):</span>
+          <span class="text-xs font-bold text-indigo-600 font-mono">
+            Esperado: Q {{ d.efectivoEsperado.toFixed(2) }}
+          </span>
+        </label>
+
+        <div class="relative">
+          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base font-bold text-slate-400">Q</span>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            [(ngModel)]="efectivoContado"
+            name="efectivoContado"
+            placeholder="0.00"
+            required
+            class="w-full pl-9 pr-4 py-3 text-lg font-black rounded-xl border-2 border-slate-200 bg-white focus:outline-none focus:border-indigo-600 text-slate-900 shadow-xs font-mono"
+          />
+        </div>
+      </div>
+
+      <!-- Tarjeta Reactiva de Resultado de Arqueo (Diferencia) -->
+      @if (diferencia(); as dif) {
+        <div
+          class="p-4 rounded-2xl border flex items-center justify-between"
+          [class.bg-emerald-50]="dif === 0"
+          [class.border-emerald-200]="dif === 0"
+          [class.bg-emerald-50/70]="dif > 0"
+          [class.border-emerald-300]="dif > 0"
+          [class.bg-red-50]="dif < 0"
+          [class.border-red-200]="dif < 0"
+        >
+          <div>
+            @if (dif === 0) {
+              <div class="flex items-center gap-2 text-emerald-800 font-bold text-xs">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>¡Corte Cuadrado Exacto!</span>
+              </div>
+              <span class="text-[11px] text-emerald-700 block mt-0.5">
+                El conteo coincide al 100% con los registros del sistema.
+              </span>
+            } @else if (dif > 0) {
+              <div class="flex items-center gap-2 text-emerald-800 font-bold text-xs">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="16"></line>
+                  <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <span>Sobrante en Caja</span>
+              </div>
+              <span class="text-[11px] text-emerald-700 block mt-0.5">
+                Hay más efectivo en físico del registrado en el sistema.
+              </span>
+            } @else {
+              <div class="flex items-center gap-2 text-red-800 font-bold text-xs">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Faltante de Caja (Alerta de Auditoría)</span>
+              </div>
+              <span class="text-[11px] text-red-700 block mt-0.5">
+                El dinero físico es menor al esperado. Se registrará incidencia contable.
+              </span>
+            }
+          </div>
+
+          <div class="text-right">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Diferencia</span>
+            <span
+              class="text-lg font-black font-mono block"
+              [class.text-emerald-700]="dif >= 0"
+              [class.text-red-700]="dif < 0"
+            >
+              {{ dif > 0 ? '+' : '' }}Q {{ dif.toFixed(2) }}
+            </span>
+          </div>
+        </div>
+      }
+
+      <!-- Observación / Justificación -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-bold text-slate-700">
+          Observaciones de Cierre / Justificación de Auditoría:
+          @if (diferencia() !== null && diferencia() !== 0) {
+            <span class="text-red-600">* (Obligatorio por descalce)</span>
+          }
+        </label>
+        <textarea
+          rows="2"
+          [(ngModel)]="observacionCierre"
+          name="observacionCierre"
+          placeholder="Ej. Cuadre verificado conforme / Diferencia por vuelto no retirado o error de digitación"
+          class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-indigo-500 text-slate-800 shadow-2xs"
+        ></textarea>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+        <button
+          type="button"
+          (click)="cancelado.emit()"
+          class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors cursor-pointer"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="guardando()"
+          class="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl shadow-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
+        >
+          @if (guardando()) {
+            <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Auditando y Cerrando...
+          } @else {
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Confirmar Cierre y Arqueo Oficial
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>
