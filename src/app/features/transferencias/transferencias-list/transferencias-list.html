@@ -1,0 +1,337 @@
+<div class="space-y-6">
+  <div class="transferencias-vista-principal space-y-6 print:hidden">
+    <!-- Encabezado de la Sección -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+          <div
+            class="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 3h5v5"></path>
+              <path d="M4 20L21 3"></path>
+              <path d="M21 16v5h-5"></path>
+              <path d="M15 15l6 6"></path>
+              <path d="M4 4l5 5"></path>
+            </svg>
+          </div>
+          Reabastecimiento y Transferencias de Medicamentos
+        </h1>
+      </div>
+
+      <!-- Botón Nueva Solicitud de Reabastecimiento -->
+      <button type="button" (click)="abrirModalCrear()"
+        class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer self-start sm:self-auto">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nueva Solicitud de Reabastecimiento
+      </button>
+    </div>
+
+    <!-- Métricas Rápidas (KPIs) ordenadas por el flujo de 3 pasos -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <!-- Paso 1: Solicitadas -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 font-medium block">Paso 1: Solicitadas (Pendientes)</span>
+          <span class="text-2xl font-black text-amber-700">{{ totalSolicitadas() }}</span>
+        </div>
+      </div>
+
+      <!-- Paso 2: En Tránsito -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 font-medium block">Paso 2: En Tránsito (Ruta)</span>
+          <span class="text-2xl font-black text-sky-700">{{ totalEnTransito() }}</span>
+        </div>
+      </div>
+
+      <!-- Paso 3: Recibidas -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 font-medium block">Paso 3: Recibidas (En Stock)</span>
+          <span class="text-2xl font-black text-emerald-700">{{ totalRecibidas() }}</span>
+        </div>
+      </div>
+
+      <!-- Total de Operaciones -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center border border-slate-100 shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 font-medium block">Total Solicitudes</span>
+          <span class="text-2xl font-black text-slate-900">{{ totalTransferencias() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de Filtros e Interacción -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <!-- Píldoras de Estado -->
+        <div class="inline-flex rounded-xl bg-slate-100 p-0.5 border border-slate-200 text-xs overflow-x-auto">
+          <button type="button" (click)="cambiarFiltroEstado('')" [class.bg-white]="filtroEstado() === ''"
+            [class.text-slate-900]="filtroEstado() === ''" [class.shadow-xs]="filtroEstado() === ''"
+            [class.font-bold]="filtroEstado() === ''"
+            class="px-3 py-1.5 rounded-lg text-slate-600 transition-all cursor-pointer whitespace-nowrap">
+            Todas ({{ transferencias().length }})
+          </button>
+
+          <button type="button" (click)="cambiarFiltroEstado('EN_TRANSITO')"
+            [class.bg-white]="filtroEstado() === 'EN_TRANSITO'" [class.text-sky-700]="filtroEstado() === 'EN_TRANSITO'"
+            [class.shadow-xs]="filtroEstado() === 'EN_TRANSITO'" [class.font-bold]="filtroEstado() === 'EN_TRANSITO'"
+            class="px-3 py-1.5 rounded-lg text-slate-600 transition-all cursor-pointer whitespace-nowrap">
+            ✈ En Tránsito ({{ totalEnTransito() }})
+          </button>
+
+          <button type="button" (click)="cambiarFiltroEstado('SOLICITADA')"
+            [class.bg-white]="filtroEstado() === 'SOLICITADA'" [class.text-amber-700]="filtroEstado() === 'SOLICITADA'"
+            [class.shadow-xs]="filtroEstado() === 'SOLICITADA'" [class.font-bold]="filtroEstado() === 'SOLICITADA'"
+            class="px-3 py-1.5 rounded-lg text-slate-600 transition-all cursor-pointer whitespace-nowrap">
+            ● Solicitadas ({{ totalSolicitadas() }})
+          </button>
+
+          <button type="button" (click)="cambiarFiltroEstado('RECIBIDA')"
+            [class.bg-white]="filtroEstado() === 'RECIBIDA'" [class.text-emerald-700]="filtroEstado() === 'RECIBIDA'"
+            [class.shadow-xs]="filtroEstado() === 'RECIBIDA'" [class.font-bold]="filtroEstado() === 'RECIBIDA'"
+            class="px-3 py-1.5 rounded-lg text-slate-600 transition-all cursor-pointer whitespace-nowrap">
+            ✓ Recibidas ({{ totalRecibidas() }})
+          </button>
+
+          <button type="button" (click)="cambiarFiltroEstado('CANCELADA')"
+            [class.bg-white]="filtroEstado() === 'CANCELADA'" [class.text-red-700]="filtroEstado() === 'CANCELADA'"
+            [class.shadow-xs]="filtroEstado() === 'CANCELADA'" [class.font-bold]="filtroEstado() === 'CANCELADA'"
+            class="px-3 py-1.5 rounded-lg text-slate-600 transition-all cursor-pointer whitespace-nowrap">
+            ✕ Canceladas
+          </button>
+        </div>
+
+        <!-- Buscador -->
+        <div class="relative min-w-[240px]">
+          <input type="text" [(ngModel)]="busqueda" placeholder="Buscar por guía, sucursal u observación…"
+            class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-indigo-500 transition-all" />
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" width="13" height="13"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor de la Tabla -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      @if (cargando()) {
+      <div class="py-16 text-center text-slate-400 text-sm animate-pulse space-y-2">
+        <svg class="mx-auto animate-spin text-indigo-600" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+          <path d="M12 2a10 10 0 0 1 10 10"></path>
+        </svg>
+        <p>Cargando transferencias inter-sucursales…</p>
+      </div>
+      } @else if (error()) {
+      <div class="p-8 text-center text-red-600 text-sm font-semibold bg-red-50/50">
+        {{ error() }}
+      </div>
+      } @else if (transferenciasFiltradas().length === 0) {
+      <div class="py-16 text-center space-y-3">
+        <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 3h5v5"></path>
+            <path d="M4 20L21 3"></path>
+          </svg>
+        </div>
+        <p class="text-sm font-bold text-slate-700">No hay transferencias con el filtro aplicado</p>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto">
+          Crea una nueva solicitud de traslado inter-farmacias con el botón superior.
+        </p>
+      </div>
+      } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead
+            class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+            <tr>
+              <th class="px-4 py-3">Guía</th>
+              <th class="px-4 py-3">Fecha Solicitud</th>
+              <th class="px-4 py-3">Ruta (Origen ➔ Destino)</th>
+              <th class="px-4 py-3 text-right">Lotes / Unidades</th>
+              <th class="px-4 py-3">Estado</th>
+              <th class="px-4 py-3 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (t of transferenciasPaginadas(); track t.transferenciaId) {
+            <tr class="hover:bg-slate-50/70 transition-colors">
+              <!-- Folio -->
+              <td class="px-4 py-3.5 whitespace-nowrap font-mono font-bold text-indigo-700">
+                #TRF-{{ t.transferenciaId }}
+              </td>
+
+              <!-- Fecha -->
+              <td class="px-4 py-3.5 whitespace-nowrap text-slate-600 font-medium">
+                {{ formatearFecha(t.fechaSolicitud) }}
+              </td>
+
+              <!-- Ruta Origen ➔ Destino -->
+              <td class="px-4 py-3.5 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex items-center gap-1 font-semibold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg">
+                    {{ t.sucursalOrigen?.nombre ?? 'Origen' }}
+                  </span>
+                  <span class="text-indigo-400 font-bold">➔</span>
+                  <span
+                    class="inline-flex items-center gap-1 font-semibold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg">
+                    {{ t.sucursalDestino?.nombre ?? 'Destino' }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Ítems y Unidades -->
+              <td class="px-4 py-3.5 text-right whitespace-nowrap font-mono">
+                <span class="font-bold text-slate-900">{{ contarUnidadesTotales(t) }} uds</span>
+                <span class="text-slate-400 text-[11px] block">
+                  {{ t.transferenciaDetalles.length }} lote(s)
+                </span>
+              </td>
+
+              <!-- Estado -->
+              <td class="px-4 py-3.5 whitespace-nowrap">
+                @switch (t.estado) {
+                @case ('SOLICITADA') {
+                <span
+                  class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-bold">
+                  ● SOLICITADA
+                </span>
+                }
+                @case ('EN_TRANSITO') {
+                <div class="flex flex-col gap-1 items-start">
+                  <span
+                    class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold animate-pulse">
+                    ✈ EN TRÁNSITO
+                  </span>
+                  @if (esDestinoMiSucursal(t)) {
+                    <span class="inline-flex items-center gap-1 text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 tracking-wide">
+                      ● Por recibir en tu sede
+                    </span>
+                  }
+                </div>
+                }
+                @case ('RECIBIDA') {
+                <span
+                  class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                  ✓ RECIBIDA
+                </span>
+                }
+                @case ('CANCELADA') {
+                <span
+                  class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 font-bold">
+                  ✕ CANCELADA
+                </span>
+                }
+                }
+              </td>
+
+              <!-- Acciones -->
+              <td class="px-4 py-3.5 text-right whitespace-nowrap">
+                @if (t.estado === 'EN_TRANSITO' && (esAdmin() || esDestinoMiSucursal(t))) {
+                  <button type="button" (click)="verDetalle(t)"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors cursor-pointer">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Recibir Stock
+                  </button>
+                } @else {
+                  <button type="button" (click)="verDetalle(t)"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 rounded-xl border border-indigo-200 transition-colors cursor-pointer">
+                    Ver Guía
+                  </button>
+                }
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Barra de Paginación -->
+      <div
+        class="px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span>
+          Mostrando página <strong class="text-slate-700 font-semibold">{{ page() }}</strong> de <strong
+            class="text-slate-700 font-semibold">{{ totalPaginas() }}</strong> ({{ transferenciasFiltradas().length }}
+          transferencias)
+        </span>
+        <div class="flex items-center gap-1.5">
+          <button (click)="cambiarPagina(-1)" [disabled]="page() <= 1"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            ← Anterior
+          </button>
+          <div class="hidden sm:flex items-center gap-1">
+            @for (p of listaPaginas(); track p) {
+            <button (click)="irAPagina(p)" [class.bg-indigo-600]="p === page()" [class.text-white]="p === page()"
+              [class.font-semibold]="p === page()" [class.shadow-sm]="p === page()"
+              [class.border-indigo-600]="p === page()"
+              class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+              {{ p }}
+            </button>
+            }
+          </div>
+          <button (click)="cambiarPagina(1)" [disabled]="page() >= totalPaginas()"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Modal Crear Transferencia -->
+  @if (modalCrearAbierto()) {
+  <app-modal maxWidthClass="max-w-3xl" (cerrar)="cerrarModalCrear()">
+    <app-transferencia-form (guardado)="onTransferenciaCreada()"
+      (cancelado)="cerrarModalCrear()"></app-transferencia-form>
+  </app-modal>
+  }
+
+  <!-- Modal Ver Detalle / Guía de Remisión -->
+  @if (transferenciaSeleccionada(); as tSel) {
+  <app-modal maxWidthClass="max-w-3xl" (cerrar)="cerrarDetalle()">
+    <app-transferencia-detalle-modal [transferencia]="tSel" (actualizado)="onTransferenciaActualizada()"
+      (cerrar)="cerrarDetalle()"></app-transferencia-detalle-modal>
+  </app-modal>
+  }
+</div>

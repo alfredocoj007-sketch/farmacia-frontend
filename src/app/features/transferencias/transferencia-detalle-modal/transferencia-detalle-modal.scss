@@ -1,0 +1,31 @@
+// Estilos específicos de TransferenciaDetalleModal
+
+@media print {
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+
+  // Ocultar cualquier botón nativo de cerrar del modal
+  :host {
+    display: block;
+    width: 100%;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th,
+  td {
+    border: 1px solid #94a3b8 !important;
+    padding: 6px 8px !important;
+    color: black !important;
+  }
+
+  th {
+    background-color: #f1f5f9 !important;
+    font-weight: bold !important;
+  }
+}

@@ -1,0 +1,7 @@
+// Estilos específicos de TransferenciasList
+
+@media print {
+  .transferencias-vista-principal {
+    display: none !important;
+  }
+}
