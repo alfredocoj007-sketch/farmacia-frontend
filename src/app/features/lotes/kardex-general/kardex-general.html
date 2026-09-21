@@ -1,0 +1,450 @@
+<div class="max-w-7xl mx-auto space-y-6 pb-12 print:p-0 print:space-y-3">
+  <!-- Navegación Superior (Pantalla) -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:hidden">
+    <div class="flex items-center gap-2 flex-wrap">
+      <a routerLink="/lotes"
+        class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all cursor-pointer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Volver a Lotes e Inventario
+      </a>
+
+      <a routerLink="/productos"
+        class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all cursor-pointer"
+        title="Consultar ficha del medicamento en el Catálogo">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-600">
+          <path d="m7.5 4.27 9 5.15"></path>
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+          <path d="m3.3 7 8.7 5 8.7-5"></path>
+          <path d="M12 22V12"></path>
+        </svg>
+        Catálogo de Productos
+      </a>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button type="button" (click)="cargarMovimientos()"
+        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-xs transition-colors cursor-pointer"
+        title="Actualizar datos">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+        </svg>
+        Refrescar
+      </button>
+
+      <button type="button" (click)="imprimirKardex()"
+        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-semibold shadow-xs hover:border-slate-300 transition-all cursor-pointer"
+        title="Imprimir reporte oficial de Kardex general">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-violet-600">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Imprimir Kardex General
+      </button>
+    </div>
+  </div>
+
+  <!-- Título y Descripción Principal -->
+  <div class="print:hidden">
+    <h1 class="text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2.5">
+      <span class="w-9 h-9 rounded-xl bg-violet-600 text-white flex items-center justify-center shadow-md shadow-violet-500/20">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+      </span>
+      Kardex General de Movimientos e Inventario
+    </h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Auditoría global consolidada: monitoreo de todas las entradas, salidas por ventas y ajustes físicos en todas las sucursales
+    </p>
+  </div>
+
+  <!-- Métricas Rápidas (KPIs) -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 print:hidden">
+    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Movimientos</span>
+        <p class="text-2xl font-bold text-slate-800 mt-1">{{ totalMovimientos() }}</p>
+        <span class="text-xs text-slate-500">registros auditados</span>
+      </div>
+      <div class="w-11 h-11 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wider text-emerald-600">Total Entradas</span>
+        <p class="text-2xl font-bold text-slate-800 mt-1">{{ totalUnidadesEntrada() | number:'1.0-0' }}</p>
+        <span class="text-xs text-emerald-600 font-medium">unidades recibidas</span>
+      </div>
+      <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wider text-sky-600">Total Salidas / Ventas</span>
+        <p class="text-2xl font-bold text-slate-800 mt-1">{{ totalUnidadesSalida() | number:'1.0-0' }}</p>
+        <span class="text-xs text-sky-600 font-medium">unidades egresadas</span>
+      </div>
+      <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="19" x2="12" y2="5"></line>
+          <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wider text-amber-600">Ajustes Realizados</span>
+        <p class="text-2xl font-bold text-slate-800 mt-1">{{ totalUnidadesAjuste() | number:'1.0-0' }}</p>
+        <span class="text-xs text-amber-600 font-medium">unidades ajustadas</span>
+      </div>
+      <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 20h9"></path>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENCABEZADO INSTITUCIONAL OFICIAL (SOLO MODO IMPRESIÓN) -->
+  <div class="hidden print:block mb-4 border-b-2 border-slate-900 pb-3">
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="text-xl font-black uppercase tracking-tight text-slate-950">
+          FarmaGest · Farmacia Comunitaria
+        </h1>
+        <h2 class="text-base font-black text-slate-950 mt-1 tracking-wide uppercase">
+          Reporte Oficial de Kardex General y Auditoría de Movimientos
+        </h2>
+        <p class="text-xs text-slate-700 font-semibold mt-0.5">
+          Alcance: <span class="underline">{{ nombreSucursalFiltro() }}</span>
+        </p>
+      </div>
+
+      <div class="text-right text-[10px] font-mono text-slate-800 space-y-0.5">
+        <p><strong>Fecha y Hora Emisión:</strong> {{ fechaImpresion() }}</p>
+        <p><strong>Usuario Auditor:</strong> {{ usuario()?.nombre ?? usuario()?.username ?? 'Administrador' }}</p>
+        <p><strong>Rol / Perfil:</strong> {{ usuario()?.rol ?? 'ADMINISTRADOR' }}</p>
+        <p><strong>Total Registros:</strong> {{ totalMovimientos() }} movimientos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Filtros y Búsqueda (Pantalla) -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm space-y-3.5 print:hidden">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <!-- Buscador en tiempo real -->
+      <div class="relative flex-1">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input type="text" [value]="busqueda()" (input)="actualizarBusqueda($event)"
+          placeholder="Buscar por medicamento, principio activo, lote, factura/ticket u observación..."
+          class="w-full pl-9 pr-9 py-2 text-xs sm:text-sm bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all placeholder:text-slate-400" />
+        @if (busqueda()) {
+        <button (click)="limpiarBusqueda()"
+          class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 cursor-pointer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        }
+      </div>
+
+      <!-- Selector de Sucursal -->
+      <div class="flex items-center gap-2">
+        <label for="select-sucursal-kardex" class="text-xs font-semibold text-slate-500 whitespace-nowrap">Sucursal:</label>
+        <select id="select-sucursal-kardex" (change)="cambiarFiltroSucursal($event)"
+          class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/70 text-xs font-medium text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all cursor-pointer">
+          <option value="">Todas las Sucursales</option>
+          @for (s of sucursales(); track s.sucursalId) {
+          <option [value]="s.sucursalId" [selected]="filtroSucursalId() === s.sucursalId">
+            {{ s.nombre }}
+          </option>
+          }
+        </select>
+      </div>
+
+      <!-- Toggle de Orden Cronológico -->
+      <button (click)="toggleOrden()"
+        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-all cursor-pointer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+        {{ ordenAscendente() ? 'Más antiguos primero' : 'Más recientes primero' }}
+      </button>
+    </div>
+
+    <!-- Píldoras de Filtro por Tipo de Movimiento y Rango de Fechas -->
+    <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="text-xs font-semibold text-slate-400 mr-1">Tipo de Movimiento:</span>
+        <button (click)="cambiarFiltroTipo('')"
+          [class.bg-slate-800]="filtroTipo() === ''" [class.text-white]="filtroTipo() === ''"
+          [class.bg-slate-100]="filtroTipo() !== ''" [class.text-slate-600]="filtroTipo() !== ''"
+          class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+          Todos ({{ movimientos().length }})
+        </button>
+
+        <button (click)="cambiarFiltroTipo('ENTRADA')"
+          [class.bg-emerald-600]="filtroTipo() === 'ENTRADA'" [class.text-white]="filtroTipo() === 'ENTRADA'"
+          [class.bg-emerald-50]="filtroTipo() !== 'ENTRADA'" [class.text-emerald-700]="filtroTipo() !== 'ENTRADA'"
+          class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer border border-emerald-200">
+          📥 Entradas
+        </button>
+
+        <button (click)="cambiarFiltroTipo('VENTA')"
+          [class.bg-sky-600]="filtroTipo() === 'VENTA'" [class.text-white]="filtroTipo() === 'VENTA'"
+          [class.bg-sky-50]="filtroTipo() !== 'VENTA'" [class.text-sky-700]="filtroTipo() !== 'VENTA'"
+          class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer border border-sky-200">
+          📤 Salidas / Ventas
+        </button>
+
+        <button (click)="cambiarFiltroTipo('AJUSTE')"
+          [class.bg-violet-600]="filtroTipo() === 'AJUSTE'" [class.text-white]="filtroTipo() === 'AJUSTE'"
+          [class.bg-violet-50]="filtroTipo() !== 'AJUSTE'" [class.text-violet-700]="filtroTipo() !== 'AJUSTE'"
+          class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer border border-violet-200">
+          ⚖️ Ajustes
+        </button>
+      </div>
+
+      <!-- Filtro Rango de Fechas -->
+      <div class="flex items-center gap-2 text-xs text-slate-500">
+        <span>Desde:</span>
+        <input type="date" [value]="fechaDesde()" (change)="cambiarFechaDesde($event)"
+          class="px-2 py-1 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-700 focus:outline-none" />
+        <span>Hasta:</span>
+        <input type="date" [value]="fechaHasta()" (change)="cambiarFechaHasta($event)"
+          class="px-2 py-1 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-700 focus:outline-none" />
+        @if (fechaDesde() || fechaHasta()) {
+        <button (click)="limpiarFechas()" class="text-xs text-red-600 hover:underline cursor-pointer">
+          Limpiar fechas
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado de Carga -->
+  @if (cargando()) {
+  <div class="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm">
+    <div class="w-10 h-10 border-3 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+    <p class="text-sm font-semibold text-slate-700">Cargando movimientos globales del Kardex...</p>
+    <p class="text-xs text-slate-400 mt-0.5">Sincronizando registros de todas las sucursales</p>
+  </div>
+  } @else if (error()) {
+  <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-2xl text-xs flex items-center justify-between">
+    <span>{{ error() }}</span>
+    <button (click)="cargarMovimientos()" class="font-bold underline cursor-pointer">Reintentar</button>
+  </div>
+  } @else if (movimientosFiltrados().length === 0) {
+  <!-- Estado Vacío -->
+  <div class="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm">
+    <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+      </svg>
+    </div>
+    <h3 class="text-base font-bold text-slate-800">No se encontraron movimientos registrados</h3>
+    <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+      No hay registros que coincidan con los filtros seleccionados. Prueba modificando los términos de búsqueda o el tipo de movimiento.
+    </p>
+  </div>
+  } @else {
+  <!-- Tabla Consolidada de Kardex -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden print:border-none print:shadow-none">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+            <th class="px-4 py-3 whitespace-nowrap">Folio</th>
+            <th class="px-4 py-3 whitespace-nowrap">Fecha / Hora</th>
+            <th class="px-4 py-3 min-w-[200px]">Medicamento / Producto</th>
+            <th class="px-4 py-3 whitespace-nowrap">Lote & FEFO</th>
+            <th class="px-4 py-3 whitespace-nowrap">Sucursal</th>
+            <th class="px-4 py-3 text-center whitespace-nowrap">Tipo</th>
+            <th class="px-4 py-3 text-right whitespace-nowrap">Cantidad</th>
+            <th class="px-4 py-3 text-center whitespace-nowrap">Saldo (Ant → Nvo)</th>
+            <th class="px-4 py-3 whitespace-nowrap">Referencia</th>
+            <th class="px-4 py-3 min-w-[160px]">Observación</th>
+            <th class="px-4 py-3 text-right whitespace-nowrap print:hidden">Acción</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+          @for (m of movimientosPaginados(); track m.movimientoInventarioId) {
+          <tr class="hover:bg-slate-50/75 transition-colors">
+            <!-- Folio / ID -->
+            <td class="px-4 py-3 font-mono font-bold text-slate-500 whitespace-nowrap">
+              #{{ m.movimientoInventarioId }}
+            </td>
+
+            <!-- Fecha y Hora -->
+            <td class="px-4 py-3 whitespace-nowrap text-slate-600 font-mono text-[11px]">
+              {{ formatearFechaHora(m.fechaMovimiento) }}
+            </td>
+
+            <!-- Medicamento / Producto -->
+            <td class="px-4 py-3">
+              <div class="font-bold text-slate-900 leading-snug">
+                {{ m.inventario?.lote?.producto?.nombre ?? 'Producto no especificado' }}
+              </div>
+              <div class="text-[11px] text-slate-500 flex items-center gap-1.5 flex-wrap mt-0.5">
+                @if (m.inventario?.lote?.producto?.concentracion) {
+                <span>{{ m.inventario?.lote?.producto?.concentracion }}</span>
+                }
+                @if (m.inventario?.lote?.producto?.presentacion) {
+                <span>· {{ m.inventario?.lote?.producto?.presentacion }}</span>
+                }
+                @if (m.inventario?.lote?.producto?.codigoProducto) {
+                <span class="font-mono text-slate-400">({{ m.inventario?.lote?.producto?.codigoProducto }})</span>
+                }
+              </div>
+            </td>
+
+            <!-- Lote y FEFO -->
+            <td class="px-4 py-3 whitespace-nowrap">
+              <span class="font-mono font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded border border-violet-200/80">
+                {{ m.inventario?.lote?.numeroLote ?? 'LOTE-N/A' }}
+              </span>
+              @if (m.inventario?.lote?.fechaVencimiento) {
+              <div class="text-[10px] text-slate-500 mt-0.5">
+                Vence: {{ m.inventario?.lote?.fechaVencimiento | date:'MM/yy' }}
+              </div>
+              }
+            </td>
+
+            <!-- Sucursal -->
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-slate-800">
+              {{ m.inventario?.sucursal?.nombre ?? 'Sucursal' }}
+            </td>
+
+            <!-- Tipo de Movimiento -->
+            <td class="px-4 py-3 text-center whitespace-nowrap">
+              @if (m.tipoMovimiento === 'ENTRADA') {
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                ENTRADA
+              </span>
+              } @else if (m.tipoMovimiento === 'VENTA' || m.tipoMovimiento === 'SALIDA') {
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                {{ m.tipoMovimiento }}
+              </span>
+              } @else {
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-violet-50 text-violet-700 border border-violet-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
+                {{ m.tipoMovimiento }}
+              </span>
+              }
+            </td>
+
+            <!-- Cantidad -->
+            <td class="px-4 py-3 text-right font-mono font-bold whitespace-nowrap"
+              [class.text-emerald-700]="m.tipoMovimiento === 'ENTRADA'"
+              [class.text-sky-700]="m.tipoMovimiento === 'VENTA' || m.tipoMovimiento === 'SALIDA'"
+              [class.text-violet-700]="m.tipoMovimiento === 'AJUSTE'">
+              {{ m.tipoMovimiento === 'ENTRADA' ? '+' : '-' }}{{ m.cantidad }} uds
+            </td>
+
+            <!-- Saldo Anterior -> Saldo Nuevo -->
+            <td class="px-4 py-3 text-center font-mono text-[11px] whitespace-nowrap text-slate-600">
+              <span class="text-slate-400">{{ m.cantidadAnterior }}</span>
+              <span class="mx-1 text-slate-400">→</span>
+              <span class="font-bold text-slate-900">{{ m.cantidadNueva }}</span>
+            </td>
+
+            <!-- Referencia -->
+            <td class="px-4 py-3 whitespace-nowrap text-[11px]">
+              @if (m.referenciaTipo) {
+              <span class="font-semibold text-slate-700">{{ m.referenciaTipo }}</span>
+              @if (m.referenciaId) {
+              <span class="font-mono text-slate-500"> #{{ m.referenciaId }}</span>
+              }
+              } @else {
+              <span class="text-slate-400 italic">—</span>
+              }
+            </td>
+
+            <!-- Observación -->
+            <td class="px-4 py-3 text-[11px] text-slate-600 max-w-[220px] truncate" [title]="m.observacion ?? ''">
+              {{ m.observacion || 'Sin observaciones' }}
+            </td>
+
+            <!-- Acción: Ver Kardex Individual del Lote (Pantalla) -->
+            <td class="px-4 py-3 text-right whitespace-nowrap print:hidden">
+              @if (m.inventario?.loteId || m.inventario?.lote?.loteId) {
+              <a [routerLink]="['/lotes', m.inventario?.loteId ?? m.inventario?.lote?.loteId]"
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-violet-50 text-slate-700 hover:text-violet-700 border border-slate-200 text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                title="Ver Kardex individual de este medicamento y lote">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                Ver Lote
+              </a>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación (Pantalla) -->
+    <div class="px-5 py-4 bg-slate-50/50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 print:hidden">
+      <span>
+        Mostrando página <strong class="text-slate-700 font-semibold">{{ page() }}</strong> de <strong class="text-slate-700 font-semibold">{{ totalPaginas() }}</strong> ({{ totalMovimientos() }} movimientos filtrados)
+      </span>
+
+      <div class="flex items-center gap-1.5">
+        <button (click)="cambiarPagina(-1)" [disabled]="page() <= 1"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+          ← Anterior
+        </button>
+
+        <div class="hidden sm:flex items-center gap-1">
+          @for (p of listaPaginas(); track p) {
+          <button (click)="irAPagina(p)"
+            [class.bg-violet-600]="p === page()" [class.text-white]="p === page()"
+            [class.font-semibold]="p === page()" [class.shadow-sm]="p === page()"
+            [class.border-violet-600]="p === page()"
+            class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+            {{ p }}
+          </button>
+          }
+        </div>
+
+        <button (click)="cambiarPagina(1)" [disabled]="page() >= totalPaginas()"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+          Siguiente →
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>
