@@ -1,95 +1,497 @@
-<div class="min-h-screen bg-slate-100">
-  <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
-    <div class="flex items-center gap-6 min-w-0">
-      <h1 class="text-lg font-semibold text-slate-800 shrink-0">Farmacia</h1>
-      <nav class="hidden sm:flex items-center gap-4 text-sm">
-        <a
-          routerLink="/dashboard"
-          routerLinkActive="text-sky-600 font-medium"
-          class="text-slate-600 hover:text-sky-600"
-        >
-          Dashboard
+<div class="min-h-screen bg-slate-100/70 text-slate-800 flex flex-col">
+  <!-- Barra de Navegación Superior Glassmorphic de 2 Niveles -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-all print:hidden">
+    <!-- Nivel 1: Marca Corporativa, Indicador de Red y Perfil de Usuario -->
+    <div class="px-4 sm:px-8 py-2.5 border-b border-slate-100">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <!-- Marca FarmaGest -->
+        <a routerLink="/dashboard" class="flex items-center gap-2.5 shrink-0 group">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-600 to-emerald-500 text-white flex items-center justify-center shadow-md shadow-sky-600/20 group-hover:scale-105 transition-transform">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
+              <path d="m8.5 8.5 7 7"></path>
+            </svg>
+          </div>
+          <div>
+            <span class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 leading-none block">
+              Farma<span class="text-sky-600">Gest</span>
+            </span>
+            <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold leading-none">
+              Gestión Farmacéutica
+            </span>
+          </div>
         </a>
-        <a
-          routerLink="/productos"
-          routerLinkActive="text-sky-600 font-medium"
-          class="text-slate-600 hover:text-sky-600"
-        >
-          Productos
-        </a>
-        <a
-          routerLink="/lotes"
-          routerLinkActive="text-sky-600 font-medium"
-          class="text-slate-600 hover:text-sky-600"
-        >
-          Lotes
-        </a>
-      </nav>
-    </div>
 
-    <!-- Desktop: usuario + logout inline -->
-    <div class="hidden sm:flex items-center gap-4 shrink-0">
-      @if (usuario(); as u) {
-        <span class="text-sm text-slate-600">{{ u.nombre }} · {{ u.rol }}</span>
-      }
-      <button (click)="cerrarSesion()" class="text-sm text-slate-600 hover:text-red-600">
-        Cerrar sesión
-      </button>
-    </div>
+        <!-- Indicador de Red Farmacéutica -->
+        <div class="hidden lg:flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-slate-50 border border-slate-200/80 text-[11px] font-medium text-slate-600">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="font-semibold text-slate-700">Red Farmacias:</span>
+          <span class="text-slate-500">Bodega Matriz · Centros Comerciales · Stands Gasolinera</span>
+        </div>
 
-    <!-- Mobile: hamburger menu -->
-    <div class="sm:hidden relative shrink-0" #menuMovil>
-      <button
-        (click)="alternarMenuMovil()"
-        class="w-9 h-9 flex items-center justify-center rounded-md hover:bg-slate-100"
-        aria-label="Abrir menú"
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75">
-          <path d="M2.5 5h15M2.5 10h15M2.5 15h15" stroke-linecap="round" />
-        </svg>
-      </button>
-
-      @if (menuMovilAbierto()) {
-        <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
-          <a
-            routerLink="/dashboard"
-            routerLinkActive="text-sky-600"
-            (click)="cerrarMenuMovil()"
-            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-          >
-            Dashboard
-          </a>
-          <a
-            routerLink="/productos"
-            routerLinkActive="text-sky-600"
-            (click)="cerrarMenuMovil()"
-            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-          >
-            Productos
-          </a>
-          <a
-            routerLink="/lotes"
-            routerLinkActive="text-sky-600"
-            (click)="cerrarMenuMovil()"
-            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-          >
-            Lotes
-          </a>
+        <!-- Perfil de Usuario y Logout Desktop -->
+        <div class="hidden md:flex items-center gap-4 shrink-0">
           @if (usuario(); as u) {
-            <div class="px-4 py-2 text-xs text-slate-400 border-t border-slate-100">{{ u.nombre }} · {{ u.rol }}</div>
+            <div class="flex items-center gap-3 pl-4 border-l border-slate-200/80">
+              <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                {{ u.nombre.slice(0, 1).toUpperCase() }}
+              </div>
+              <div class="text-left">
+                <span class="text-xs font-bold text-slate-800 block leading-tight">{{ u.nombre }}</span>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                  <span
+                    class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-1.5 py-0.2 rounded"
+                    [class.bg-sky-100]="u.rol === 'ADMIN'"
+                    [class.text-sky-800]="u.rol === 'ADMIN'"
+                    [class.bg-amber-100]="u.rol === 'VENDEDOR'"
+                    [class.text-amber-800]="u.rol === 'VENDEDOR'"
+                    [class.bg-emerald-100]="u.rol === 'FARMACEUTICO'"
+                    [class.text-emerald-800]="u.rol === 'FARMACEUTICO'"
+                  >
+                    {{ u.rol }}
+                  </span>
+                  @if (u.sucursalNombre) {
+                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded" title="Sucursal Asignada">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                      </svg>
+                      {{ u.sucursalNombre }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
           }
+
           <button
             (click)="cerrarSesion()"
-            class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            title="Cerrar sesión segura"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-red-600 hover:bg-red-50/70 border border-transparent transition-all cursor-pointer"
           >
-            Cerrar sesión
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Salir
           </button>
         </div>
-      }
+
+        <!-- Botón Menú Móvil -->
+        <div class="md:hidden relative shrink-0" #menuMovil>
+          <button
+            (click)="alternarMenuMovil()"
+            class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+            aria-label="Abrir menú"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2.5 5h15M2.5 10h15M2.5 15h15" stroke-linecap="round" />
+            </svg>
+          </button>
+
+          @if (menuMovilAbierto()) {
+            <div class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-modalScaleUp space-y-1">
+              @if (usuario(); as u) {
+                <div class="px-4 py-2 border-b border-slate-100 flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-xs">
+                    {{ u.nombre.slice(0, 1).toUpperCase() }}
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold text-slate-800">{{ u.nombre }}</p>
+                    <p class="text-[10px] text-slate-500 font-semibold flex items-center gap-1">
+                      <span>{{ u.rol }}</span>
+                      @if (u.sucursalNombre) {
+                        <span>· {{ u.sucursalNombre }}</span>
+                      }
+                    </p>
+                  </div>
+                </div>
+              }
+
+              <a
+                routerLink="/dashboard"
+                routerLinkActive="bg-sky-50 text-sky-700 font-bold"
+                (click)="cerrarMenuMovil()"
+                class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Dashboard
+              </a>
+
+              <a
+                routerLink="/productos"
+                routerLinkActive="bg-sky-50 text-sky-700 font-bold"
+                (click)="cerrarMenuMovil()"
+                class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
+                  <path d="m8.5 8.5 7 7"></path>
+                </svg>
+                Catálogo Productos
+              </a>
+
+              @if (puedeVerLotes()) {
+                <a
+                  routerLink="/lotes"
+                  routerLinkActive="bg-violet-50 text-violet-700 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                  Lotes & Inventario
+                </a>
+              }
+
+              @if (puedeVerTransferencias()) {
+                <a
+                  routerLink="/transferencias"
+                  routerLinkActive="bg-indigo-50 text-indigo-700 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 3h5v5"></path>
+                    <path d="M4 20L21 3"></path>
+                    <path d="M21 16v5h-5"></path>
+                    <path d="M15 15l6 6"></path>
+                    <path d="M4 4l5 5"></path>
+                  </svg>
+                  Transferencias
+                </a>
+              }
+
+              @if (puedeVerCajas()) {
+                <a
+                  routerLink="/cajas"
+                  routerLinkActive="bg-emerald-50 text-emerald-800 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <path d="M7 15h0M2 9.5h20"></path>
+                  </svg>
+                  Cajas & Arqueos
+                </a>
+              }
+
+              @if (puedeVerVentas()) {
+                <a
+                  routerLink="/ventas"
+                  routerLinkActive="bg-emerald-50 text-emerald-800 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                  </svg>
+                  Ventas & Facturación POS
+                </a>
+              }
+
+              @if (puedeVerActivos()) {
+                <a
+                  routerLink="/activos-fijos"
+                  routerLinkActive="bg-indigo-50 text-indigo-800 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                  Activos Fijos
+                </a>
+              }
+
+              @if (puedeVerCallCenter()) {
+                <a
+                  routerLink="/call-center"
+                  routerLinkActive="bg-amber-50 text-amber-800 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                  Call Center & Envíos
+                </a>
+              }
+
+              @if (puedeVerPlanillas()) {
+                <a
+                  routerLink="/planillas"
+                  routerLinkActive="bg-teal-50 text-teal-800 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                  </svg>
+                  Planillas & Personal
+                </a>
+              }
+
+              @if (puedeVerAuditoria()) {
+                <a
+                  routerLink="/auditoria"
+                  routerLinkActive="bg-rose-50 text-rose-800 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                  Auditoría & Seguridad
+                </a>
+              }
+
+              @if (puedeVerSucursales()) {
+                <a
+                  routerLink="/sucursales"
+                  routerLinkActive="bg-emerald-50 text-emerald-800 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path>
+                  </svg>
+                  Red de Sucursales
+                </a>
+              }
+
+              @if (puedeVerUsuarios()) {
+                <a
+                  routerLink="/usuarios"
+                  routerLinkActive="bg-indigo-50 text-indigo-800 font-bold"
+                  (click)="cerrarMenuMovil()"
+                  class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  Usuarios & Roles
+                </a>
+              }
+
+              <div class="pt-1 border-t border-slate-100">
+                <button
+                  (click)="cerrarSesion()"
+                  class="flex items-center gap-2 w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                  Cerrar sesión
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Nivel 2: Barra de Módulos Operativos (Tabs Ejecutivos con Espacio Completo) -->
+    <div class="hidden md:block bg-slate-50/75 px-4 sm:px-8 py-1.5 overflow-x-auto no-scrollbar border-t border-slate-100/80">
+      <div class="max-w-7xl mx-auto flex items-center gap-1.5 text-xs font-semibold">
+        <a
+          routerLink="/dashboard"
+          routerLinkActive="bg-white text-sky-700 font-bold border-slate-200/90 shadow-xs"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          Dashboard
+        </a>
+
+        <a
+          routerLink="/productos"
+          routerLinkActive="bg-white text-sky-700 font-bold border-slate-200/90 shadow-xs"
+          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
+            <path d="m8.5 8.5 7 7"></path>
+          </svg>
+          Catálogo Productos
+        </a>
+
+        @if (puedeVerLotes()) {
+          <a
+            routerLink="/lotes"
+            routerLinkActive="bg-white text-violet-700 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            Lotes & Inventario
+          </a>
+        }
+
+        @if (puedeVerTransferencias()) {
+          <a
+            routerLink="/transferencias"
+            routerLinkActive="bg-white text-indigo-700 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 3h5v5"></path>
+              <path d="M4 20L21 3"></path>
+              <path d="M21 16v5h-5"></path>
+              <path d="M15 15l6 6"></path>
+              <path d="M4 4l5 5"></path>
+            </svg>
+            Transferencias
+          </a>
+        }
+
+        @if (puedeVerCajas()) {
+          <a
+            routerLink="/cajas"
+            routerLinkActive="bg-white text-emerald-800 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M7 15h0M2 9.5h20"></path>
+            </svg>
+            Cajas & Arqueos
+          </a>
+        }
+
+        @if (puedeVerVentas()) {
+          <a
+            routerLink="/ventas"
+            routerLinkActive="bg-white text-emerald-800 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+              <path d="M3 6h18"></path>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            Ventas & POS
+          </a>
+        }
+
+        @if (puedeVerActivos()) {
+          <a
+            routerLink="/activos-fijos"
+            routerLinkActive="bg-white text-indigo-800 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            Activos Fijos
+          </a>
+        }
+
+        @if (puedeVerCallCenter()) {
+          <a
+            routerLink="/call-center"
+            routerLinkActive="bg-white text-amber-800 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            Call Center & Envíos
+          </a>
+        }
+
+        @if (puedeVerPlanillas()) {
+          <a
+            routerLink="/planillas"
+            routerLinkActive="bg-white text-teal-800 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Planillas & Personal
+          </a>
+        }
+
+        @if (puedeVerAuditoria()) {
+          <a
+            routerLink="/auditoria"
+            routerLinkActive="bg-white text-slate-900 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Auditoría & Seguridad
+          </a>
+        }
+
+        @if (puedeVerSucursales()) {
+          <a
+            routerLink="/sucursales"
+            routerLinkActive="bg-white text-emerald-800 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path>
+            </svg>
+            Red de Sucursales
+          </a>
+        }
+
+        @if (puedeVerUsuarios()) {
+          <a
+            routerLink="/usuarios"
+            routerLinkActive="bg-white text-indigo-800 font-bold border-slate-200/90 shadow-xs"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Usuarios & Roles
+          </a>
+        }
+      </div>
     </div>
   </header>
 
-  <main class="p-4 sm:p-6">
+  <!-- Contenido Principal -->
+  <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto">
     <router-outlet />
   </main>
 </div>
