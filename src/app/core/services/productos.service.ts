@@ -13,6 +13,7 @@ export class ProductosService {
     let params = new HttpParams();
     if (query.q) params = params.set('q', query.q);
     if (query.estado) params = params.set('estado', query.estado);
+    if (query.categoriaId) params = params.set('categoriaId', query.categoriaId);
     if (query.page) params = params.set('page', query.page);
     if (query.limit) params = params.set('limit', query.limit);
 

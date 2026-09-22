@@ -57,6 +57,7 @@ export interface ProductoPayload {
 export interface QueryProductos {
   q?: string;
   estado?: 'ACTIVO' | 'INACTIVO';
+  categoriaId?: number;
   page?: number;
   limit?: number;
 }

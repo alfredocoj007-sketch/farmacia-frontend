@@ -1,110 +1,374 @@
-<div class="p-6">
-  <h2 class="text-lg font-semibold text-slate-800 mb-4">Entrada de compra</h2>
-
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-slate-700 mb-1">Producto</label>
-      <select
-        formControlName="productoId"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-      >
-        <option [ngValue]="null" disabled>Seleccioná un producto</option>
-        @for (p of productos(); track p.productoId) {
-          <option [ngValue]="p.productoId">{{ p.nombre }} ({{ p.codigoProducto }})</option>
-        }
-      </select>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-slate-700 mb-1">Sucursal</label>
-      <select
-        formControlName="sucursalId"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-      >
-        <option [ngValue]="null" disabled>Seleccioná una sucursal</option>
-        @for (s of sucursales(); track s.sucursalId) {
-          <option [ngValue]="s.sucursalId">{{ s.nombre }}</option>
-        }
-      </select>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-slate-700 mb-1">Número de lote</label>
-      <input
-        type="text"
-        formControlName="numeroLote"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-      />
-    </div>
-
-    <div class="grid grid-cols-2 gap-4">
+<div class="p-6 sm:p-7 space-y-6">
+  <!-- Cabecera del Modal -->
+  <div class="border-b border-slate-100 pb-4">
+    <div class="flex items-center gap-2.5">
+      <span class="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-md shadow-sky-600/20 font-bold">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="12" y1="18" x2="12" y2="12"></line>
+          <line x1="9" y1="15" x2="15" y2="15"></line>
+        </svg>
+      </span>
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Fecha de vencimiento</label>
-        <input
-          type="date"
-          formControlName="fechaVencimiento"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Fecha de fabricación</label>
-        <input
-          type="date"
-          formControlName="fechaFabricacion"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
+        <h2 class="text-lg font-bold text-slate-800 tracking-tight">Registrar Entrada de Compra por Factura</h2>
+        <p class="text-xs text-slate-400">Recepción formal de mercadería farmacéutica multi-renglón y actualización atómica del inventario</p>
       </div>
     </div>
+  </div>
 
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Costo unitario</label>
-        <input
-          type="number"
-          step="0.01"
-          formControlName="costoUnitario"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
+  @if (resultadoCompra(); as res) {
+    <!-- Pantalla de Éxito / Comprobante de Recepción -->
+    <div class="space-y-5 py-2">
+      <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
       </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Cantidad</label>
-        <input
-          type="number"
-          step="0.001"
-          formControlName="cantidad"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
+      <div class="text-center">
+        <h3 class="text-lg font-bold text-slate-800">¡Factura de Compra Ingresada con Éxito!</h3>
+        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+          Los lotes y movimientos de Kardex han sido sellados en la base de datos de forma atómica.
+        </p>
+      </div>
+
+      <!-- Ficha Resumen de la Factura -->
+      <div class="bg-slate-50 rounded-2xl border border-slate-200 p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div>
+          <span class="text-slate-400 block font-semibold uppercase text-[10px]">Factura / Documento:</span>
+          <strong class="text-slate-800 font-mono text-sm">{{ res.numeroFactura }}</strong>
+        </div>
+        <div>
+          <span class="text-slate-400 block font-semibold uppercase text-[10px]">Proveedor:</span>
+          <strong class="text-slate-800">{{ res.proveedor }}</strong>
+        </div>
+        <div>
+          <span class="text-slate-400 block font-semibold uppercase text-[10px]">Sucursal Destino:</span>
+          <strong class="text-slate-800">{{ res.sucursalNombre }}</strong>
+        </div>
+        <div>
+          <span class="text-slate-400 block font-semibold uppercase text-[10px]">Monto Total Factura:</span>
+          <strong class="text-emerald-700 text-sm font-extrabold">Q {{ res.totalMonto | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+
+      <!-- Tabla de Lotes Creados / Kardex -->
+      <div class="rounded-xl border border-slate-200 overflow-hidden text-xs">
+        <div class="bg-slate-100/80 px-4 py-2.5 font-bold text-slate-700 flex items-center justify-between">
+          <span>Renglones Procesados ({{ res.totalItems }} productos · {{ res.totalUnidades }} unidades)</span>
+        </div>
+        <div class="divide-y divide-slate-100 max-h-60 overflow-y-auto bg-white">
+          @for (d of res.detalles; track d.movimientoId) {
+            <div class="px-4 py-2 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-slate-800">{{ d.nombreProducto }}</span>
+                <span class="text-slate-400 block text-[11px] font-mono">Lote: {{ d.numeroLote }}</span>
+              </div>
+              <div class="text-right">
+                <span class="text-slate-600 font-semibold">{{ d.cantidad }} uds × Q {{ d.costoUnitario | number:'1.2-2' }}</span>
+                <span class="block text-emerald-700 font-bold">Subtotal: Q {{ d.subtotal | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="flex justify-center pt-2">
+        <button
+          type="button"
+          (click)="cerrarConExito()"
+          class="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold shadow-md shadow-slate-800/20 active:scale-95 transition-all cursor-pointer"
+        >
+          Finalizar y Volver al Inventario
+        </button>
       </div>
     </div>
+  } @else {
+    <!-- Formulario de Factura de Compra -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+      <!-- 1. Cabecera (Datos Generales de Factura) -->
+      <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-200/60 pb-2">
+          <span class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-sky-600"></span>
+            1. Cabecera del Documento de Compra
+          </span>
+          <span class="text-[11px] text-slate-500 font-medium">Campos con (*) son obligatorios</span>
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-slate-700 mb-1">Observación (opcional)</label>
-      <input
-        type="text"
-        formControlName="observacion"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-      />
-    </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <!-- Proveedor / Laboratorio -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">
+              Proveedor / Laboratorio
+            </label>
+            <select
+              formControlName="proveedorId"
+              class="w-full text-xs bg-white border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 cursor-pointer"
+            >
+              <option [ngValue]="null">-- Seleccionar Proveedor --</option>
+              @for (lab of laboratorios(); track lab.laboratorioId) {
+                <option [ngValue]="lab.laboratorioId">{{ lab.nombre }}</option>
+              }
+            </select>
+          </div>
 
-    @if (error()) {
-      <p class="text-sm text-red-600">{{ error() }}</p>
-    }
+          <!-- N° de Factura / Documento -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">
+              N° Factura / Serie <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="numeroFactura"
+              placeholder="Ej: FAC-2026-9042"
+              class="w-full text-xs font-mono uppercase bg-white border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800"
+            />
+          </div>
 
-    <div class="flex justify-end gap-3 pt-2">
-      <button
-        type="button"
-        (click)="cancelado.emit()"
-        class="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
-      >
-        Cancelar
-      </button>
-      <button
-        type="submit"
-        [disabled]="guardando()"
-        class="rounded-md bg-sky-600 text-white text-sm font-medium px-4 py-2 hover:bg-sky-700 disabled:opacity-60"
-      >
-        {{ guardando() ? 'Guardando…' : 'Registrar entrada' }}
-      </button>
-    </div>
-  </form>
+          <!-- Fecha de Emisión de Factura -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">
+              Fecha de Emisión <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              formControlName="fechaFactura"
+              class="w-full text-xs bg-white border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 cursor-pointer"
+            />
+          </div>
+
+          <!-- Sucursal Destino -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">
+              Sucursal Destino <span class="text-red-500">*</span>
+            </label>
+            <select
+              formControlName="sucursalId"
+              class="w-full text-xs font-semibold bg-white border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800 cursor-pointer"
+            >
+              <option [ngValue]="null" disabled>Selecciona la sucursal</option>
+              @for (s of sucursales(); track s.sucursalId) {
+                <option [ngValue]="s.sucursalId">{{ s.nombre }} (#SUC-{{ s.sucursalId }})</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Observaciones o Referencia General -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Observaciones o Referencia General de la Entrega (Opcional)
+          </label>
+          <input
+            type="text"
+            formControlName="observacion"
+            placeholder="Ej: Entrega conforme con guía de despacho #GD-4412, bultos completos"
+            class="w-full text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800"
+          />
+        </div>
+      </div>
+
+      <!-- 2. Detalle de Productos y Lotes (Tabla Dinámica / Multi-renglón) -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">
+              2. Detalle de Productos y Asignación de Lotes
+            </h3>
+            <span class="text-[11px] px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold">
+              {{ items.length }} renglón(es)
+            </span>
+          </div>
+
+          <!-- Botón Añadir Producto a la Factura -->
+          <button
+            type="button"
+            (click)="agregarRenglon()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow-sm active:scale-95 transition-all cursor-pointer"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>+ Añadir Producto a la Factura</span>
+          </button>
+        </div>
+
+        <!-- Tabla Multi-renglón -->
+        <div class="rounded-xl border border-slate-200 overflow-x-auto shadow-xs bg-white">
+          <table class="w-full text-left text-xs border-collapse min-w-[760px]">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px] tracking-wider">
+                <th class="py-2.5 px-3 w-8 text-center">#</th>
+                <th class="py-2.5 px-3 min-w-[220px]">Producto Farmacéutico <span class="text-red-500">*</span></th>
+                <th class="py-2.5 px-3 min-w-[130px]">N° Lote / Batch <span class="text-red-500">*</span></th>
+                <th class="py-2.5 px-3 min-w-[130px]">Vencimiento <span class="text-red-500">*</span></th>
+                <th class="py-2.5 px-3 min-w-[90px] text-right">Cantidad <span class="text-red-500">*</span></th>
+                <th class="py-2.5 px-3 min-w-[110px] text-right">Costo Unit. (Q) <span class="text-red-500">*</span></th>
+                <th class="py-2.5 px-3 min-w-[110px] text-right">Subtotal (GTQ)</th>
+                <th class="py-2.5 px-3 w-10 text-center"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100" formArrayName="items">
+              @for (item of items.controls; track $index; let i = $index) {
+                <tr [formGroupName]="i" class="hover:bg-sky-50/20 transition-colors">
+                  <!-- Número -->
+                  <td class="py-2 px-3 text-center text-slate-400 font-mono font-semibold">
+                    {{ i + 1 }}
+                  </td>
+
+                  <!-- Producto -->
+                  <td class="py-2 px-3">
+                    <select
+                      formControlName="productoId"
+                      (change)="onProductoSeleccionado(i, $event)"
+                      class="w-full text-xs bg-slate-50/70 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:bg-white focus:outline-none focus:border-sky-500 text-slate-800"
+                    >
+                      <option [ngValue]="null" disabled>-- Seleccionar medicamento --</option>
+                      @for (p of productos(); track p.productoId) {
+                        <option [ngValue]="p.productoId">
+                          {{ p.nombre }} ({{ p.codigoProducto }})
+                        </option>
+                      }
+                    </select>
+                  </td>
+
+                  <!-- Lote -->
+                  <td class="py-2 px-3">
+                    <input
+                      type="text"
+                      formControlName="numeroLote"
+                      placeholder="LOT-2026-X"
+                      class="w-full text-xs font-mono uppercase bg-slate-50/70 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:bg-white focus:outline-none focus:border-sky-500 text-slate-800"
+                    />
+                  </td>
+
+                  <!-- Fecha Vencimiento -->
+                  <td class="py-2 px-3">
+                    <input
+                      type="date"
+                      formControlName="fechaVencimiento"
+                      class="w-full text-xs bg-slate-50/70 border border-slate-200 rounded-lg px-2 py-1.5 focus:bg-white focus:outline-none focus:border-sky-500 text-slate-800"
+                    />
+                  </td>
+
+                  <!-- Cantidad -->
+                  <td class="py-2 px-3 text-right">
+                    <input
+                      type="number"
+                      step="1"
+                      min="1"
+                      formControlName="cantidad"
+                      (input)="onValorCambiado()"
+                      class="w-20 text-xs font-semibold text-right bg-slate-50/70 border border-slate-200 rounded-lg px-2 py-1.5 focus:bg-white focus:outline-none focus:border-sky-500 text-slate-800"
+                    />
+                  </td>
+
+                  <!-- Costo Unitario -->
+                  <td class="py-2 px-3 text-right">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      formControlName="costoUnitario"
+                      (input)="onValorCambiado()"
+                      class="w-24 text-xs font-mono font-semibold text-right bg-slate-50/70 border border-slate-200 rounded-lg px-2 py-1.5 focus:bg-white focus:outline-none focus:border-sky-500 text-slate-800"
+                    />
+                  </td>
+
+                  <!-- Subtotal de Línea -->
+                  <td class="py-2 px-3 text-right font-mono font-bold text-slate-800">
+                    Q {{ subtotalRenglon(i) | number:'1.2-2' }}
+                  </td>
+
+                  <!-- Botón Eliminar Renglón -->
+                  <td class="py-2 px-3 text-center">
+                    <button
+                      type="button"
+                      (click)="eliminarRenglon(i)"
+                      [disabled]="items.length <= 1"
+                      title="Eliminar este renglón"
+                      class="w-7 h-7 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all inline-flex items-center justify-center cursor-pointer"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3. Resumen y Cierre de la Compra -->
+      <div class="p-4 bg-slate-900 rounded-2xl text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md shadow-slate-900/10">
+        <!-- Indicadores de Totales -->
+        <div class="flex items-center gap-6 text-xs flex-wrap">
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Productos Distintos</span>
+            <span class="text-base font-bold text-slate-100">{{ totalProductosDistintos() }} ítems</span>
+          </div>
+
+          <div class="h-8 w-px bg-slate-700 hidden sm:block"></div>
+
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Total Unidades Físicas</span>
+            <span class="text-base font-bold text-sky-400">{{ totalUnidadesFisicas() | number:'1.0-0' }} uds</span>
+          </div>
+        </div>
+
+        <!-- Total Global en Quetzales -->
+        <div class="text-right">
+          <span class="text-slate-400 block text-[10px] uppercase font-semibold">Monto Total Global de la Factura</span>
+          <span class="text-2xl font-black text-emerald-400 tracking-tight">
+            Q {{ montoTotalGlobal() | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          {{ error() }}
+        </div>
+      }
+
+      <!-- Botones de Acción -->
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+        <button
+          type="button"
+          (click)="cancelado.emit()"
+          class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="guardando() || form.invalid || items.length === 0"
+          class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-xs font-bold shadow-md shadow-sky-600/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 cursor-pointer"
+        >
+          @if (guardando()) {
+            <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <span>Procesando Compra e Inventario…</span>
+          } @else {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Confirmar y Procesar Compra</span>
+          }
+        </button>
+      </div>
+    </form>
+  }
 </div>

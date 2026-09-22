@@ -1,75 +1,709 @@
-<div class="max-w-3xl">
-  <a routerLink="/lotes" class="text-sm text-slate-500 hover:text-slate-700">← Volver a lotes</a>
+<div class="max-w-7xl mx-auto space-y-6 pb-12 print:p-0 print:space-y-3">
+  <!-- Navegación y Acciones Superiores -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:hidden">
+    <div class="flex items-center gap-2 flex-wrap">
+      <a routerLink="/lotes"
+        class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all cursor-pointer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Volver a Lotes e Inventario
+      </a>
+
+      <a routerLink="/lotes/kardex-general"
+        class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all cursor-pointer"
+        title="Consultar auditoría consolidada de todos los movimientos de la farmacia">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-violet-600">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        Ver Kardex General
+      </a>
+
+      <a routerLink="/productos"
+        class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all cursor-pointer"
+        title="Consultar ficha del medicamento en el Catálogo">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-600">
+          <path d="m7.5 4.27 9 5.15"></path>
+          <path
+            d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z">
+          </path>
+          <path d="m3.3 7 8.7 5 8.7-5"></path>
+          <path d="M12 22V12"></path>
+        </svg>
+        Ver en Catálogo de Productos
+      </a>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button type="button" (click)="imprimirKardex()"
+        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-xs transition-colors cursor-pointer"
+        title="Imprimir reporte oficial o exportar como PDF">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Imprimir Kardex Oficial
+      </button>
+    </div>
+  </div>
 
   @if (lote(); as l) {
-    <div class="bg-white rounded-lg shadow p-6 mt-4 mb-4">
-      <h2 class="text-lg font-semibold text-slate-800">{{ l.producto?.nombre }}</h2>
-      <p class="text-sm text-slate-500">
-        Lote {{ l.numeroLote }} · Vence {{ l.fechaVencimiento }} · Costo unitario Q{{ l.costoUnitario }}
-      </p>
+  <!-- Barra Dinámica de Lotes del Medicamento (Si el producto tiene más de 1 lote registrado) -->
+  @if (lotesDelProducto().length > 1) {
+  <div
+    class="bg-indigo-50/70 border border-indigo-200/80 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs print:hidden">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+      <span class="font-bold text-indigo-950">
+        Lotes registrados de este medicamento ({{ lotesDelProducto().length }}):
+      </span>
+      <span class="text-indigo-600 text-[11px] hidden md:inline">
+        Alterna para auditar el Kardex individual de cada lote
+      </span>
+    </div>
 
-      @if (l.inventarios && l.inventarios.length > 0) {
-        <div class="mt-3 flex flex-wrap gap-2">
-          @for (inv of l.inventarios; track inv.inventarioId) {
-            <span class="text-xs bg-slate-100 text-slate-600 rounded-full px-3 py-1">
-              {{ inv.sucursal?.nombre }}: {{ inv.cantidadDisponible }} disponibles
-            </span>
-          }
-        </div>
+    <div class="flex flex-wrap items-center gap-1.5">
+      @for (hermano of lotesDelProducto(); track hermano.loteId) {
+      <button type="button" (click)="cambiarLote(hermano.loteId)" [class.bg-indigo-600]="hermano.loteId === l.loteId"
+        [class.text-white]="hermano.loteId === l.loteId" [class.font-bold]="hermano.loteId === l.loteId"
+        [class.shadow-xs]="hermano.loteId === l.loteId" [class.bg-white]="hermano.loteId !== l.loteId"
+        [class.text-slate-700]="hermano.loteId !== l.loteId" [class.border]="hermano.loteId !== l.loteId"
+        class="px-2.5 py-1 rounded-lg transition-all cursor-pointer text-xs flex items-center gap-1.5">
+        <span class="font-mono font-semibold">{{ hermano.numeroLote }}</span>
+        <span class="text-[10px] opacity-75">({{ hermano.fechaVencimiento | date:'MM/yy' }})</span>
+        @if (hermano.loteId === l.loteId) {
+        <span class="text-[10px] bg-indigo-800 px-1 py-0.2 rounded text-white">Activo</span>
+        }
+      </button>
       }
     </div>
+  </div>
   }
 
-  <div class="bg-white rounded-lg shadow overflow-hidden">
-    <h3 class="text-sm font-medium text-slate-700 px-4 pt-4">Kardex (historial de movimientos)</h3>
+  <!-- ========================================================================= -->
+  <!-- ENCABEZADO INSTITUCIONAL Y FICHA TÉCNICA OFICIAL (SOLO IMPRESIÓN AUDITORÍA) -->
+  <!-- ========================================================================= -->
+  <div class="hidden print:block mb-4 border-b-2 border-slate-900 pb-3">
+    <!-- Encabezado Institucional -->
+    <div class="flex items-start justify-between">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl font-black uppercase tracking-tight text-slate-950">
+            Farmacia
+          </h1>
+        </div>
+
+        <h2 class="text-base font-black text-slate-950 mt-2 tracking-wide uppercase">
+          Reporte Oficial de Kardex Físico y Valorado
+        </h2>
+      </div>
+
+      <div class="text-right text-[10px] font-mono text-slate-800 space-y-0.5">
+        <p><strong>Fecha y Hora Emisión:</strong> {{ fechaImpresion() }}</p>
+        <p><strong>Usuario Emisor:</strong> {{ usuario()?.nombre ?? usuario()?.username ?? 'Administrador' }}</p>
+        <p><strong>Rol / Perfil:</strong> {{ usuario()?.rol ?? 'ADMINISTRADOR' }}</p>
+      </div>
+    </div>
+
+    <!-- Ficha Técnica del Medicamento y Lote -->
+    <div class="mt-3 grid grid-cols-2 gap-3 text-xs bg-slate-50/80 p-3 rounded border border-slate-300">
+      <div class="space-y-1">
+        <p>
+          <strong class="text-slate-900">Nombre Comercial:</strong>
+          <span class="font-bold text-slate-900 ml-1">{{ l.producto?.nombre }}</span>
+        </p>
+        <p>
+          <strong class="text-slate-700">Principio Activo:</strong>
+          <span class="ml-1">{{ l.producto?.principioActivo || 'No especificado' }}</span>
+        </p>
+        <p>
+          <strong class="text-slate-700">Concentración:</strong> {{ l.producto?.concentracion || '—' }} |
+          <strong class="text-slate-700">Presentación:</strong> {{ l.producto?.presentacion || '—' }}
+        </p>
+        <p>
+          <strong class="text-slate-700">Código / SKU:</strong> <span class="font-mono">{{ l.producto?.codigoProducto
+            }}</span> |
+          <strong class="text-slate-700">Laboratorio:</strong> {{ l.producto?.laboratorio?.nombre ?? 'No asignado' }}
+        </p>
+      </div>
+
+      <div class="space-y-1">
+        <p>
+          <strong class="text-slate-900">Número de Lote:</strong>
+          <span class="font-mono font-black text-slate-950 ml-1 text-sm bg-slate-200 px-1.5 py-0.5 rounded">{{
+            l.numeroLote }}</span>
+          <span class="text-[11px] text-slate-500 ml-1">(ID #{{ l.loteId }})</span>
+        </p>
+        <p>
+          <strong class="text-slate-700">Fecha de Caducidad (FEFO):</strong>
+          <span class="font-bold text-slate-900 ml-1">{{ l.fechaVencimiento | date:'dd/MM/yyyy' }}</span>
+          <span class="ml-1 text-[11px] font-semibold text-slate-600">({{ estadoFefo().texto }})</span>
+        </p>
+        <p>
+          <strong class="text-slate-700">Costo Unitario Actual:</strong>
+          <span class="font-bold text-slate-900 ml-1">Q {{ l.costoUnitario.toFixed(2) }}</span> |
+          <strong class="text-slate-700">Precio Venta:</strong> Q {{ (l.producto?.precioVenta || 0).toFixed(2) }}
+        </p>
+        <p>
+          <strong class="text-slate-900">Existencia en Sucursal:</strong>
+          <span class="font-black text-slate-950 ml-1 underline">{{ stockSucursalConsultada() }} unidades</span>
+          <span class="text-slate-500 text-[11px] ml-1">(Existencia Global: {{ stockTotal() }} uds)</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta Principal: Ficha Maestra del Lote y Medicamento (Modo Pantalla) -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6 print:hidden">
+    <!-- Encabezado de Identificación del Medicamento -->
+    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5 border-b border-slate-100 pb-5">
+      <div class="space-y-2">
+        <!-- Badges de Lote y Semáforo FEFO -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span
+            class="font-mono text-xs font-bold px-3 py-1 rounded-lg bg-violet-50 text-violet-700 border border-violet-200">
+            LOTE: {{ l.numeroLote }}
+          </span>
+          <span class="text-xs font-mono text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
+            ID #{{ l.loteId }}
+          </span>
+          <!-- Semáforo de Vencimiento FEFO -->
+          <span [class]="estadoFefo().clase"
+            class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full border">
+            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+            {{ estadoFefo().texto }}
+          </span>
+          <!-- Badge de Prescripción Médica -->
+          @if (l.producto?.requiereReceta === 'S') {
+          <span
+            class="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 font-semibold">
+            ⚕️ Requiere Receta Médica
+          </span>
+          } @else {
+          <span
+            class="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+            ✓ Venta Libre (OTC)
+          </span>
+          }
+        </div>
+
+        <!-- Nombre Comercial y Principio Activo -->
+        <div>
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">
+            {{ l.producto?.nombre }}
+          </h1>
+          <p class="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+            @if (l.producto?.principioActivo) {
+            <span>
+              <strong class="font-semibold text-slate-700">Principio Activo:</strong> {{ l.producto?.principioActivo }}
+            </span>
+            }
+            @if (l.producto?.concentracion) {
+            <span>·</span>
+            <span>
+              <strong class="font-semibold text-slate-700">Concentración:</strong> {{ l.producto?.concentracion }}
+            </span>
+            }
+            @if (l.producto?.presentacion) {
+            <span>·</span>
+            <span>
+              <strong class="font-semibold text-slate-700">Presentación:</strong> {{ l.producto?.presentacion }}
+            </span>
+            }
+          </p>
+        </div>
+
+        <!-- Datos Institucionales y Clasificación -->
+        <div class="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-600">
+          <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md">
+            <span class="text-slate-400">Laboratorio:</span>
+            <strong class="text-slate-700">{{ l.producto?.laboratorio?.nombre ?? 'No especificado' }}</strong>
+          </span>
+          <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md">
+            <span class="text-slate-400">Categoría:</span>
+            <strong class="text-slate-700">{{ l.producto?.categoria?.nombre ?? 'General' }}</strong>
+          </span>
+          <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md">
+            <span class="text-slate-400">Unidad:</span>
+            <strong class="text-slate-700">{{ l.producto?.unidadMedida?.nombre ?? l.producto?.unidadMedida?.abreviatura
+              ?? 'Unidad' }}</strong>
+          </span>
+          <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md font-mono">
+            <span class="text-slate-400">SKU:</span>
+            <strong class="text-slate-700">{{ l.producto?.codigoProducto }}</strong>
+          </span>
+        </div>
+      </div>
+
+      <!-- Bloque Destacado de Stock Actual -->
+      <div
+        class="bg-gradient-to-br from-emerald-50/80 to-teal-50/50 border border-emerald-200/80 p-4 rounded-2xl sm:min-w-[240px] text-right flex flex-col justify-center">
+        <span class="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">
+          Existencia Física Total
+        </span>
+        <div class="flex items-baseline justify-end gap-1.5 mt-1">
+          <span class="text-3xl font-black text-emerald-950">{{ stockTotal() }}</span>
+          <span class="text-xs font-semibold text-emerald-700">uds</span>
+        </div>
+        <span class="text-[11px] text-emerald-600 mt-0.5 block">
+          Disponible para dispensación
+        </span>
+      </div>
+    </div>
+
+    <!-- Matriz Técnica y Financiera (8 Datos Clave) -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70">
+        <span class="text-slate-400 font-medium block mb-1">Fecha Fabricación</span>
+        <span class="font-bold text-slate-800 text-sm">
+          {{ l.fechaFabricacion ? formatearFecha(l.fechaFabricacion) : 'No especificada' }}
+        </span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70">
+        <span class="text-slate-400 font-medium block mb-1">Fecha Caducidad</span>
+        <span class="font-bold text-slate-800 text-sm">
+          {{ formatearFecha(l.fechaVencimiento) }}
+        </span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70">
+        <span class="text-slate-400 font-medium block mb-1">Costo Unit. (Adquisición)</span>
+        <span class="font-bold text-slate-800 text-sm">
+          Q {{ l.costoUnitario.toFixed(2) }}
+        </span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70">
+        <span class="text-slate-400 font-medium block mb-1">Precio Venta Público</span>
+        <span class="font-bold text-slate-800 text-sm">
+          Q {{ (l.producto?.precioVenta || 0).toFixed(2) }}
+        </span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70">
+        <span class="text-slate-400 font-medium block mb-1">Margen Unitario Bruto</span>
+        <span class="font-bold text-indigo-700 text-sm">
+          Q {{ margenUnitario().toFixed(2) }}
+          <span class="text-xs font-normal text-indigo-500">({{ porcentajeMargen().toFixed(1) }}%)</span>
+        </span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70">
+        <span class="text-slate-400 font-medium block mb-1">Valor en Bodega (Costo)</span>
+        <span class="font-bold text-emerald-700 text-sm">
+          Q {{ valorInventarioCosto().toFixed(2) }}
+        </span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70">
+        <span class="text-slate-400 font-medium block mb-1">Valor Potencial Venta</span>
+        <span class="font-bold text-teal-700 text-sm">
+          Q {{ valorPotencialVenta().toFixed(2) }}
+        </span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70">
+        <span class="text-slate-400 font-medium block mb-1">IVA Aplicable</span>
+        <span class="font-bold text-slate-800 text-sm">
+          {{ l.producto?.porcentajeIva ?? 12 }}% Incluido
+        </span>
+      </div>
+    </div>
+
+    <!-- Desglose de Existencias por Sucursal Física -->
+    @if (l.inventarios && l.inventarios.length > 0) {
+    <div class="space-y-2 pt-2 border-t border-slate-100">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          Disponibilidad Física por Sucursal:
+        </span>
+        <span class="text-xs text-slate-400">{{ l.inventarios.length }} sucursales registradas</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        @for (inv of l.inventarios; track inv.inventarioId) {
+        <div
+          class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 transition-colors space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <strong class="text-xs font-bold text-slate-900">{{ inv.sucursal?.nombre ?? 'Sucursal' }}</strong>
+            </div>
+            @if (inv.cantidadDisponible <= inv.stockMinimo) { <span
+              class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
+              ⚠️ Stock Bajo
+              </span>
+              }
+          </div>
+
+          <div class="flex items-baseline justify-between text-xs pt-1 border-t border-slate-200/60">
+            <span class="text-slate-500">Disponible:</span>
+            <span class="font-mono font-bold text-sm text-slate-900">{{ inv.cantidadDisponible }} uds</span>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-400">
+            <span>Mín: {{ inv.stockMinimo }} | Máx: {{ inv.stockMaximo ?? '—' }}</span>
+            <span>Reservado: {{ inv.cantidadReservada }}</span>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Barra de KPIs y Auditoría de Movimientos (Solo Pantalla) -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 print:hidden">
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+      <span class="text-xs text-slate-400 font-medium block">Total Ingresos (+)</span>
+      <span class="text-xl font-black text-emerald-600 mt-1 block">+{{ totalEntradas() }}</span>
+      <span class="text-[11px] text-slate-400">unidades recibidas</span>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+      <span class="text-xs text-slate-400 font-medium block">Total Egresos (−)</span>
+      <span class="text-xl font-black text-amber-600 mt-1 block">−{{ totalSalidas() }}</span>
+      <span class="text-[11px] text-slate-400">ventas y ajustes</span>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+      <span class="text-xs text-slate-400 font-medium block">Saldo Remanente</span>
+      <span class="text-xl font-black text-slate-900 mt-1 block">{{ stockTotal() }}</span>
+      <span class="text-[11px] text-slate-400">unidades en stock</span>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-slate-400 font-medium">Rotación del Lote</span>
+          <span class="text-xs font-bold text-indigo-600">{{ porcentajeRotacion() }}%</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-2 mt-2 overflow-hidden">
+          <div class="bg-indigo-600 h-2 rounded-full transition-all duration-500"
+            [style.width.%]="porcentajeRotacion()"></div>
+        </div>
+      </div>
+      <span class="text-[11px] text-slate-400 mt-1">dispensado vs ingresado</span>
+    </div>
+  </div>
+
+  <!-- Sección Principal del Kardex (Tabla de Movimientos Físicos y Valorados) -->
+  <div
+    class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden space-y-4 p-5 print:border-none print:shadow-none print:p-0">
+    <!-- Encabezado de la Sección y Controles (Solo Pantalla) -->
+    <div
+      class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-100 pb-4 print:hidden">
+      <div>
+        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-emerald-600">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          Kardex Físico y Valorado (Trazabilidad Total)
+        </h2>
+        <p class="text-xs text-slate-400 mt-0.5">
+          Auditoría legal y financiera de entradas por compras, ventas en mostrador y regularizaciones
+        </p>
+      </div>
+
+      <!-- Barra de Filtros e Interacción (Oculta en Impresión) -->
+      <div class="flex flex-wrap items-center gap-2 print:hidden">
+        <!-- Buscador en tiempo real -->
+        <div class="relative min-w-[220px]">
+          <input type="text" [value]="busqueda()" (input)="actualizarBusqueda($event)"
+            placeholder="Buscar en historial…"
+            class="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-700 bg-slate-50/50 focus:bg-white focus:border-emerald-500 focus:outline-none transition-all" />
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" width="13" height="13"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          @if (busqueda()) {
+          <button type="button" (click)="limpiarBusqueda()"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+            ✕
+          </button>
+          }
+        </div>
+
+        <!-- Filtro por Sucursal (si hay más de una) -->
+        @if (sucursalesDisponibles().length > 1) {
+        <select (change)="cambiarFiltroSucursal($event)"
+          class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-700 bg-slate-50/50 focus:bg-white focus:outline-none cursor-pointer">
+          <option value="">Todas las Sucursales</option>
+          @for (suc of sucursalesDisponibles(); track suc.id) {
+          <option [value]="suc.id">{{ suc.nombre }}</option>
+          }
+        </select>
+        }
+
+        <!-- Píldoras de Tipo de Movimiento -->
+        <div class="inline-flex rounded-xl bg-slate-100 p-0.5 border border-slate-200/80 text-xs">
+          <button type="button" (click)="cambiarFiltroTipo('')" [class.bg-white]="filtroTipo() === ''"
+            [class.text-slate-900]="filtroTipo() === ''" [class.shadow-xs]="filtroTipo() === ''"
+            [class.font-bold]="filtroTipo() === ''"
+            class="px-2.5 py-1 rounded-lg text-slate-600 transition-all cursor-pointer">
+            Todos ({{ movimientos().length }})
+          </button>
+          <button type="button" (click)="cambiarFiltroTipo('ENTRADA')" [class.bg-white]="filtroTipo() === 'ENTRADA'"
+            [class.text-emerald-700]="filtroTipo() === 'ENTRADA'" [class.shadow-xs]="filtroTipo() === 'ENTRADA'"
+            [class.font-bold]="filtroTipo() === 'ENTRADA'"
+            class="px-2.5 py-1 rounded-lg text-slate-600 transition-all cursor-pointer">
+            Entradas (+)
+          </button>
+          <button type="button" (click)="cambiarFiltroTipo('VENTA')" [class.bg-white]="filtroTipo() === 'VENTA'"
+            [class.text-amber-700]="filtroTipo() === 'VENTA'" [class.shadow-xs]="filtroTipo() === 'VENTA'"
+            [class.font-bold]="filtroTipo() === 'VENTA'"
+            class="px-2.5 py-1 rounded-lg text-slate-600 transition-all cursor-pointer">
+            Ventas (−)
+          </button>
+          <button type="button" (click)="cambiarFiltroTipo('AJUSTE')" [class.bg-white]="filtroTipo() === 'AJUSTE'"
+            [class.text-purple-700]="filtroTipo() === 'AJUSTE'" [class.shadow-xs]="filtroTipo() === 'AJUSTE'"
+            [class.font-bold]="filtroTipo() === 'AJUSTE'"
+            class="px-2.5 py-1 rounded-lg text-slate-600 transition-all cursor-pointer">
+            Ajustes
+          </button>
+        </div>
+
+        <!-- Botón de Orden Cronológico -->
+        <button type="button" (click)="toggleOrden()"
+          class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-600 hover:text-slate-900 shadow-xs cursor-pointer"
+          [title]="ordenAscendente() ? 'Orden: Antiguos primero' : 'Orden: Recientes primero'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            @if (ordenAscendente()) {
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+            } @else {
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+            }
+          </svg>
+          {{ ordenAscendente() ? 'Antiguos 1°' : 'Recientes 1°' }}
+        </button>
+      </div>
+    </div>
 
     @if (cargando()) {
-      <p class="text-sm text-slate-500 p-6">Cargando…</p>
+    <div class="py-16 text-center text-slate-400 text-sm animate-pulse space-y-2">
+      <svg class="mx-auto animate-spin text-emerald-600" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+        <path d="M12 2a10 10 0 0 1 10 10"></path>
+      </svg>
+      <p>Cargando auditoría de movimientos del Kardex…</p>
+    </div>
     } @else if (error()) {
-      <p class="text-sm text-red-600 p-6">{{ error() }}</p>
-    } @else if (movimientos().length === 0) {
-      <p class="text-sm text-slate-500 p-6">Este lote todavía no tiene movimientos.</p>
+    <div class="p-8 text-center text-red-600 text-sm font-semibold bg-red-50/50 rounded-xl border border-red-100">
+      {{ error() }}
+    </div>
+    } @else if (movimientosFiltrados().length === 0) {
+    <div class="p-16 text-center space-y-3">
+      <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <p class="text-sm text-slate-700 font-semibold">No se encontraron movimientos registrados</p>
+      <p class="text-xs text-slate-400 max-w-sm mx-auto">
+        Prueba cambiando el filtro de tipo de movimiento o limpiando la búsqueda.
+      </p>
+    </div>
     } @else {
-      <div class="overflow-x-auto">
-      <table class="w-full text-sm mt-2">
-        <thead class="bg-slate-50 text-slate-500 text-left">
-          <tr>
-            <th class="px-4 py-2 font-medium">Fecha</th>
-            <th class="px-4 py-2 font-medium">Tipo</th>
-            <th class="px-4 py-2 font-medium">Sucursal</th>
-            <th class="px-4 py-2 font-medium text-right">Anterior</th>
-            <th class="px-4 py-2 font-medium text-right">Cantidad</th>
-            <th class="px-4 py-2 font-medium text-right">Nuevo saldo</th>
+    <!-- Tabla Principal del Kardex -->
+    <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <table class="w-full text-left text-xs border-collapse">
+        <thead>
+          <!-- Fila de Encabezados Agrupados: Físico vs Valorado -->
+          <tr
+            class="bg-slate-100/90 text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200">
+            <th colspan="5" class="px-4 py-2 border-r border-slate-200">
+              Información del Evento y Documento
+            </th>
+            <th colspan="3" class="px-4 py-2 text-center bg-blue-50/70 text-blue-900 border-r border-slate-200">
+              Kardex Físico (Unidades)
+            </th>
+            <th colspan="3" class="px-4 py-2 text-center bg-emerald-50/70 text-emerald-900 border-r border-slate-200">
+              Kardex Valorado (Quetzales)
+            </th>
+            <th class="px-4 py-2">
+              Auditoría
+            </th>
+          </tr>
+          <!-- Fila de Columnas Específicas -->
+          <tr
+            class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+            <th class="px-3.5 py-2.5">Folio</th>
+            <th class="px-3.5 py-2.5">Fecha y Hora</th>
+            <th class="px-3.5 py-2.5">Tipo</th>
+            <th class="px-3.5 py-2.5">Referencia</th>
+            <th class="px-3.5 py-2.5 border-r border-slate-200">Sucursal</th>
+
+            <!-- Columnas Físicas -->
+            <th class="px-3.5 py-2.5 text-right bg-blue-50/30">Saldo Ant.</th>
+            <th class="px-3.5 py-2.5 text-right bg-blue-50/30">Cantidad</th>
+            <th class="px-3.5 py-2.5 text-right bg-blue-50/30 border-r border-slate-200">Nuevo Saldo</th>
+
+            <!-- Columnas Valoradas -->
+            <th class="px-3.5 py-2.5 text-right bg-emerald-50/30">Costo Unit.</th>
+            <th class="px-3.5 py-2.5 text-right bg-emerald-50/30">Impacto Q</th>
+            <th class="px-3.5 py-2.5 text-right bg-emerald-50/30 border-r border-slate-200">Saldo Valorado</th>
+
+            <th class="px-3.5 py-2.5">Observación / Justificación</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100">
-          @for (m of movimientos(); track m.movimientoInventarioId) {
-            <tr>
-              <td class="px-4 py-2 text-slate-600">{{ m.fechaMovimiento | slice: 0 : 10 }}</td>
-              <td class="px-4 py-2">
-                <span
-                  class="text-xs px-2 py-0.5 rounded-full"
-                  [class.bg-green-100]="m.tipoMovimiento === 'ENTRADA'"
-                  [class.text-green-700]="m.tipoMovimiento === 'ENTRADA'"
-                  [class.bg-amber-100]="m.tipoMovimiento === 'VENTA'"
-                  [class.text-amber-700]="m.tipoMovimiento === 'VENTA'"
-                  [class.bg-red-100]="m.tipoMovimiento === 'AJUSTE'"
-                  [class.text-red-700]="m.tipoMovimiento === 'AJUSTE'"
-                >
-                  {{ m.tipoMovimiento }}
-                </span>
-              </td>
-              <td class="px-4 py-2 text-slate-600">{{ m.inventario?.sucursal?.nombre }}</td>
-              <td class="px-4 py-2 text-right text-slate-600">{{ m.cantidadAnterior }}</td>
-              <td class="px-4 py-2 text-right text-slate-600">
-                {{ m.tipoMovimiento === 'ENTRADA' ? '+' : '-' }}{{ m.cantidad }}
-              </td>
-              <td class="px-4 py-2 text-right font-medium text-slate-800">{{ m.cantidadNueva }}</td>
-            </tr>
+
+        <tbody class="divide-y divide-slate-100 font-sans">
+          @for (m of movimientosFiltrados(); track m.movimientoInventarioId) {
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <!-- Folio / ID de Auditoría -->
+            <td class="px-3.5 py-3 whitespace-nowrap font-mono text-[11px] font-bold text-slate-500">
+              #MOV-{{ m.movimientoInventarioId }}
+            </td>
+
+            <!-- Fecha y Hora Completa -->
+            <td class="px-3.5 py-3 whitespace-nowrap text-slate-700 font-medium">
+              {{ formatearFechaHora(m.fechaMovimiento) }}
+            </td>
+
+            <!-- Tipo de Movimiento -->
+            <td class="px-3.5 py-3 whitespace-nowrap">
+              @switch (m.tipoMovimiento) {
+              @case ('ENTRADA') {
+              <span
+                class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+                ENTRADA
+              </span>
+              }
+              @case ('VENTA') {
+              <span
+                class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-bold">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="19" x2="12" y2="5"></line>
+                  <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+                VENTA
+              </span>
+              }
+              @case ('SALIDA') {
+              <span
+                class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-bold">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="19" x2="12" y2="5"></line>
+                  <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+                SALIDA
+              </span>
+              }
+              @case ('AJUSTE') {
+              <span
+                class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-bold">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                AJUSTE
+              </span>
+              }
+              @default {
+              <span
+                class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold">
+                {{ m.tipoMovimiento }}
+              </span>
+              }
+              }
+            </td>
+
+            <!-- Referencia Documental -->
+            <td class="px-3.5 py-3 whitespace-nowrap">
+              @if (m.referenciaTipo || m.referenciaId) {
+              <span
+                class="inline-flex items-center gap-1 font-mono text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                {{ m.referenciaTipo ?? 'DOC' }} #{{ m.referenciaId ?? '—' }}
+              </span>
+              } @else {
+              <span class="text-slate-400 italic text-[11px]">Manual</span>
+              }
+            </td>
+
+            <!-- Sucursal Operante -->
+            <td class="px-3.5 py-3 whitespace-nowrap text-slate-700 font-medium border-r border-slate-200">
+              {{ m.inventario?.sucursal?.nombre ?? 'Sucursal' }}
+            </td>
+
+            <!-- Saldo Anterior Físico -->
+            <td class="px-3.5 py-3 text-right font-mono text-slate-500 bg-blue-50/20">
+              {{ m.cantidadAnterior }}
+            </td>
+
+            <!-- Cantidad Variación Físico -->
+            <td class="px-3.5 py-3 text-right font-mono font-bold bg-blue-50/20">
+              @if (m.tipoMovimiento === 'ENTRADA') {
+              <span class="text-emerald-600">+{{ m.cantidad }}</span>
+              } @else {
+              <span class="text-amber-600">−{{ m.cantidad }}</span>
+              }
+            </td>
+
+            <!-- Nuevo Saldo Físico -->
+            <td
+              class="px-3.5 py-3 text-right font-mono font-black text-slate-900 bg-blue-50/30 border-r border-slate-200">
+              {{ m.cantidadNueva }}
+            </td>
+
+            <!-- Costo Unitario Valorado -->
+            <td class="px-3.5 py-3 text-right font-mono text-slate-600 bg-emerald-50/20">
+              Q {{ (lote()?.costoUnitario || 0).toFixed(2) }}
+            </td>
+
+            <!-- Impacto en Quetzales del Movimiento -->
+            <td class="px-3.5 py-3 text-right font-mono font-bold bg-emerald-50/20">
+              @if (m.tipoMovimiento === 'ENTRADA') {
+              <span class="text-emerald-700">
+                +Q {{ (m.cantidad * (lote()?.costoUnitario || 0)).toFixed(2) }}
+              </span>
+              } @else {
+              <span class="text-amber-700">
+                −Q {{ (m.cantidad * (lote()?.costoUnitario || 0)).toFixed(2) }}
+              </span>
+              }
+            </td>
+
+            <!-- Saldo Valorado Acumulado -->
+            <td
+              class="px-3.5 py-3 text-right font-mono font-black text-emerald-900 bg-emerald-50/30 border-r border-slate-200">
+              Q {{ (m.cantidadNueva * (lote()?.costoUnitario || 0)).toFixed(2) }}
+            </td>
+
+            <!-- Observación / Justificación -->
+            <td class="px-3.5 py-3 text-slate-600 max-w-xs print:max-w-none print:whitespace-normal">
+              <span class="block truncate print:truncate-none print:whitespace-normal print:text-[8.5px]"
+                [title]="m.observacion || ''">
+                {{ m.observacion || 'Sin observación registrada' }}
+              </span>
+            </td>
+          </tr>
           }
         </tbody>
       </table>
-      </div>
+    </div>
     }
   </div>
 </div>

@@ -21,6 +21,19 @@ export class Login {
 
   protected readonly cargando = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly mostrarPassword = signal(false);
+
+  protected alternarPassword(): void {
+    this.mostrarPassword.update((val) => !val);
+  }
+
+  protected llenarCredenciales(usuario: string, clave: string): void {
+    this.form.patchValue({
+      username: usuario,
+      password: clave,
+    });
+    this.error.set(null);
+  }
 
   protected onSubmit(): void {
     if (this.form.invalid) {
@@ -33,14 +46,14 @@ export class Login {
 
     const { username, password } = this.form.getRawValue();
 
-    this.authService.login({ username: username!, password: password! }).subscribe({
+    this.authService.login({ username: username!.trim(), password: password! }).subscribe({
       next: () => {
         this.cargando.set(false);
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.cargando.set(false);
-        this.error.set(err.error?.message ?? 'No se pudo iniciar sesión.');
+        this.error.set(err.error?.message ?? 'Credenciales incorrectas o usuario no activo.');
       },
     });
   }

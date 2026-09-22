@@ -5,6 +5,7 @@ import { CategoriasProductoService } from '../../../core/services/categorias-pro
 import { LaboratoriosService } from '../../../core/services/laboratorios.service';
 import { UnidadesMedidaService } from '../../../core/services/unidades-medida.service';
 import { CategoriaProducto, Laboratorio, UnidadMedida } from '../../../core/models/producto.models';
+import { ConfirmService } from '../../../shared/confirm/confirm.service';
 
 @Component({
   selector: 'app-producto-form',
@@ -18,6 +19,7 @@ export class ProductoForm implements OnInit {
   @Output() cancelado = new EventEmitter<void>();
 
   private readonly fb = inject(FormBuilder);
+  private readonly confirmService = inject(ConfirmService);
   private readonly productosService = inject(ProductosService);
   private readonly categoriasService = inject(CategoriasProductoService);
   private readonly laboratoriosService = inject(LaboratoriosService);
@@ -82,9 +84,26 @@ export class ProductoForm implements OnInit {
     });
   }
 
-  protected onSubmit(): void {
+  protected async onSubmit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
+    }
+
+    const esEdicion = this.modoEdicion();
+    const nombre = this.form.get('nombre')?.value?.trim() || 'este producto';
+
+    const confirmado = await this.confirmService.confirm({
+      title: esEdicion ? '¿Estás seguro de guardar los cambios?' : '¿Estás seguro de agregar este producto?',
+      message: esEdicion
+        ? `Se actualizarán los datos técnicos y comerciales de "${nombre}".`
+        : `El medicamento "${nombre}" se incorporará al catálogo comercial de la farmacia.`,
+      confirmText: esEdicion ? 'Sí, Guardar Cambios' : 'Sí, Agregar Producto',
+      cancelText: 'Cancelar',
+      tipo: 'primary',
+    });
+
+    if (!confirmado) {
       return;
     }
 

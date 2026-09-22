@@ -1,4 +1,4 @@
-import { Component, HostListener, Output, EventEmitter } from '@angular/core';
+import { Component, HostListener, Output, EventEmitter, Input } from '@angular/core';
 
 @Component({
   selector: 'app-modal',
@@ -6,6 +6,7 @@ import { Component, HostListener, Output, EventEmitter } from '@angular/core';
   styleUrl: './modal.scss',
 })
 export class Modal {
+  @Input() maxWidthClass = 'max-w-2xl';
   @Output() cerrar = new EventEmitter<void>();
 
   @HostListener('document:keydown.escape')

@@ -1,108 +1,344 @@
-<div class="p-6">
-  <h2 class="text-lg font-semibold text-slate-800 mb-4">Registrar salida</h2>
+<div class="p-6 sm:p-7 space-y-6">
+  <!-- Cabecera -->
+  <div class="border-b border-slate-100 pb-4">
+    <div class="flex items-center gap-2.5">
+      <span class="w-8 h-8 rounded-lg bg-slate-800 text-white flex items-center justify-center font-bold">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </span>
+      <div>
+        <h2 class="text-lg font-bold text-slate-800">Registrar Salida de Inventario</h2>
+        <p class="text-xs text-slate-400">Descargo de inventario por venta de mostrador o ajuste de mermas</p>
+      </div>
+    </div>
+  </div>
 
   @if (resultado(); as movimientos) {
-    <div class="space-y-3">
-      <p class="text-sm text-slate-700 font-medium">Salida registrada correctamente:</p>
-      <ul class="text-sm text-slate-600 space-y-1">
+    <!-- Pantalla de Éxito -->
+    <div class="space-y-4 py-3">
+      <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <div class="text-center">
+        <h3 class="text-base font-bold text-slate-800">Salida aplicada con éxito</h3>
+        <p class="text-xs text-slate-500 mt-1">Los movimientos de stock han sido actualizados en el Kardex:</p>
+      </div>
+
+      <div class="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-2">
         @for (m of movimientos; track m.movimientoInventarioId) {
-          <li>
-            Lote {{ m.inventario?.loteId }} ({{ m.inventario?.sucursal?.nombre }}):
-            {{ m.cantidadAnterior }} → {{ m.cantidadNueva }} (−{{ m.cantidad }})
-          </li>
+          <div class="flex items-center justify-between text-xs py-1.5 border-b border-slate-200/60 last:border-0">
+            <div>
+              <span class="font-semibold text-slate-800">Lote #{{ m.inventario?.loteId }}</span>
+              <span class="text-slate-400 block">{{ m.inventario?.sucursal?.nombre }}</span>
+            </div>
+            <div class="text-right font-mono">
+              <span class="text-slate-500">{{ m.cantidadAnterior }}</span>
+              <span class="text-amber-600 font-bold mx-1.5">−{{ m.cantidad }}</span>
+              <span class="text-slate-900 font-bold">→ {{ m.cantidadNueva }}</span>
+            </div>
+          </div>
         }
-      </ul>
-      <div class="flex justify-end pt-2">
+      </div>
+
+      <div class="flex justify-center pt-2">
         <button
+          type="button"
           (click)="cerrarConResultado()"
-          class="rounded-md bg-sky-600 text-white text-sm font-medium px-4 py-2 hover:bg-sky-700"
+          class="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold shadow-md shadow-slate-800/20 active:scale-95 transition-all cursor-pointer"
         >
-          Listo
+          Entendido / Cerrar
         </button>
       </div>
     </div>
   } @else {
+    <!-- Formulario de Salida -->
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Producto</label>
-        <select formControlName="productoId" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
-          <option [ngValue]="null" disabled>Seleccioná un producto</option>
-          @for (p of productos(); track p.productoId) {
-            <option [ngValue]="p.productoId">{{ p.nombre }} ({{ p.codigoProducto }})</option>
-          }
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Sucursal</label>
-        <select formControlName="sucursalId" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
-          <option [ngValue]="null" disabled>Seleccioná una sucursal</option>
-          @for (s of sucursales(); track s.sucursalId) {
-            <option [ngValue]="s.sucursalId">{{ s.nombre }}</option>
-          }
-        </select>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Producto -->
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Cantidad</label>
-          <input
-            type="number"
-            step="0.001"
-            formControlName="cantidad"
-            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-          />
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Producto a Dispensar <span class="text-red-500">*</span>
+          </label>
+          <select
+            formControlName="productoId"
+            (change)="onProductoChange($event)"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all cursor-pointer"
+          >
+            <option [ngValue]="null" disabled>Selecciona el medicamento</option>
+            @for (p of productos(); track p.productoId) {
+              <option [ngValue]="p.productoId">
+                {{ p.nombre }} ({{ p.codigoProducto }})
+              </option>
+            }
+          </select>
         </div>
+
+        <!-- Sucursal -->
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
-          <select formControlName="tipoMovimiento" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
-            <option value="VENTA">Venta</option>
-            @if (esAdmin()) {
-              <option value="AJUSTE">Ajuste (merma / corrección)</option>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Sucursal de Egreso <span class="text-red-500">*</span>
+          </label>
+          <select
+            formControlName="sucursalId"
+            (change)="onSucursalChange($event)"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all cursor-pointer"
+          >
+            <option [ngValue]="null" disabled>Selecciona la sucursal</option>
+            @for (s of sucursales(); track s.sucursalId) {
+              <option [ngValue]="s.sucursalId">
+                {{ s.nombre }} (#SUC-{{ s.sucursalId }})
+              </option>
             }
           </select>
         </div>
       </div>
 
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">
-          Lote específico (opcional)
-        </label>
-        <input
-          type="number"
-          formControlName="loteId"
-          placeholder="Dejalo vacío para elegir automáticamente el lote que vence antes (FEFO)"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
+      <!-- Alerta de Existencias Disponibles Reactiva -->
+      @if (cargandoLotes()) {
+        <div class="p-3.5 rounded-xl border bg-slate-50 border-slate-200 text-slate-600 text-xs flex items-center gap-2.5 animate-pulse">
+          <span class="w-4 h-4 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"></span>
+          <span>Consultando lotes y existencias en {{ nombreSucursalSeleccionada() }}…</span>
+        </div>
+      } @else if (productoSeleccionadoId() && sucursalSeleccionadaId()) {
+        <div
+          class="p-3.5 rounded-xl border flex items-center justify-between text-xs transition-all"
+          [class.bg-emerald-50]="stockDisponibleSucursal() > 0"
+          [class.border-emerald-200]="stockDisponibleSucursal() > 0"
+          [class.text-emerald-800]="stockDisponibleSucursal() > 0"
+          [class.bg-red-50]="stockDisponibleSucursal() <= 0"
+          [class.border-red-200]="stockDisponibleSucursal() <= 0"
+          [class.text-red-800]="stockDisponibleSucursal() <= 0"
+        >
+          <div class="flex items-center gap-2">
+            @if (stockDisponibleSucursal() > 0) {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-emerald-600">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            } @else {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-500">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            }
+            <span>Stock físico disponible en <strong>{{ nombreSucursalSeleccionada() }}</strong>:</span>
+          </div>
+          <strong class="font-bold text-sm">{{ stockDisponibleSucursal() }} unidades</strong>
+        </div>
+
+        @if ((form.get('cantidad')?.value ?? 0) > stockDisponibleSucursal() && stockDisponibleSucursal() > 0) {
+          <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span>La cantidad a dispensar ({{ form.get('cantidad')?.value }}) supera las {{ stockDisponibleSucursal() }} unidades en existencia.</span>
+          </div>
+        }
+      }
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Cantidad -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Cantidad a Salir <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            step="1"
+            min="1"
+            formControlName="cantidad"
+            class="w-full text-sm font-semibold px-3.5 py-2.5 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800"
+          />
+        </div>
+
+        <!-- Tipo de Movimiento -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Tipo de Movimiento <span class="text-red-500">*</span>
+          </label>
+          <select
+            formControlName="tipoMovimiento"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all cursor-pointer"
+          >
+            <option value="VENTA">Venta de Mostrador</option>
+            @if (esAdmin()) {
+              <option value="AJUSTE">Ajuste de Inventario / Merma</option>
+            }
+          </select>
+        </div>
       </div>
 
+      <!-- Estrategia de Selección de Lote: FEFO Automático vs Excepción Manual -->
+      <div class="space-y-3 p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
+        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+          Estrategia de Asignación de Lote:
+        </label>
+
+        <!-- Selector de Modo -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <!-- Opción FEFO Automático -->
+          <button
+            type="button"
+            (click)="cambiarModoDespacho('FEFO')"
+            [class.border-emerald-500]="modoDespacho() === 'FEFO'"
+            [class.bg-emerald-50/60]="modoDespacho() === 'FEFO'"
+            [class.text-emerald-900]="modoDespacho() === 'FEFO'"
+            [class.shadow-xs]="modoDespacho() === 'FEFO'"
+            class="p-3 text-left rounded-xl border border-slate-200 bg-white transition-all cursor-pointer space-y-1"
+          >
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full" [class.bg-emerald-500]="modoDespacho() === 'FEFO'" [class.bg-slate-300]="modoDespacho() !== 'FEFO'"></span>
+                ⚡ FEFO Automático
+              </span>
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                Recomendado
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500">
+              Descuenta el lote más próximo a caducar para proteger la inversión farmacéutica.
+            </p>
+          </button>
+
+          <!-- Opción Excepción Manual -->
+          <button
+            type="button"
+            (click)="cambiarModoDespacho('MANUAL')"
+            [class.border-amber-500]="modoDespacho() === 'MANUAL'"
+            [class.bg-amber-50/60]="modoDespacho() === 'MANUAL'"
+            [class.text-amber-900]="modoDespacho() === 'MANUAL'"
+            [class.shadow-xs]="modoDespacho() === 'MANUAL'"
+            class="p-3 text-left rounded-xl border border-slate-200 bg-white transition-all cursor-pointer space-y-1"
+          >
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full" [class.bg-amber-500]="modoDespacho() === 'MANUAL'" [class.bg-slate-300]="modoDespacho() !== 'MANUAL'"></span>
+                ⚠️ Excepción Manual
+              </span>
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                Auditable
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500">
+              Selecciona un lote específico por merma, rotura de frasco o retiro sanitario.
+            </p>
+          </button>
+        </div>
+
+        <!-- Panel Informativo Modo FEFO -->
+        @if (modoDespacho() === 'FEFO') {
+          <div class="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200/80 text-xs space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-800 flex items-center gap-1">
+                ✓ Algoritmo FEFO Activo:
+              </span>
+              @if (loteFefoRecomendado(); as f) {
+                <span class="font-mono text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded text-[11px] font-bold">
+                  Prioridad: Lote {{ f.lote.numeroLote }}
+                </span>
+              }
+            </div>
+
+            @if (loteFefoRecomendado(); as f) {
+              <p class="text-[11px] text-emerald-700">
+                Se dispensará del lote con fecha de caducidad más cercana:
+                <strong>{{ f.lote.fechaVencimiento }}</strong> ({{ f.disponible }} uds disponibles).
+                Si la cantidad supera este lote, el saldo se tomará automáticamente del siguiente lote por vencer.
+              </p>
+            } @else {
+              <p class="text-[11px] text-slate-500 italic">
+                Selecciona un medicamento y sucursal para previsualizar el lote prioritario.
+              </p>
+            }
+          </div>
+        } @else {
+          <!-- Panel Selector y Justificación Modo Excepción Manual -->
+          <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200/80 text-xs space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">
+                Seleccionar Lote Específico a Descargar <span class="text-red-600">*</span>:
+              </label>
+              <select
+                formControlName="loteId"
+                class="w-full text-xs font-semibold bg-white border border-amber-300 rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500 text-slate-800"
+              >
+                <option [ngValue]="null">-- Selecciona el lote puntual a descargar --</option>
+                @for (item of lotesDisponiblesEnSucursal(); track item.lote.loteId) {
+                  <option [ngValue]="item.lote.loteId">
+                    Lote: {{ item.lote.numeroLote }} · Vence: {{ item.lote.fechaVencimiento }} (Disponible: {{ item.disponible }} uds)
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">
+                Motivo de la Excepción Manual <span class="text-red-600">* (Obligatorio para Auditoría)</span>:
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="motivoExcepcion"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="Ej: Frasco quebrado en estantería / Merma por rotura / Retiro de lote solicitado por fabricante"
+                class="w-full text-xs bg-white border border-amber-300 rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500 text-slate-800"
+              />
+              <span class="text-[10px] text-amber-700 mt-0.5 block">
+                Este motivo quedará registrado de forma indeleble en el Kardex y auditoría del sistema.
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Observaciones generales -->
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Observación (opcional)</label>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">
+          Observaciones Adicionales (Opcional)
+        </label>
         <input
           type="text"
           formControlName="observacion"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          placeholder="Ej: Factura #1024, venta directa cliente"
+          class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800"
         />
       </div>
 
       @if (error()) {
-        <p class="text-sm text-red-600">{{ error() }}</p>
+        <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+          </svg>
+          {{ error() }}
+        </div>
       }
 
-      <div class="flex justify-end gap-3 pt-2">
+      <!-- Botones -->
+      <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
         <button
           type="button"
           (click)="cancelado.emit()"
-          class="rounded-md px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+          class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
         >
           Cancelar
         </button>
         <button
           type="submit"
-          [disabled]="guardando()"
-          class="rounded-md bg-slate-700 text-white text-sm font-medium px-4 py-2 hover:bg-slate-800 disabled:opacity-60"
+          [disabled]="guardando() || form.invalid || stockDisponibleSucursal() <= 0 || (form.get('cantidad')?.value ?? 0) > stockDisponibleSucursal()"
+          class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold shadow-md shadow-slate-800/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 cursor-pointer"
         >
-          {{ guardando() ? 'Guardando…' : 'Registrar salida' }}
+          @if (guardando()) {
+            <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <span>Aplicando descargo…</span>
+          } @else {
+            <span>Confirmar Salida de Inventario</span>
+          }
         </button>
       </div>
     </form>

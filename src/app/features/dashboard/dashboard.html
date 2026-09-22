@@ -1,175 +1,908 @@
-<div class="max-w-6xl mx-auto space-y-6">
-  <!-- Saludo -->
+<div class="max-w-7xl mx-auto space-y-6">
+  <!-- Banner Ejecutivo de Perfil y Centro de Mando -->
   @if (perfil(); as p) {
-    <div class="flex items-center gap-3">
-      <div class="w-11 h-11 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-xl">
-        👋
-      </div>
-      <div>
-        <h1 class="text-xl font-semibold text-slate-800">Hola, {{ p.username }}</h1>
-        <p class="text-sm text-slate-500">Rol: {{ p.rolNombre }}</p>
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 sm:p-7 relative overflow-hidden">
+      <!-- Barra superior decorativa con gradiente farmacéutico -->
+      <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600"></div>
+
+      <!-- Orbes decorativos sutiles de fondo -->
+      <div class="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-emerald-50/60 blur-2xl pointer-events-none"></div>
+      <div class="absolute right-1/4 -top-12 w-48 h-48 rounded-full bg-teal-50/50 blur-2xl pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+        <!-- Bloque Izquierdo: Identidad de Usuario y Perfil -->
+        <div class="flex items-start sm:items-center gap-5">
+          <!-- Avatar Medallón con Indicador de Estado Activo -->
+          <div class="relative shrink-0">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-700 to-slate-900 text-white flex items-center justify-center font-extrabold text-2xl shadow-lg shadow-emerald-600/20 ring-4 ring-emerald-50">
+              {{ (usuarioActual()?.nombre || p.username).slice(0, 1).toUpperCase() }}
+            </div>
+            <span
+              class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center shadow-xs"
+              title="Sesión Segura y Auditoría Activa"
+            >
+              <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
+            </span>
+          </div>
+
+          <!-- Información del Usuario y Roles -->
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 flex-wrap">
+              <!-- Rol Badge -->
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                {{ p.rolNombre || usuarioActual()?.rol || 'ADMINISTRADOR' }}
+              </span>
+
+              <!-- ID Empleado Badge -->
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold text-slate-600 bg-slate-100 border border-slate-200">
+                ID: #EMP-{{ p.empleadoId }}
+              </span>
+
+              <!-- Fecha -->
+              <span class="inline-flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                {{ fechaHoy() }}
+              </span>
+            </div>
+
+            <!-- Nombre y Saludo -->
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2 flex-wrap">
+              <span>{{ saludo() }},</span>
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-teal-900 to-emerald-800">
+                {{ usuarioActual()?.nombre || p.username }}
+              </span>
+            </h1>
+
+            <p class="text-xs sm:text-sm text-slate-500 max-w-2xl">
+              Consola Maestra de Operaciones Farmacéuticas · Monitoreo centralizado de existencias, Call Center de pedidos, traslados y red de sucursales.
+            </p>
+          </div>
+        </div>
+
+        <!-- Bloque Derecho: Dock de Accesos Rápidos Operativos por Rol -->
+        <div class="flex items-center gap-2.5 flex-wrap xl:flex-nowrap shrink-0">
+          @if (esVendedor()) {
+            <a
+              routerLink="/ventas"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                <path d="M3 6h18"></path>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              Facturación POS
+            </a>
+
+            <a
+              routerLink="/cajas"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200/90 shadow-xs transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <path d="M7 15h0M2 9.5h20"></path>
+              </svg>
+              Cajas & Arqueos
+            </a>
+
+            <a
+              routerLink="/call-center"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold shadow-md shadow-amber-500/20 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              Call Center
+            </a>
+          } @else if (esFarmaceutico()) {
+            <a
+              routerLink="/lotes"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md shadow-slate-900/10 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+              </svg>
+              Lotes & Kardex
+            </a>
+
+            <a
+              routerLink="/transferencias"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M16 3h5v5"/>
+                <path d="M4 20L21 3"/>
+                <path d="M21 16v5h-5"/>
+                <path d="M15 15l6 6"/>
+                <path d="M4 4l5 5"/>
+              </svg>
+              Transferencias
+            </a>
+
+            <a
+              routerLink="/productos"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200/90 shadow-xs transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
+                <path d="m8.5 8.5 7 7"></path>
+              </svg>
+              Catálogo Medicamentos
+            </a>
+          } @else {
+            <!-- Rol ADMIN: Acceso integral -->
+            <a
+              routerLink="/ventas"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                <path d="M3 6h18"></path>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              Ventas POS
+            </a>
+
+            <a
+              routerLink="/transferencias"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M16 3h5v5"/>
+                <path d="M4 20L21 3"/>
+                <path d="M21 16v5h-5"/>
+                <path d="M15 15l6 6"/>
+                <path d="M4 4l5 5"/>
+              </svg>
+              Transferencias
+            </a>
+
+            <a
+              routerLink="/lotes"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md shadow-slate-900/10 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+              </svg>
+              Lotes
+            </a>
+
+            <a
+              routerLink="/usuarios"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200/90 shadow-xs transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              Usuarios & Roles
+            </a>
+          }
+        </div>
       </div>
     </div>
   }
 
   @if (error()) {
-    <p class="text-sm text-red-600">{{ error() }}</p>
+    <div class="p-4 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-700 flex items-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {{ error() }}
+    </div>
   }
 
-  <!-- KPIs -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="stat-tile bg-white rounded-xl shadow p-5 flex items-start justify-between">
-      <div>
-        <p class="text-xs font-medium text-slate-500">Total productos</p>
-        @if (cargandoKpis()) {
-          <div class="h-8 w-16 bg-slate-100 rounded animate-pulse mt-1"></div>
-        } @else {
-          <p class="text-2xl font-semibold text-slate-800 mt-1">{{ totalProductos() }}</p>
-        }
+  <!-- Bento Grid de 6 KPIs Estratégicos -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+    <!-- KPI 1: Valoración de Inventario -->
+    <div class="stat-tile bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 flex flex-col justify-between">
+      <div class="flex items-start justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-700">Valor Inventario</span>
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
       </div>
-      <div class="w-10 h-10 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-          <rect x="3" y="7" width="18" height="13" rx="1.5" stroke-linejoin="round" />
-          <path d="M3 11h18M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+      <div class="mt-2">
+        @if (cargandoKpis()) {
+          <div class="h-6 w-20 bg-slate-100 rounded-md animate-pulse"></div>
+        } @else {
+          <p class="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight">
+            Q {{ valorInventario().toLocaleString('es-GT', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }}
+          </p>
+          <p class="text-[10px] text-slate-400 mt-0.5 truncate">
+            Costo compra · Venta Q {{ valorVentaPotencial().toLocaleString('es-GT', { maximumFractionDigits: 0 }) }}
+          </p>
+        }
       </div>
     </div>
 
-    <div class="stat-tile bg-white rounded-xl shadow p-5 flex items-start justify-between">
-      <div>
-        <p class="text-xs font-medium text-slate-500">Productos activos</p>
-        @if (cargandoKpis()) {
-          <div class="h-8 w-16 bg-slate-100 rounded animate-pulse mt-1"></div>
-        } @else {
-          <p class="text-2xl font-semibold text-slate-800 mt-1">{{ productosActivos() }}</p>
-          <p class="text-xs text-slate-400 mt-0.5">{{ productosInactivos() }} inactivos</p>
-        }
+    <!-- KPI 2: Stock Físico Global -->
+    <div class="stat-tile bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 flex flex-col justify-between">
+      <div class="flex items-start justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Stock Físico</span>
+        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+        </div>
       </div>
-      <div class="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center shrink-0">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M8.5 12.5l2.2 2.2L15.5 9.5" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+      <div class="mt-2">
+        @if (cargandoKpis()) {
+          <div class="h-6 w-16 bg-slate-100 rounded-md animate-pulse"></div>
+        } @else {
+          <p class="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight">
+            {{ stockTotal().toLocaleString('es-GT') }}
+          </p>
+          <p class="text-[10px] text-slate-400 mt-0.5 truncate">
+            Unidades en {{ totalSucursales() }} sucursales y stands
+          </p>
+        }
       </div>
     </div>
 
-    <div class="stat-tile bg-white rounded-xl shadow p-5 flex items-start justify-between">
-      <div>
-        <p class="text-xs font-medium text-slate-500">Lotes registrados</p>
-        @if (cargandoKpis()) {
-          <div class="h-8 w-16 bg-slate-100 rounded animate-pulse mt-1"></div>
-        } @else {
-          <p class="text-2xl font-semibold text-slate-800 mt-1">{{ totalLotes() }}</p>
-        }
+    <!-- KPI 3: Call Center & Despachos -->
+    <div class="stat-tile bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 flex flex-col justify-between">
+      <div class="flex items-start justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700">Call Center</span>
+        <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+        </div>
       </div>
-      <div class="w-10 h-10 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-          <path d="M3 7h11v9H3z" stroke-linejoin="round" />
-          <path d="M14 10h4l3 3v3h-7z" stroke-linejoin="round" />
-          <circle cx="7" cy="18" r="1.6" />
-          <circle cx="17.5" cy="18" r="1.6" />
-        </svg>
+      <div class="mt-2">
+        @if (cargandoKpis()) {
+          <div class="h-6 w-16 bg-slate-100 rounded-md animate-pulse"></div>
+        } @else {
+          <p class="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight">
+            {{ statsCallCenter()?.totalPedidos || 0 }}
+          </p>
+          <div class="flex items-center gap-1.5 mt-0.5 text-[10px]">
+            <span class="text-amber-700 font-bold">{{ (statsCallCenter()?.enPreparacion || 0) + (statsCallCenter()?.enRuta || 0) }} activos</span>
+            <span class="text-slate-300">·</span>
+            <span class="text-emerald-700 font-bold">{{ statsCallCenter()?.entregados || 0 }} entregados</span>
+          </div>
+        }
       </div>
     </div>
 
-    <div class="stat-tile bg-white rounded-xl shadow p-5 flex items-start justify-between">
-      <div>
-        <p class="text-xs font-medium text-slate-500">Stock disponible</p>
+    <!-- KPI 4: Catálogo y Control -->
+    <div class="stat-tile bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 flex flex-col justify-between">
+      <div class="flex items-start justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-sky-700">Medicamentos</span>
+        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-2">
         @if (cargandoKpis()) {
-          <div class="h-8 w-16 bg-slate-100 rounded animate-pulse mt-1"></div>
+          <div class="h-6 w-16 bg-slate-100 rounded-md animate-pulse"></div>
         } @else {
-          <p class="text-2xl font-semibold text-slate-800 mt-1">{{ stockTotal() }}</p>
-          <p class="text-xs text-slate-400 mt-0.5">unidades en total</p>
+          <p class="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight">
+            {{ totalProductos() }}
+          </p>
+          <p class="text-[10px] text-slate-400 mt-0.5 truncate">
+            <span class="text-emerald-600 font-bold">{{ productosActivos() }} activos</span> · {{ medicamentosControlados() }} con receta
+          </p>
         }
       </div>
-      <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-          <path d="M3 10.5 12 4l9 6.5" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M5 10v9h14v-9" stroke-linejoin="round" />
-          <path d="M10 19v-5h4v5" stroke-linejoin="round" />
-        </svg>
+    </div>
+
+    <!-- KPI 5: Transferencias Logísticas -->
+    <div class="stat-tile bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 flex flex-col justify-between">
+      <div class="flex items-start justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-700">Transferencias</span>
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M16 3h5v5"/>
+            <path d="M4 20L21 3"/>
+            <path d="M21 16v5h-5"/>
+            <path d="M15 15l6 6"/>
+            <path d="M4 4l5 5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-2">
+        @if (cargandoKpis()) {
+          <div class="h-6 w-16 bg-slate-100 rounded-md animate-pulse"></div>
+        } @else {
+          <p class="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight">
+            {{ transferenciasTotal() }}
+          </p>
+          <p class="text-[10px] text-slate-400 mt-0.5 truncate">
+            <span class="text-indigo-600 font-bold">{{ transferenciasEnTransito() }} en ruta</span> · {{ transferenciasCompletadas() }} concluidas
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- KPI 6: Activos Fijos & Cadena Frío -->
+    <div class="stat-tile bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 flex flex-col justify-between">
+      <div class="flex items-start justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-teal-700">Activos Fijos</span>
+        <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-2">
+        @if (cargandoKpis()) {
+          <div class="h-6 w-16 bg-slate-100 rounded-md animate-pulse"></div>
+        } @else {
+          <p class="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight">
+            Q {{ (statsActivos()?.valorLibrosTotal || 0).toLocaleString('es-GT', { maximumFractionDigits: 0 }) }}
+          </p>
+          <p class="text-[10px] text-emerald-700 font-bold mt-0.5 truncate">
+            {{ statsActivos()?.totalOperativos || 0 }} equipos operativos (Cadena de frío)
+          </p>
+        }
       </div>
     </div>
   </div>
 
-  <!-- Gráfico + vencimientos -->
-  <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
-    <div class="lg:col-span-3 bg-white rounded-xl shadow p-5">
-      <h2 class="text-sm font-semibold text-slate-700 mb-4">Productos por categoría</h2>
-
-      @if (cargandoKpis()) {
-        <p class="text-sm text-slate-400">Cargando…</p>
-      } @else if (categorias().length === 0) {
-        <p class="text-sm text-slate-400">No hay productos activos todavía.</p>
-      } @else {
-        <div class="space-y-3">
-          @for (c of categorias(); track c.nombre) {
-            <div class="bar-row flex items-center gap-3" [attr.title]="c.nombre + ': ' + c.cantidad + ' productos'">
-              <span class="text-xs text-slate-600 w-28 shrink-0 truncate">{{ c.nombre }}</span>
-              <div class="bar-track flex-1 h-6 rounded-r-[4px] overflow-hidden">
-                <div class="bar-fill h-6" [style.width.%]="c.porcentaje"></div>
-              </div>
-              <span class="text-xs font-medium text-slate-700 w-6 text-right shrink-0">{{ c.cantidad }}</span>
+  <!-- Fila de Gráficas de Alto Nivel: Tendencia SVG Interactiva & Donut Chart de Red -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Gráfica 1: Tendencia Operativa (Curva Suave Vectorial SVG) -->
+    <div class="lg:col-span-8 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between relative">
+      <div>
+        <!-- Encabezado de la Gráfica y Selector de Métrica -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4 mb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <h2 class="text-base font-bold text-slate-900">Actividad & Rendimiento Semanal</h2>
             </div>
-          }
+            <p class="text-xs text-slate-400">Flujo consolidado de ventas, entregas de Call Center y salidas de medicamentos</p>
+          </div>
+
+          <!-- Selector de Modo de Gráfica -->
+          <div class="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-semibold shrink-0">
+            <button
+              (click)="cambiarMetricaGrafica('facturacion')"
+              class="px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+              [class.bg-white]="metricaGrafica() === 'facturacion'"
+              [class.text-emerald-700]="metricaGrafica() === 'facturacion'"
+              [class.shadow-xs]="metricaGrafica() === 'facturacion'"
+              [class.font-bold]="metricaGrafica() === 'facturacion'"
+              [class.text-slate-500]="metricaGrafica() !== 'facturacion'"
+            >
+              Facturación (Q)
+            </button>
+            <button
+              (click)="cambiarMetricaGrafica('operaciones')"
+              class="px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+              [class.bg-white]="metricaGrafica() === 'operaciones'"
+              [class.text-emerald-700]="metricaGrafica() === 'operaciones'"
+              [class.shadow-xs]="metricaGrafica() === 'operaciones'"
+              [class.font-bold]="metricaGrafica() === 'operaciones'"
+              [class.text-slate-500]="metricaGrafica() !== 'operaciones'"
+            >
+              Operaciones
+            </button>
+          </div>
         </div>
-      }
-    </div>
 
-    <div class="lg:col-span-2 bg-white rounded-xl shadow p-5">
-      <h2 class="text-sm font-semibold text-slate-700 mb-4">Próximos vencimientos</h2>
+        @if (cargandoKpis()) {
+          <div class="h-48 bg-slate-50 rounded-2xl animate-pulse flex items-center justify-center text-xs text-slate-400">
+            Calculando vectores analíticos...
+          </div>
+        } @else {
+          <!-- Contenedor del Gráfico SVG Vectorial -->
+          <div class="relative w-full overflow-hidden pt-2">
+            <svg
+              viewBox="0 0 560 160"
+              class="w-full h-48 sm:h-56 overflow-visible"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <!-- Gradiente de Relleno del Área -->
+                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.28" />
+                  <stop offset="60%" stop-color="#0ea5e9" stop-opacity="0.08" />
+                  <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
+                </linearGradient>
 
-      @if (cargandoKpis()) {
-        <p class="text-sm text-slate-400">Cargando…</p>
-      } @else if (vencimientos().length === 0) {
-        <p class="text-sm text-slate-400">No hay lotes con stock registrado.</p>
-      } @else {
-        <ul class="space-y-3">
-          @for (v of vencimientos(); track v.loteId) {
-            <li class="flex items-center gap-3">
-              <svg
-                class="shrink-0"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
+                <!-- Gradiente de la Línea -->
+                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#059669" />
+                  <stop offset="50%" stop-color="#0d9488" />
+                  <stop offset="100%" stop-color="#0284c7" />
+                </linearGradient>
+              </defs>
+
+              <!-- Guías de Eje Horizontales Suaves -->
+              <line x1="40" y1="25" x2="520" y2="25" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="4" />
+              <line x1="40" y1="80" x2="520" y2="80" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="4" />
+              <line x1="40" y1="135" x2="520" y2="135" stroke="#e2e8f0" stroke-width="1.2" />
+
+              <!-- Área bajo la curva -->
+              <path
+                [attr.d]="pathAreaDegradada()"
+                fill="url(#areaGradient)"
+                class="chart-area"
+              />
+
+              <!-- Línea de Curva Suave Principal -->
+              <path
+                [attr.d]="pathCurvaSuave()"
                 fill="none"
-                stroke-width="2"
+                stroke="url(#lineGradient)"
+                stroke-width="3"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                [style.color]="'var(--status-' + colorEstado(v.diasParaVencer) + ')'"
-                [attr.stroke]="'var(--status-' + colorEstado(v.diasParaVencer) + ')'"
+                class="chart-line"
+              />
+
+              <!-- Puntos Interiores Interactivos con Coordenadas Reales -->
+              @for (p of puntosGrafica(); track p.dia) {
+                <g class="cursor-pointer group" (mouseenter)="puntoHover.set(p)" (mouseleave)="puntoHover.set(null)">
+                  <!-- Línea vertical punteada al hover -->
+                  @if (puntoHover()?.dia === p.dia) {
+                    <line
+                      [attr.x1]="p.x"
+                      [attr.y1]="p.y"
+                      [attr.x2]="p.x"
+                      [attr.y2]="135"
+                      stroke="#0d9488"
+                      stroke-width="1.5"
+                      stroke-dasharray="3 3"
+                    />
+                  }
+
+                  <!-- Círculo exterior con resplandor -->
+                  <circle
+                    [attr.cx]="p.x"
+                    [attr.cy]="p.y"
+                    r="6"
+                    class="fill-white stroke-teal-600 transition-all duration-150 group-hover:scale-125"
+                    stroke-width="2.5"
+                  />
+                  <!-- Núcleo interior -->
+                  <circle
+                    [attr.cx]="p.x"
+                    [attr.cy]="p.y"
+                    r="2.5"
+                    class="fill-teal-600 group-hover:fill-emerald-500"
+                  />
+
+                  <!-- Etiqueta del Eje X -->
+                  <text
+                    [attr.x]="p.x"
+                    y="152"
+                    text-anchor="middle"
+                    class="text-[10px] font-bold fill-slate-400 group-hover:fill-slate-800 transition-colors"
+                  >
+                    {{ p.dia }}
+                  </text>
+                </g>
+              }
+            </svg>
+
+            <!-- Tooltip Flotante Interactivo al Hover -->
+            @if (puntoHover(); as p) {
+              <div
+                class="absolute top-2 right-4 bg-slate-900 text-white rounded-xl shadow-xl px-3.5 py-2 text-xs animate-fadeIn border border-slate-700 pointer-events-none z-20 flex items-center gap-3"
               >
-                @switch (iconoEstado(v.diasParaVencer)) {
-                  @case ('check_circle') {
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M8.5 12.5l2.2 2.2L15.5 9.5" />
-                  }
-                  @case ('warning') {
-                    <path d="M12 4 21 20H3z" />
-                    <path d="M12 10v4" />
-                    <circle cx="12" cy="17" r="0.1" fill="currentColor" stroke="none" />
-                  }
-                  @default {
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 8v5" />
-                    <circle cx="12" cy="16" r="0.1" fill="currentColor" stroke="none" />
-                  }
-                }
-              </svg>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm text-slate-800 truncate">{{ v.producto }}</p>
-                <p class="text-xs text-slate-400">Lote {{ v.numeroLote }} · {{ v.stock }} unidades</p>
+                <div>
+                  <span class="text-[10px] text-emerald-400 uppercase font-bold block">{{ p.dia }} ({{ p.fechaCorta }})</span>
+                  <span class="text-sm font-black font-mono">Q {{ p.facturacion.toLocaleString('es-GT', { minimumFractionDigits: 2 }) }}</span>
+                </div>
+                <div class="pl-3 border-l border-slate-700">
+                  <span class="text-[10px] text-slate-400 block">Despachos</span>
+                  <span class="text-xs font-bold text-slate-200">{{ p.operaciones }} pedidos</span>
+                </div>
               </div>
-              <span
-                class="text-xs font-medium shrink-0"
-                [style.color]="'var(--status-' + colorEstado(v.diasParaVencer) + ')'"
-              >
-                {{ textoEstado(v.diasParaVencer) }}
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Pie de Gráfica: Resumen Ejecutivo -->
+      <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Facturación promedio calculada en base a volumen despachado</span>
+        </div>
+        <div class="font-mono text-slate-700 font-bold">
+          Total pedidos Call Center: Q {{ (statsCallCenter()?.montoTotal || 0).toLocaleString('es-GT', { minimumFractionDigits: 2 }) }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfica 2: Donut Chart de Distribución de Stock por Red de Sedes -->
+    <div class="lg:col-span-4 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Distribución por Red</h2>
+            <p class="text-xs text-slate-400">Existencias físicas en farmacias y stands</p>
+          </div>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            Multi-Sede
+          </span>
+        </div>
+
+        @if (cargandoKpis()) {
+          <div class="h-44 bg-slate-50 rounded-2xl animate-pulse"></div>
+        } @else {
+          <!-- Anillo Donut SVG -->
+          <div class="relative flex items-center justify-center my-3">
+            <svg viewBox="0 0 180 180" class="w-40 h-40 transform -rotate-90">
+              <!-- Fondo del anillo -->
+              <circle
+                cx="90"
+                cy="90"
+                r="70"
+                fill="none"
+                stroke="#f1f5f9"
+                stroke-width="16"
+              />
+
+              <!-- Segmentos proporcionales -->
+              @for (s of distribucionSedes(); track s.nombre) {
+                <circle
+                  cx="90"
+                  cy="90"
+                  r="70"
+                  fill="none"
+                  [attr.stroke]="s.color"
+                  stroke-width="16"
+                  [attr.stroke-dasharray]="s.dasharray"
+                  [attr.stroke-dashoffset]="s.dashoffset"
+                  class="donut-segment cursor-pointer"
+                  stroke-linecap="round"
+                />
+              }
+            </svg>
+
+            <!-- Centro del Donut -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+              <span class="text-xl font-black text-slate-900 font-mono leading-none">
+                {{ stockTotal().toLocaleString('es-GT') }}
               </span>
-            </li>
-          }
-        </ul>
-      }
+              <span class="text-[10px] font-bold uppercase text-slate-400 mt-1">
+                Uds en Red
+              </span>
+            </div>
+          </div>
+
+          <!-- Leyenda de Sedes y Stands -->
+          <div class="space-y-2 mt-4">
+            @for (s of distribucionSedes(); track s.nombre) {
+              <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50/70 border border-slate-100 text-xs">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="w-2.5 h-2.5 rounded-full shrink-0" [style.backgroundColor]="s.color"></span>
+                  <div class="truncate">
+                    <span class="font-bold text-slate-800 block truncate">{{ s.nombre }}</span>
+                    <span class="text-[10px] text-slate-400 uppercase font-semibold">{{ s.tipo }}</span>
+                  </div>
+                </div>
+                <div class="text-right shrink-0 font-mono">
+                  <span class="font-bold text-slate-800">{{ s.unidades }} uds</span>
+                  <span class="text-[10px] text-slate-400 block font-sans">({{ s.porcentaje }}%)</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-100">
+        <a
+          routerLink="/transferencias"
+          class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl text-center block transition-colors cursor-pointer"
+        >
+          Coordinar Reabastecimiento →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fila Secundaria: Categorías Terapéuticas y Radar FEFO -->
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+    <!-- Panel de Categorías Terapéuticas -->
+    <div class="lg:col-span-3 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Distribución por Categoría Farmacéutica</h2>
+            <p class="text-xs text-slate-400">Medicamentos clasificados según su acción terapéutica</p>
+          </div>
+          <a
+            routerLink="/productos"
+            class="text-xs font-semibold text-sky-600 hover:text-sky-800 transition-colors"
+          >
+            Ver catálogo completo →
+          </a>
+        </div>
+
+        @if (cargandoKpis()) {
+          <div class="space-y-3 py-4">
+            @for (i of [1,2,3,4,5]; track i) {
+              <div class="h-7 bg-slate-100 rounded-lg animate-pulse"></div>
+            }
+          </div>
+        } @else if (categorias().length === 0) {
+          <div class="py-12 text-center text-slate-400 text-xs">
+            No hay productos clasificados registrados actualmente.
+          </div>
+        } @else {
+          <div class="space-y-3.5">
+            @for (c of categorias(); track c.nombre) {
+              <div class="group flex items-center gap-3">
+                <span class="text-xs font-semibold text-slate-700 w-36 shrink-0 truncate group-hover:text-sky-600 transition-colors">
+                  {{ c.nombre }}
+                </span>
+                <div class="flex-1 h-3.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/40">
+                  <div
+                    class="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-600 transition-all duration-700"
+                    [style.width.%]="c.porcentaje"
+                  ></div>
+                </div>
+                <span class="text-xs font-bold text-slate-800 w-8 text-right font-mono shrink-0">
+                  {{ c.cantidad }}
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-400 flex items-center justify-between">
+        <span>Catálogo sincronizado en tiempo real</span>
+        <span class="font-medium text-slate-600">{{ categorias().length }} grupos terapéuticos</span>
+      </div>
+    </div>
+
+    <!-- Panel de Radar de Caducidad (FEFO) -->
+    <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+              Radar de Caducidad (FEFO)
+            </h2>
+            <p class="text-xs text-slate-400">Lotes de medicamentos con prioridad de rotación</p>
+          </div>
+          <a
+            routerLink="/lotes"
+            class="text-xs font-semibold text-violet-600 hover:text-violet-800 transition-colors"
+          >
+            Auditar →
+          </a>
+        </div>
+
+        @if (cargandoKpis()) {
+          <div class="space-y-3 py-4">
+            @for (i of [1,2,3,4]; track i) {
+              <div class="h-12 bg-slate-100 rounded-xl animate-pulse"></div>
+            }
+          </div>
+        } @else if (vencimientos().length === 0) {
+          <div class="py-12 text-center text-slate-400 text-xs">
+            No hay lotes con existencias por vencer registradas.
+          </div>
+        } @else {
+          <div class="space-y-2.5">
+            @for (v of vencimientos(); track v.loteId) {
+              <div class="p-3 rounded-2xl border border-slate-100 hover:border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                  <span class="text-xs font-bold text-slate-800 truncate block">
+                    {{ v.producto }}
+                  </span>
+                  <div class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                    <span class="font-mono text-slate-600">Lote {{ v.numeroLote }}</span>
+                    <span>·</span>
+                    <span class="font-semibold text-slate-700">{{ v.stock }} uds</span>
+                  </div>
+                </div>
+
+                <div class="text-right shrink-0">
+                  <span
+                    class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full"
+                    [class.bg-red-100]="v.diasParaVencer <= 30"
+                    [class.text-red-700]="v.diasParaVencer <= 30"
+                    [class.bg-amber-100]="v.diasParaVencer > 30 && v.diasParaVencer <= 90"
+                    [class.text-amber-800]="v.diasParaVencer > 30 && v.diasParaVencer <= 90"
+                    [class.bg-emerald-100]="v.diasParaVencer > 90"
+                    [class.text-emerald-800]="v.diasParaVencer > 90"
+                  >
+                    {{ textoEstado(v.diasParaVencer) }}
+                  </span>
+                  <a
+                    [routerLink]="['/lotes', v.loteId]"
+                    class="text-[10px] text-sky-600 hover:text-sky-800 font-semibold block mt-0.5 cursor-pointer"
+                  >
+                    Kardex →
+                  </a>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-100">
+        <a
+          routerLink="/lotes"
+          class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl text-center block transition-colors cursor-pointer"
+        >
+          Gestionar Lotes y Salidas FEFO
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fila Terciaria: Feeds Operativos en Vivo (Call Center y Transferencias) -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Feed 1: Últimos Pedidos de Call Center & Envíos -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-600">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              Últimos Pedidos Call Center
+            </h2>
+            <p class="text-xs text-slate-400">Órdenes con entrega a domicilio o retiro en stand</p>
+          </div>
+          <a routerLink="/call-center" class="text-xs font-semibold text-amber-700 hover:text-amber-800 transition-colors">
+            Ver todos →
+          </a>
+        </div>
+
+        @if (cargandoKpis()) {
+          <div class="space-y-2 py-3">
+            @for (i of [1,2,3]; track i) {
+              <div class="h-12 bg-slate-100 rounded-xl animate-pulse"></div>
+            }
+          </div>
+        } @else if (ultimosPedidos().length === 0) {
+          <div class="py-8 text-center text-slate-400 text-xs">
+            No hay pedidos recientes registrados en el Call Center.
+          </div>
+        } @else {
+          <div class="space-y-2.5">
+            @for (p of ultimosPedidos(); track p.pedidoId) {
+              <div class="p-3 rounded-2xl bg-slate-50/70 hover:bg-slate-100/70 border border-slate-100 transition-colors flex items-center justify-between gap-3 text-xs">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono font-bold text-slate-900">#ORD-{{ p.pedidoId }}</span>
+                    <span class="text-slate-400">·</span>
+                    <span class="font-semibold text-slate-800 truncate">{{ p.cliente?.nombre || 'Cliente General' }}</span>
+                  </div>
+                  <div class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                    <span>Sede: {{ p.sucursalPreparacion?.nombre || 'Central' }}</span>
+                    <span>·</span>
+                    <span>Pago: {{ p.metodoPago }}</span>
+                  </div>
+                </div>
+
+                <div class="text-right shrink-0">
+                  <span class="font-mono font-bold text-slate-900 block">Q {{ p.total.toFixed(2) }}</span>
+                  <span
+                    class="inline-block text-[10px] font-bold px-2 py-0.2 rounded-full mt-0.5"
+                    [class.bg-amber-100]="p.estado === 'RECIBIDO' || p.estado === 'EN_PREPARACION'"
+                    [class.text-amber-800]="p.estado === 'RECIBIDO' || p.estado === 'EN_PREPARACION'"
+                    [class.bg-sky-100]="p.estado === 'EN_RUTA'"
+                    [class.text-sky-800]="p.estado === 'EN_RUTA'"
+                    [class.bg-emerald-100]="p.estado === 'ENTREGADO'"
+                    [class.text-emerald-800]="p.estado === 'ENTREGADO'"
+                    [class.bg-slate-100]="p.estado === 'CANCELADO'"
+                    [class.text-slate-600]="p.estado === 'CANCELADO'"
+                  >
+                    {{ p.estado }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-100 text-center">
+        <a routerLink="/call-center" class="text-xs text-amber-700 hover:text-amber-900 font-semibold">
+          Abrir Módulo de Despacho & Call Center →
+        </a>
+      </div>
+    </div>
+
+    <!-- Feed 2: Últimas Transferencias Inter-Sucursales -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-600">
+                <path d="M16 3h5v5"/>
+                <path d="M4 20L21 3"/>
+                <path d="M21 16v5h-5"/>
+                <path d="M15 15l6 6"/>
+                <path d="M4 4l5 5"/>
+              </svg>
+              Movimientos Inter-Sucursales
+            </h2>
+            <p class="text-xs text-slate-400">Reabastecimiento entre bodega central y stands satélite</p>
+          </div>
+          <a routerLink="/transferencias" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition-colors">
+            Ver todas →
+          </a>
+        </div>
+
+        @if (cargandoKpis()) {
+          <div class="space-y-2 py-3">
+            @for (i of [1,2,3]; track i) {
+              <div class="h-12 bg-slate-100 rounded-xl animate-pulse"></div>
+            }
+          </div>
+        } @else if (ultimasTransferencias().length === 0) {
+          <div class="py-8 text-center text-slate-400 text-xs">
+            No hay transferencias recientes registradas.
+          </div>
+        } @else {
+          <div class="space-y-2.5">
+            @for (t of ultimasTransferencias(); track t.transferenciaId) {
+              <div class="p-3 rounded-2xl bg-slate-50/70 hover:bg-slate-100/70 border border-slate-100 transition-colors flex items-center justify-between gap-3 text-xs">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono font-bold text-slate-900">#TRF-{{ t.transferenciaId }}</span>
+                    <span class="text-slate-400">·</span>
+                    <span class="font-semibold text-slate-800 truncate">
+                      {{ t.sucursalOrigen?.nombre }} → {{ t.sucursalDestino?.nombre }}
+                    </span>
+                  </div>
+                  <div class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                    <span>{{ t.transferenciaDetalles?.length || 1 }} ítems</span>
+                    <span>·</span>
+                    <span>{{ t.fechaSolicitud | slice:0:10 }}</span>
+                  </div>
+                </div>
+
+                <div class="text-right shrink-0">
+                  <span
+                    class="inline-block text-[10px] font-bold px-2 py-0.2 rounded-full"
+                    [class.bg-amber-100]="t.estado === 'SOLICITADA'"
+                    [class.text-amber-800]="t.estado === 'SOLICITADA'"
+                    [class.bg-sky-100]="t.estado === 'EN_TRANSITO'"
+                    [class.text-sky-800]="t.estado === 'EN_TRANSITO'"
+                    [class.bg-emerald-100]="t.estado === 'RECIBIDA'"
+                    [class.text-emerald-800]="t.estado === 'RECIBIDA'"
+                    [class.bg-slate-100]="t.estado === 'CANCELADA'"
+                    [class.text-slate-600]="t.estado === 'CANCELADA'"
+                  >
+                    {{ t.estado }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-100 text-center">
+        <a routerLink="/transferencias" class="text-xs text-emerald-700 hover:text-emerald-900 font-semibold">
+          Administrar Traslados y Recepción de Carga →
+        </a>
+      </div>
     </div>
   </div>
 </div>
