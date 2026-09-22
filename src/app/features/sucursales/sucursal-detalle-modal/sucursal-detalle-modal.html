@@ -1,0 +1,372 @@
+<div class="p-6 sm:p-7 space-y-6">
+  @if (cargando()) {
+    <div class="py-12 text-center text-slate-400">
+      <div class="w-8 h-8 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin mx-auto mb-3"></div>
+      <p class="text-xs font-semibold">Cargando expediente de la sucursal...</p>
+    </div>
+  } @else if (detalle(); as d) {
+    <!-- Encabezado de la Sucursal -->
+    <div class="border-b border-slate-100 pb-5">
+      <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div class="flex items-start gap-3">
+          <div
+            class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md shrink-0"
+            [class.bg-emerald-500]="d.sucursal.tipoSucursal === 'FARMACIA' || d.sucursal.tipoSucursal === 'BODEGA_MATRIZ'"
+            [class.text-white]="d.sucursal.tipoSucursal === 'FARMACIA' || d.sucursal.tipoSucursal === 'BODEGA_MATRIZ'"
+            [class.bg-sky-500]="d.sucursal.tipoSucursal === 'MALL_STAND'"
+            [class.text-white]="d.sucursal.tipoSucursal === 'MALL_STAND'"
+            [class.bg-amber-500]="d.sucursal.tipoSucursal === 'GAS_STAND'"
+            [class.text-white]="d.sucursal.tipoSucursal === 'GAS_STAND'"
+          >
+            @if (d.sucursal.tipoSucursal === 'GAS_STAND') {
+              ⛽
+            } @else if (d.sucursal.tipoSucursal === 'MALL_STAND') {
+              🛍️
+            } @else {
+              🏥
+            }
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+                {{ d.sucursal.nombre }}
+              </h3>
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                #SUC-{{ d.sucursal.sucursalId }}
+              </span>
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase"
+                [class.bg-emerald-100]="d.sucursal.estado === 'ACTIVA'"
+                [class.text-emerald-800]="d.sucursal.estado === 'ACTIVA'"
+                [class.bg-amber-100]="d.sucursal.estado === 'MANTENIMIENTO'"
+                [class.text-amber-800]="d.sucursal.estado === 'MANTENIMIENTO'"
+                [class.bg-slate-100]="d.sucursal.estado === 'INACTIVA'"
+                [class.text-slate-700]="d.sucursal.estado === 'INACTIVA'"
+              >
+                {{ d.sucursal.estado }}
+              </span>
+            </div>
+
+            <p class="text-xs text-slate-600 mt-1 flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span>{{ d.sucursal.direccion }}</span>
+              <span class="text-slate-400">·</span>
+              <span class="font-bold text-slate-700">{{ d.sucursal.municipio?.nombre }}, {{ d.sucursal.municipio?.departamento?.nombre }}</span>
+            </p>
+
+            <div class="flex items-center gap-4 text-[11px] text-slate-500 mt-1 font-mono">
+              @if (d.sucursal.telefono) {
+                <span>Tel: <strong>{{ d.sucursal.telefono }}</strong></span>
+              }
+              @if (d.sucursal.latitud && d.sucursal.longitud) {
+                <span>GPS: {{ d.sucursal.latitud }}, {{ d.sucursal.longitud }}</span>
+              }
+              <span>Apertura: {{ d.sucursal.fechaApertura | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0 no-print">
+          <button
+            type="button"
+            (click)="imprimir()"
+            class="p-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+            title="Imprimir Expediente de Sede"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+          </button>
+          <button
+            type="button"
+            (click)="emitirEdicion()"
+            class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            Editar Sede
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Métricas Clave de la Sede -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/70">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Colaboradores</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-xl font-extrabold text-slate-900">{{ d.resumen.empleadosActivos }}</span>
+          <span class="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md font-bold">Activos</span>
+        </div>
+        <span class="text-[10px] text-slate-400 block mt-0.5">
+          {{ d.resumen.totalEmpleados - d.resumen.empleadosActivos }} inactivos ({{ d.resumen.totalEmpleados }} en total)
+        </span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/70">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Cajas Registradoras</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-xl font-extrabold text-slate-900">{{ d.resumen.totalCajas }}</span>
+          <span class="text-[10px] text-sky-600 font-bold">({{ d.resumen.cajasActivas }} operando)</span>
+        </div>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/70">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Activos Asignados</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-xl font-extrabold text-slate-900">{{ d.resumen.totalActivos }}</span>
+          <span class="text-[10px] text-indigo-600 font-bold">Q {{ d.resumen.totalValorActivos | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/70">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Stock Físico Local</span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-xl font-extrabold text-slate-900">{{ d.resumen.totalStockUnidades }}</span>
+          <span class="text-[10px] text-teal-700 font-bold">Q {{ d.resumen.totalValorInventario | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pestañas Internas del Expediente -->
+    <div class="space-y-3">
+      <div class="flex items-center gap-2 border-b border-slate-200 subtab-buttons">
+        <button
+          type="button"
+          (click)="cambiarSubTab('equipo')"
+          class="pb-2.5 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5"
+          [class.border-slate-900]="subTabActiva() === 'equipo'"
+          [class.text-slate-900]="subTabActiva() === 'equipo'"
+          [class.border-transparent]="subTabActiva() !== 'equipo'"
+          [class.text-slate-500]="subTabActiva() !== 'equipo'"
+        >
+          Colaboradores ({{ d.empleados.length }})
+        </button>
+
+        <button
+          type="button"
+          (click)="cambiarSubTab('cajas')"
+          class="pb-2.5 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5"
+          [class.border-slate-900]="subTabActiva() === 'cajas'"
+          [class.text-slate-900]="subTabActiva() === 'cajas'"
+          [class.border-transparent]="subTabActiva() !== 'cajas'"
+          [class.text-slate-500]="subTabActiva() !== 'cajas'"
+        >
+          💳 Cajas & Terminales ({{ d.cajas.length }})
+        </button>
+
+        <button
+          type="button"
+          (click)="cambiarSubTab('activos')"
+          class="pb-2.5 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5"
+          [class.border-slate-900]="subTabActiva() === 'activos'"
+          [class.text-slate-900]="subTabActiva() === 'activos'"
+          [class.border-transparent]="subTabActiva() !== 'activos'"
+          [class.text-slate-500]="subTabActiva() !== 'activos'"
+        >
+          Equipos de refrigeración ({{ d.activosFijos.length }})
+        </button>
+
+        <button
+          type="button"
+          (click)="cambiarSubTab('stock')"
+          class="pb-2.5 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5"
+          [class.border-slate-900]="subTabActiva() === 'stock'"
+          [class.text-slate-900]="subTabActiva() === 'stock'"
+          [class.border-transparent]="subTabActiva() !== 'stock'"
+          [class.text-slate-500]="subTabActiva() !== 'stock'"
+        >
+          💊 Inventario Destacado ({{ d.inventarioDestacado.length }})
+        </button>
+      </div>
+
+      <!-- Contenido de Pestaña: Equipo Humano -->
+      @if (subTabActiva() === 'equipo') {
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 gap-2 text-xs">
+          <span class="text-slate-500 font-medium">Personal activo y dependientes en esta sede comercial</span>
+          <a
+            routerLink="/planillas"
+            (click)="cerrar.emit()"
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold border border-teal-200/80 transition-colors cursor-pointer"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="20" y1="8" x2="20" y2="14"></line>
+              <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            + Gestionar o Dar de Alta en Planillas
+          </a>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="py-2.5 px-3">Colaborador</th>
+                <th class="py-2.5 px-3">Puesto</th>
+                <th class="py-2.5 px-3">Teléfono</th>
+                <th class="py-2.5 px-3">Ingreso</th>
+                <th class="py-2.5 px-3 text-center">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              @for (emp of d.empleados; track emp.empleadoId) {
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="py-2.5 px-3 font-bold text-slate-900">{{ emp.nombreCompleto }}</td>
+                  <td class="py-2.5 px-3 text-slate-600">{{ emp.puesto }}</td>
+                  <td class="py-2.5 px-3 font-mono text-slate-500">{{ emp.telefono }}</td>
+                  <td class="py-2.5 px-3 text-slate-500">{{ emp.fechaIngreso | date:'dd/MM/yyyy' }}</td>
+                  <td class="py-2.5 px-3 text-center">
+                    <span
+                      class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                      [class.bg-emerald-100]="emp.estado === 'ACTIVO'"
+                      [class.text-emerald-800]="emp.estado === 'ACTIVO'"
+                      [class.bg-slate-100]="emp.estado !== 'ACTIVO'"
+                      [class.text-slate-600]="emp.estado !== 'ACTIVO'"
+                    >
+                      {{ emp.estado }}
+                    </span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="py-8 text-center text-slate-400">
+                    <p class="mb-2.5">No hay colaboradores asignados a esta sucursal actualmente.</p>
+                    <a
+                      routerLink="/planillas"
+                      (click)="cerrar.emit()"
+                      class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
+                    >
+                      + Dar de Alta Colaborador para esta Sede
+                    </a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- Contenido de Pestaña: Cajas & Terminales -->
+      @if (subTabActiva() === 'cajas') {
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          @for (caja of d.cajas; track caja.cajaId) {
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-extrabold text-xs text-slate-900 font-mono">{{ caja.codigoCaja }}</span>
+                  <span
+                    class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                    [class.bg-emerald-100]="caja.estado === 'ACTIVA'"
+                    [class.text-emerald-800]="caja.estado === 'ACTIVA'"
+                    [class.bg-slate-100]="caja.estado !== 'ACTIVA'"
+                    [class.text-slate-600]="caja.estado !== 'ACTIVA'"
+                  >
+                    {{ caja.estado }}
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">{{ caja.descripcion || 'Terminal de Cobro Punto de Venta' }}</p>
+              </div>
+              <span class="text-xl">💳</span>
+            </div>
+          } @empty {
+            <div class="sm:col-span-2 py-6 text-center text-slate-400 text-xs">
+              No hay cajas registradoras asignadas a esta sucursal.
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Contenido de Pestaña: Activos Fijos -->
+      @if (subTabActiva() === 'activos') {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="py-2.5 px-3">Código</th>
+                <th class="py-2.5 px-3">Equipo / Descripción</th>
+                <th class="py-2.5 px-3">Categoría</th>
+                <th class="py-2.5 px-3">Marca / Modelo</th>
+                <th class="py-2.5 px-3 text-right">Inversión</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              @for (act of d.activosFijos; track act.activoId) {
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="py-2.5 px-3 font-mono font-bold text-slate-900">{{ act.codigoActivo }}</td>
+                  <td class="py-2.5 px-3 font-medium text-slate-800">{{ act.descripcion }}</td>
+                  <td class="py-2.5 px-3 text-slate-600">{{ act.categoria }}</td>
+                  <td class="py-2.5 px-3 text-slate-500">{{ act.marca || '—' }} {{ act.modelo || '' }}</td>
+                  <td class="py-2.5 px-3 text-right font-bold text-slate-900">
+                    Q {{ act.valorAdquisicion | number:'1.2-2' }}
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="py-6 text-center text-slate-400">
+                    No hay activos fijos patrimoniales registrados en esta sede.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- Contenido de Pestaña: Inventario Destacado -->
+      @if (subTabActiva() === 'stock') {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="py-2.5 px-3">Medicamento</th>
+                <th class="py-2.5 px-3">Lote</th>
+                <th class="py-2.5 px-3">Vencimiento</th>
+                <th class="py-2.5 px-3 text-right">Existencias</th>
+                <th class="py-2.5 px-3 text-right">Costo Unit.</th>
+                <th class="py-2.5 px-3 text-right">Valor Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              @for (inv of d.inventarioDestacado; track inv.loteNumero) {
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="py-2.5 px-3 font-bold text-slate-900">{{ inv.nombre }}</td>
+                  <td class="py-2.5 px-3 font-mono text-slate-700 font-bold">{{ inv.loteNumero }}</td>
+                  <td class="py-2.5 px-3 text-slate-500">{{ inv.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+                  <td class="py-2.5 px-3 text-right font-extrabold text-slate-900">{{ inv.stockDisponible }} uds</td>
+                  <td class="py-2.5 px-3 text-right text-slate-600">Q {{ inv.costoUnitario | number:'1.2-2' }}</td>
+                  <td class="py-2.5 px-3 text-right font-bold text-teal-700">Q {{ inv.valorTotal | number:'1.2-2' }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="py-6 text-center text-slate-400">
+                    No hay lotes con existencias físicas disponibles en esta sucursal.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Botón de Cierre -->
+    <div class="flex justify-end pt-3 border-t border-slate-100">
+      <button
+        type="button"
+        (click)="cerrar.emit()"
+        class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer shadow-xs"
+      >
+        Cerrar Expediente
+      </button>
+    </div>
+  }
+</div>

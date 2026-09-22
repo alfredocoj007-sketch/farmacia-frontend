@@ -1,0 +1,52 @@
+@media print {
+  .no-print,
+  button,
+  .subtab-buttons {
+    display: none !important;
+  }
+
+  :host {
+    display: block !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-clean {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .print-header {
+    display: block !important;
+    border-bottom: 2px solid #0f172a !important;
+    padding-bottom: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Forzar tablas legibles y con saltos de página adecuados */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+  }
+
+  th, td {
+    padding: 6px 8px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    font-size: 11px !important;
+  }
+}
+
+.print-header {
+  display: none;
+}

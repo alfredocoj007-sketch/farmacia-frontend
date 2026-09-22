@@ -1,0 +1,19 @@
+@media print {
+  button,
+  input,
+  select,
+  .overflow-x-auto::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .bg-white,
+  .bg-slate-50 {
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+}
