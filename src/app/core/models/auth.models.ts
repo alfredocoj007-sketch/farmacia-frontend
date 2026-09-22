@@ -10,7 +10,8 @@ export interface LoginResponse {
     username: string;
     nombre: string;
     rol: string;
-    sucursalId: number;
+    sucursalId: number | null;
+    sucursalNombre?: string | null;
   };
 }
 
@@ -20,4 +21,6 @@ export interface AuthenticatedUser {
   empleadoId: number;
   rolId: number;
   rolNombre: string;
+  sucursalId?: number | null;
+  sucursalNombre?: string | null;
 }
