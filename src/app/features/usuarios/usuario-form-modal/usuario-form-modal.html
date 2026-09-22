@@ -1,0 +1,363 @@
+<div class="p-6 sm:p-7 space-y-6">
+  <!-- Encabezado del Modal -->
+  <div class="border-b border-slate-100 pb-4 pr-10">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center border border-indigo-100 shrink-0 shadow-2xs">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <polyline points="16 11 18 13 22 9"></polyline>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-800 leading-tight">
+          {{ esEdicion ? 'Editar Usuario y Asignaciones' : 'Registrar Nuevo Usuario' }}
+        </h3>
+        <p class="text-xs text-slate-400 mt-0.5">
+          {{ esEdicion ? 'Actualice el rol, la sucursal de trabajo o el estado de la cuenta.' : 'Cree las credenciales de acceso al sistema y vincúlelas a una sucursal física.' }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <form (ngSubmit)="submit()" class="space-y-5">
+    <!-- Bloque 1: Credenciales de Acceso -->
+    <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+        1. Credenciales de Inicio de Sesión
+      </span>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Username -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Nombre de Usuario (Login): <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            [ngModel]="username()"
+            (ngModelChange)="username.set($event)"
+            name="username"
+            [disabled]="esEdicion"
+            placeholder="ej: carlos_z10"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white disabled:bg-slate-100 disabled:text-slate-400 focus:outline-none focus:border-indigo-500 font-mono font-medium"
+            required
+          />
+          @if (esEdicion) {
+            <span class="text-[10px] text-slate-400 mt-0.5 block">El nombre de usuario es inmutable.</span>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-700 flex items-center justify-between">
+            <span>
+              Contraseña:
+              @if (!esEdicion) {
+                <span class="text-red-500">*</span>
+              }
+            </span>
+            @if (esEdicion) {
+              <span class="text-[10px] text-slate-400">(Opcional para resetear)</span>
+            }
+          </label>
+          <div class="relative">
+            <input
+              [type]="mostrarPassword() ? 'text' : 'password'"
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
+              name="password"
+              [placeholder]="esEdicion ? '•••••••• (solo si desea cambiar)' : 'Ej: Farma#2026*'"
+              class="w-full px-3 py-2 pr-9 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-indigo-500 font-mono"
+              [required]="!esEdicion"
+            />
+            <button
+              type="button"
+              (click)="alternarVisibilidadPassword()"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer p-0.5"
+              tabindex="-1"
+            >
+              @if (mostrarPassword()) {
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              } @else {
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              }
+            </button>
+          </div>
+
+          <!-- Medidor de Fortaleza de Contraseña -->
+          @if (password().length > 0) {
+            <div class="space-y-1 pt-1">
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="font-medium text-slate-500">Nivel de Seguridad:</span>
+                <span class="font-bold" [class]="puntajePassword() === 5 ? 'text-emerald-700' : (puntajePassword() >= 3 ? 'text-amber-700' : 'text-red-600')">
+                  @if (puntajePassword() === 5) {
+                    Excelente y Segura ✓
+                  } @else if (puntajePassword() >= 3) {
+                    Seguridad Media
+                  } @else {
+                    Débil
+                  }
+                </span>
+              </div>
+              <!-- Barra de Progreso -->
+              <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden flex">
+                <div
+                  class="h-full transition-all duration-300 rounded-full"
+                  [style.width.%]="(puntajePassword() / 5) * 100"
+                  [class]="puntajePassword() === 5 ? 'bg-emerald-500' : (puntajePassword() >= 3 ? 'bg-amber-500' : 'bg-red-500')"
+                ></div>
+              </div>
+            </div>
+          }
+
+          <!-- Checklist de Requisitos de Seguridad -->
+          @if (!esEdicion || password().length > 0) {
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200/90 text-[10px] space-y-1 mt-1.5 shadow-2xs">
+              <span class="font-bold text-slate-600 block mb-0.5">Requisitos obligatorios:</span>
+              <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-slate-500">
+                <div class="flex items-center gap-1.5" [class.text-emerald-700]="tieneMinLongitud()" [class.font-bold]="tieneMinLongitud()">
+                  <span>{{ tieneMinLongitud() ? '✓' : '○' }}</span>
+                  <span>Mínimo 8 caracteres</span>
+                </div>
+                <div class="flex items-center gap-1.5" [class.text-emerald-700]="tieneMayuscula()" [class.font-bold]="tieneMayuscula()">
+                  <span>{{ tieneMayuscula() ? '✓' : '○' }}</span>
+                  <span>Una mayúscula (A-Z)</span>
+                </div>
+                <div class="flex items-center gap-1.5" [class.text-emerald-700]="tieneMinuscula()" [class.font-bold]="tieneMinuscula()">
+                  <span>{{ tieneMinuscula() ? '✓' : '○' }}</span>
+                  <span>Una minúscula (a-z)</span>
+                </div>
+                <div class="flex items-center gap-1.5" [class.text-emerald-700]="tieneNumero()" [class.font-bold]="tieneNumero()">
+                  <span>{{ tieneNumero() ? '✓' : '○' }}</span>
+                  <span>Un número (0-9)</span>
+                </div>
+                <div class="flex items-center gap-1.5 col-span-2" [class.text-emerald-700]="tieneEspecial()" [class.font-bold]="tieneEspecial()">
+                  <span>{{ tieneEspecial() ? '✓' : '○' }}</span>
+                  <span>Un símbolo especial (!@#$%*...)</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 2: Información del Empleado -->
+    <div class="p-4 bg-white rounded-2xl border border-slate-200 space-y-3 shadow-xs">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+        2. Datos Personales del Colaborador
+      </span>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Nombre -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+            <span>Nombre(s): <span class="text-red-500">*</span></span>
+            <span class="text-[10px] text-slate-400 font-normal">Solo letras</span>
+          </label>
+          <input
+            type="text"
+            [ngModel]="nombre()"
+            (input)="onNombreInput($event)"
+            name="nombre"
+            placeholder="ej: Carlos Manuel"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-indigo-500 font-medium"
+            required
+          />
+        </div>
+
+        <!-- Apellido -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+            <span>Apellido(s): <span class="text-red-500">*</span></span>
+            <span class="text-[10px] text-slate-400 font-normal">Solo letras</span>
+          </label>
+          <input
+            type="text"
+            [ngModel]="apellido()"
+            (input)="onApellidoInput($event)"
+            name="apellido"
+            placeholder="ej: López García"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-indigo-500 font-medium"
+            required
+          />
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+            <span>Teléfono:</span>
+            <span class="text-[10px] text-slate-400 font-normal">8 dígitos</span>
+          </label>
+          <input
+            type="text"
+            [ngModel]="telefono()"
+            (input)="onTelefonoInput($event)"
+            name="telefono"
+            maxlength="8"
+            placeholder="ej: 55551234"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-indigo-500 font-mono"
+          />
+          @if (telefono().length > 0) {
+            <span class="text-[10px] block mt-0.5" [class]="telefono().length === 8 ? 'text-emerald-700 font-bold' : 'text-amber-600 font-medium'">
+              {{ telefono().length }}/8 dígitos {{ telefono().length === 8 ? '✓' : '(deben ser 8)' }}
+            </span>
+          }
+        </div>
+
+        <!-- DPI -->
+        @if (!esEdicion) {
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+              <span>DPI / CUI:</span>
+              <span class="text-[10px] text-slate-400 font-normal">13 dígitos</span>
+            </label>
+            <input
+              type="text"
+              [ngModel]="dpi()"
+              (input)="onDpiInput($event)"
+              name="dpi"
+              maxlength="13"
+              placeholder="ej: 2450123450101"
+              class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-indigo-500 font-mono"
+            />
+            @if (dpi().length > 0) {
+              <span class="text-[10px] block mt-0.5" [class]="dpi().length === 13 ? 'text-emerald-700 font-bold' : 'text-amber-600 font-medium'">
+                {{ dpi().length }}/13 dígitos {{ dpi().length === 13 ? '✓' : '(deben ser 13)' }}
+              </span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Bloque 3: Asignación Organizacional -->
+    <div class="p-4 bg-indigo-50/40 rounded-2xl border border-indigo-100 space-y-3">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">
+        3. Asignación de Rol y Sucursal de Trabajo
+      </span>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <!-- Rol -->
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+            Rol del Sistema: <span class="text-red-500">*</span>
+          </label>
+          <select
+            [ngModel]="rolId()"
+            (ngModelChange)="rolId.set($event)"
+            name="rolId"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-indigo-500 font-bold text-slate-800 shadow-2xs"
+            required
+          >
+            @for (r of roles; track r.rolId) {
+              <option [ngValue]="r.rolId">
+                {{ r.nombre }} - {{ r.descripcion || 'Sin descripción' }}
+              </option>
+            }
+          </select>
+          <span class="text-[10px] text-slate-500 mt-1 block">
+            Determina los permisos y nivel de acceso en la plataforma.
+          </span>
+        </div>
+
+        <!-- Sucursal -->
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+            Sucursal Asignada: <span class="text-red-500">*</span>
+          </label>
+          <select
+            [ngModel]="sucursalId()"
+            (ngModelChange)="sucursalId.set($event)"
+            name="sucursalId"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-indigo-500 font-bold text-slate-800 shadow-2xs"
+            required
+          >
+            @for (s of sucursales; track s.sucursalId) {
+              <option [ngValue]="s.sucursalId">
+                {{ s.nombre }} ({{ s.tipoSucursal }})
+              </option>
+            }
+          </select>
+          <span class="text-[10px] text-slate-500 mt-1 block">
+            Punto físico donde el colaborador opera, vende y recibe stock.
+          </span>
+        </div>
+      </div>
+
+      @if (esEdicion) {
+        <div class="pt-2 border-t border-indigo-100 flex items-center gap-3">
+          <label class="text-xs font-semibold text-slate-700">Estado de la Cuenta:</label>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="estado.set('ACTIVO')"
+              [class]="estado() === 'ACTIVO' ? 'bg-emerald-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200'"
+              class="px-3 py-1 text-xs rounded-lg transition-all cursor-pointer"
+            >
+              ✓ Activo
+            </button>
+            <button
+              type="button"
+              (click)="estado.set('INACTIVO')"
+              [class]="estado() === 'INACTIVO' ? 'bg-red-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200'"
+              class="px-3 py-1 text-xs rounded-lg transition-all cursor-pointer"
+            >
+              ✕ Inactivo
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+      <button
+        type="button"
+        (click)="cancelado.emit()"
+        class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 rounded-xl cursor-pointer"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        [disabled]="guardando()"
+        class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-xl shadow-xs transition-colors cursor-pointer inline-flex items-center gap-2"
+      >
+        @if (guardando()) {
+          <svg class="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10"></path>
+          </svg>
+          Guardando…
+        } @else {
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          {{ esEdicion ? 'Guardar Cambios' : 'Crear Usuario' }}
+        }
+      </button>
+    </div>
+  </form>
+</div>
