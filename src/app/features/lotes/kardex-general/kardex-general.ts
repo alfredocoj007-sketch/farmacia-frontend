@@ -18,6 +18,7 @@ export class KardexGeneral implements OnInit {
   private readonly authService = inject(AuthService);
 
   protected readonly usuario = this.authService.currentUser;
+  protected readonly esAdmin = computed(() => this.usuario()?.rol === 'ADMIN');
   protected readonly movimientos = signal<MovimientoInventario[]>([]);
   protected readonly sucursales = signal<Sucursal[]>([]);
   protected readonly cargando = signal<boolean>(true);
@@ -163,6 +164,9 @@ export class KardexGeneral implements OnInit {
   });
 
   ngOnInit(): void {
+    if (!this.esAdmin() && this.usuario()?.sucursalId) {
+      this.filtroSucursalId.set(this.usuario()!.sucursalId!);
+    }
     this.actualizarFechaImpresion();
     this.cargarSucursales();
     this.cargarMovimientos();
@@ -172,13 +176,14 @@ export class KardexGeneral implements OnInit {
     const ahora = new Date();
     this.fechaImpresion.set(
       ahora.toLocaleString('es-GT', {
+        timeZone: 'America/Guatemala',
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        hour12: false,
+        hour12: true,
       }),
     );
   }
@@ -197,13 +202,22 @@ export class KardexGeneral implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.lotesService.findAllMovimientos({ limit: 500 }).subscribe({
+    const sucId = !this.esAdmin()
+      ? (this.usuario()?.sucursalId ?? undefined)
+      : (this.filtroSucursalId() ?? undefined);
+
+    const params: any = { limit: 500 };
+    if (sucId) {
+      params.sucursalId = sucId;
+    }
+
+    this.lotesService.findAllMovimientos(params).subscribe({
       next: (res) => {
         this.movimientos.set(res.data ?? []);
         this.cargando.set(false);
       },
       error: () => {
-        this.error.set('No se pudo cargar el historial global de Kardex.');
+        this.error.set('No se pudo cargar el historial de Kardex.');
         this.cargando.set(false);
       },
     });
@@ -213,6 +227,7 @@ export class KardexGeneral implements OnInit {
     const val = (evento.target as HTMLSelectElement).value;
     this.filtroSucursalId.set(val ? Number(val) : null);
     this.page.set(1);
+    this.cargarMovimientos();
   }
 
   protected cambiarFiltroTipo(tipo: '' | 'ENTRADA' | 'VENTA' | 'AJUSTE'): void {
@@ -273,13 +288,14 @@ export class KardexGeneral implements OnInit {
     const d = new Date(fechaStr);
     if (isNaN(d.getTime())) return String(fechaStr);
     return d.toLocaleString('es-GT', {
+      timeZone: 'America/Guatemala',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-      hour12: false,
+      hour12: true,
     });
   }
 

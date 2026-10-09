@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   CreateUsuarioPayload,
+  EmpleadoDisponibleItem,
   QueryUsuariosParams,
   RolItem,
   UpdateUsuarioPayload,
@@ -34,6 +35,10 @@ export class UsuariosService {
 
   listarRoles(): Observable<RolItem[]> {
     return this.http.get<RolItem[]>(`${this.apiUrl}/roles`);
+  }
+
+  listarEmpleadosDisponibles(): Observable<EmpleadoDisponibleItem[]> {
+    return this.http.get<EmpleadoDisponibleItem[]>(`${this.apiUrl}/empleados-disponibles`);
   }
 
   crear(payload: CreateUsuarioPayload): Observable<UsuarioItem> {

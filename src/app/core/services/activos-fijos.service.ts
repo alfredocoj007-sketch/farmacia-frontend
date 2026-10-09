@@ -43,8 +43,12 @@ export class ActivosFijosService {
     return this.http.get<CategoriaActivo[]>(`${this.apiUrl}/categorias`);
   }
 
-  obtenerEstadisticas(): Observable<EstadisticasActivosFijos> {
-    return this.http.get<EstadisticasActivosFijos>(`${this.apiUrl}/estadisticas`);
+  obtenerEstadisticas(sucursalId?: number): Observable<EstadisticasActivosFijos> {
+    let httpParams = new HttpParams();
+    if (sucursalId) {
+      httpParams = httpParams.set('sucursalId', sucursalId.toString());
+    }
+    return this.http.get<EstadisticasActivosFijos>(`${this.apiUrl}/estadisticas`, { params: httpParams });
   }
 
   crear(req: CreateActivoFijoRequest): Observable<ActivoFijoDetalle> {

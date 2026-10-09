@@ -230,16 +230,16 @@ export class SucursalesList implements OnInit {
   }
 
   protected obtenerIconoTipo(tipo: string): string {
-    if (tipo === 'GAS_STAND') return '⛽';
+    if (tipo === 'GAS_STAND' || tipo === 'STAND') return '⛽';
     if (tipo === 'MALL_STAND') return '🛍️';
-    if (tipo === 'BODEGA_MATRIZ') return '📦';
-    return '🏥';
+    if (tipo === 'BODEGA_MATRIZ' || tipo === 'BODEGA_CENTRAL') return '📦';
+    return '🏪';
   }
 
   protected obtenerEtiquetaTipo(tipo: string): string {
-    if (tipo === 'GAS_STAND') return 'Stand Gasolinera (Express)';
-    if (tipo === 'MALL_STAND') return 'Centro Comercial (Isla / Local)';
-    if (tipo === 'BODEGA_MATRIZ') return 'Bodega Matriz';
-    return 'Farmacia Matriz';
+    if (tipo === 'GAS_STAND' || tipo === 'STAND') return 'Stand en Gasolinera';
+    if (tipo === 'MALL_STAND') return 'Centro Comercial';
+    if (tipo === 'BODEGA_MATRIZ' || tipo === 'BODEGA_CENTRAL') return 'Bodega Central';
+    return 'Farmacia Estándar';
   }
 }

@@ -85,6 +85,7 @@ export interface SalidaLotePayload {
 }
 
 export interface QueryLotes {
+  sucursalId?: number;
   productoId?: number;
   page?: number;
   limit?: number;

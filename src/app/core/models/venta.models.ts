@@ -27,6 +27,8 @@ export interface ProductoPosItem {
   nombre: string;
   principioActivo?: string;
   presentacion?: string;
+  unidadMedida?: string | null;
+  unidadMedidaAbrev?: string | null;
   categoria: string;
   requiereReceta: boolean;
   precioVenta: number;
@@ -92,14 +94,25 @@ export interface FelData {
 export interface VentaRespuesta {
   pedidoId: number;
   fechaVenta: string;
+  fechaEmision?: string;
   estado: string;
   total: number;
   metodoPago: string;
+  serie?: string;
+  numeroFactura?: string;
+  autorizacionDte?: string;
   sucursal: {
     sucursalId: number;
     nombre: string;
+    direccion?: string;
   };
-  fel: FelData;
+  cliente?: {
+    nit?: string;
+    nombre?: string;
+    direccion?: string;
+  };
+  totales?: FelTotales;
+  fel?: FelData;
   items: {
     productoId: number;
     nombre: string;
@@ -131,4 +144,31 @@ export interface VentaListadoItem {
     precioUnitario: number;
     subtotal: number;
   }[];
+}
+
+export interface StockSucursalRed {
+  sucursalId: number;
+  nombre: string;
+  tipoSucursal: string;
+  direccion?: string | null;
+  telefono?: string | null;
+  stockDisponible: number;
+  totalLotes: number;
+  proximoVencimiento?: string | null;
+}
+
+export interface StockRedRespuesta {
+  producto: {
+    productoId: number;
+    codigoProducto: string;
+    nombre: string;
+    principioActivo?: string | null;
+    presentacion?: string | null;
+    concentracion?: string | null;
+    unidadMedida?: string | null;
+    unidadMedidaAbrev?: string | null;
+    precioVenta: number;
+  };
+  sedes: StockSucursalRed[];
+  stockTotalRed: number;
 }

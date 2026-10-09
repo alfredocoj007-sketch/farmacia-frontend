@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth.service';
 import { ActivosFijosService } from '../../../core/services/activos-fijos.service';
 import { CategoriaActivo, CreateActivoFijoRequest } from '../../../core/models/activo-fijo.models';
 import { Sucursal } from '../../../core/models/lote.models';
@@ -11,13 +12,17 @@ import { Sucursal } from '../../../core/models/lote.models';
   imports: [CommonModule, FormsModule],
   templateUrl: './activo-form-modal.html',
 })
-export class ActivoFormModal {
+export class ActivoFormModal implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly activosService = inject(ActivosFijosService);
 
   @Input() categorias: CategoriaActivo[] = [];
   @Input() sucursales: Sucursal[] = [];
   @Output() guardado = new EventEmitter<void>();
   @Output() cancelar = new EventEmitter<void>();
+
+  protected readonly usuarioActual = this.authService.currentUser;
+  protected readonly esAdmin = computed(() => this.usuarioActual()?.rol === 'ADMIN');
 
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
@@ -30,10 +35,19 @@ export class ActivoFormModal {
     marca: '',
     modelo: '',
     numeroSerie: '',
-    fechaAdquisicion: new Date().toISOString().substring(0, 10),
+    fechaAdquisicion: (() => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    })(),
     valorAdquisicion: 0,
     valorResidual: 0,
   };
+
+  ngOnInit(): void {
+    if (!this.esAdmin() && this.usuarioActual()?.sucursalId) {
+      this.form.sucursalId = this.usuarioActual()!.sucursalId!;
+    }
+  }
 
   protected submit(): void {
     if (!this.form.codigoActivo.trim()) {
@@ -47,6 +61,9 @@ export class ActivoFormModal {
     if (!this.form.categoriaActivoId) {
       this.error.set('Debe seleccionar una categoría de activo.');
       return;
+    }
+    if (!this.esAdmin() && this.usuarioActual()?.sucursalId) {
+      this.form.sucursalId = this.usuarioActual()!.sucursalId!;
     }
     if (!this.form.sucursalId) {
       this.error.set('Debe seleccionar la sucursal de asignación inicial.');

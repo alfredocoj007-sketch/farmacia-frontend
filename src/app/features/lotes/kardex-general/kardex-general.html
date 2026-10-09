@@ -130,7 +130,7 @@
     <div class="flex items-start justify-between">
       <div>
         <h1 class="text-xl font-black uppercase tracking-tight text-slate-950">
-          FarmaGest · Farmacia Comunitaria
+          Farmacia ProSalud · Red Farmacéutica
         </h1>
         <h2 class="text-base font-black text-slate-950 mt-1 tracking-wide uppercase">
           Reporte Oficial de Kardex General y Auditoría de Movimientos
@@ -175,18 +175,30 @@
       </div>
 
       <!-- Selector de Sucursal -->
-      <div class="flex items-center gap-2">
-        <label for="select-sucursal-kardex" class="text-xs font-semibold text-slate-500 whitespace-nowrap">Sucursal:</label>
-        <select id="select-sucursal-kardex" (change)="cambiarFiltroSucursal($event)"
-          class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/70 text-xs font-medium text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all cursor-pointer">
-          <option value="">Todas las Sucursales</option>
-          @for (s of sucursales(); track s.sucursalId) {
-          <option [value]="s.sucursalId" [selected]="filtroSucursalId() === s.sucursalId">
-            {{ s.nombre }}
-          </option>
-          }
-        </select>
-      </div>
+      @if (esAdmin()) {
+        <div class="flex items-center gap-2">
+          <label for="select-sucursal-kardex" class="text-xs font-semibold text-slate-500 whitespace-nowrap">Sucursal:</label>
+          <select id="select-sucursal-kardex" (change)="cambiarFiltroSucursal($event)"
+            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/70 text-xs font-medium text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all cursor-pointer">
+            <option value="">Todas las Sucursales</option>
+            @for (s of sucursales(); track s.sucursalId) {
+            <option [value]="s.sucursalId" [selected]="filtroSucursalId() === s.sucursalId">
+              {{ s.nombre }}
+            </option>
+            }
+          </select>
+        </div>
+      } @else {
+        <div class="flex items-center gap-2 rounded-xl border border-violet-100 bg-violet-50/70 px-3 py-1.5 text-xs text-violet-900 shadow-xs">
+          <svg class="h-3.5 w-3.5 text-violet-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="truncate font-semibold text-violet-800">
+            Sede: {{ usuario()?.sucursalNombre || 'Mi Sucursal Asignada' }}
+          </span>
+        </div>
+      }
 
       <!-- Toggle de Orden Cronológico -->
       <button (click)="toggleOrden()"

@@ -61,4 +61,12 @@ export class SucursalesService {
     }
     return this.http.get<MunicipioGeo[]>(`${this.apiUrl}/municipios`, { params });
   }
+
+  crearDepartamento(payload: { nombre: string; municipioInicial?: string }): Observable<DepartamentoGeo> {
+    return this.http.post<DepartamentoGeo>(`${this.apiUrl}/departamentos`, payload);
+  }
+
+  crearMunicipio(payload: { nombre: string; departamentoId: number }): Observable<MunicipioGeo> {
+    return this.http.post<MunicipioGeo>(`${this.apiUrl}/municipios`, payload);
+  }
 }

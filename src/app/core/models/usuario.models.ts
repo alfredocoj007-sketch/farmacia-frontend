@@ -31,6 +31,28 @@ export interface UsuarioItem {
   rol: RolItem;
 }
 
+export interface EmpleadoDisponibleItem {
+  empleadoId: number;
+  nombre: string;
+  apellido: string;
+  nombreCompleto: string;
+  dpi?: string | null;
+  telefono?: string | null;
+  estado: string;
+  puesto?: {
+    puestoId: number;
+    nombre: string;
+  } | null;
+  sucursal?: {
+    sucursalId: number;
+    nombre: string;
+    tipoSucursal: string;
+  } | null;
+  tieneUsuario: boolean;
+  username?: string | null;
+  rolNombre?: string | null;
+}
+
 export interface CreateUsuarioPayload {
   username: string;
   password: string;
@@ -40,6 +62,7 @@ export interface CreateUsuarioPayload {
   dpi?: string;
   rolId: number;
   sucursalId: number;
+  empleadoId?: number;
 }
 
 export interface UpdateUsuarioPayload {

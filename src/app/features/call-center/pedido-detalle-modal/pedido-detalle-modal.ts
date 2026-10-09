@@ -9,6 +9,7 @@ import { CambiarEstadoPedidoRequest, PedidoCallCenter } from '../../../core/mode
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './pedido-detalle-modal.html',
+  styleUrl: './pedido-detalle-modal.scss',
 })
 export class PedidoDetalleModal implements OnInit {
   private readonly pedidosService = inject(PedidosService);
@@ -24,6 +25,19 @@ export class PedidoDetalleModal implements OnInit {
 
   protected personaRecibeConfirmacion = '';
   protected observacionEstado = '';
+
+  protected imprimirGuia(): void {
+    const tituloOriginal = document.title;
+    document.title = '';
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        window.print();
+        setTimeout(() => {
+          document.title = tituloOriginal;
+        }, 800);
+      }, 60);
+    });
+  }
 
   ngOnInit(): void {
     this.cargarPedido();

@@ -1,10 +1,11 @@
 @media print {
-  // Ocultar botones de navegación, filtros y modales en impresión
-  button,
-  .p-1,
-  input,
-  select,
-  .overflow-x-auto::-webkit-scrollbar {
+  @page {
+    size: letter landscape;
+    margin: 12mm 10mm 12mm 10mm;
+  }
+
+  .no-print,
+  .no-print * {
     display: none !important;
   }
 
@@ -13,10 +14,21 @@
     color: #000000 !important;
   }
 
-  .bg-white,
-  .bg-slate-50,
-  .bg-slate-900 {
-    box-shadow: none !important;
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th,
+  td {
     border: 1px solid #cbd5e1 !important;
+    padding: 6px 8px !important;
+    color: #000000 !important;
+  }
+
+  th {
+    background-color: #f8fafc !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

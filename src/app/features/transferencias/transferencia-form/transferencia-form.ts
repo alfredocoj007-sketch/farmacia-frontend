@@ -7,33 +7,36 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransferenciasService } from '../../../core/services/transferencias.service';
 import { SucursalesService } from '../../../core/services/sucursales.service';
-import { LotesService } from '../../../core/services/lotes.service';
 import { ConfirmService } from '../../../shared/confirm/confirm.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Lote, Sucursal } from '../../../core/models/lote.models';
+import { Sucursal } from '../../../core/models/lote.models';
+import { LoteDisponibleTransferencia } from '../../../core/models/transferencia.models';
 
 export interface ItemTransferenciaForm {
   loteId: number;
   numeroLote: string;
   productoNombre: string;
   codigoProducto: string;
+  fechaVencimiento?: string | Date;
+  categoria?: string;
   stockDisponible: number;
   cantidadSolicitada: number;
 }
 
 @Component({
   selector: 'app-transferencia-form',
-  imports: [FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './transferencia-form.html',
   styleUrl: './transferencia-form.scss',
 })
 export class TransferenciaForm implements OnInit {
   private readonly transferenciasService = inject(TransferenciasService);
   private readonly sucursalesService = inject(SucursalesService);
-  private readonly lotesService = inject(LotesService);
   private readonly confirmService = inject(ConfirmService);
   private readonly authService = inject(AuthService);
 
@@ -45,8 +48,9 @@ export class TransferenciaForm implements OnInit {
   protected readonly sucursalAsignadaId = computed(() => this.usuarioActual()?.sucursalId);
 
   protected readonly sucursales = signal<Sucursal[]>([]);
-  protected readonly todosLotes = signal<Lote[]>([]);
+  protected readonly lotesDisponibles = signal<LoteDisponibleTransferencia[]>([]);
   protected readonly cargando = signal(true);
+  protected readonly cargandoLotes = signal(false);
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
 
@@ -54,9 +58,11 @@ export class TransferenciaForm implements OnInit {
   protected readonly sucursalDestinoId = signal<number | null>(null);
   protected readonly observacion = signal<string>('');
 
-  // Selector de ítem individual
-  protected readonly loteSeleccionadoId = signal<number | null>(null);
+  // Selector e interactividad con reactividad pura (Estilo Call Center)
+  protected readonly busquedaLote = signal<string>('');
   protected readonly cantidadItem = signal<number>(1);
+  protected readonly loteSeleccionadoId = signal<number | null>(null);
+  protected readonly soloConStock = signal<boolean>(true);
 
   // Lista acumulada de medicamentos a transferir
   protected readonly items = signal<ItemTransferenciaForm[]>([]);
@@ -83,44 +89,62 @@ export class TransferenciaForm implements OnInit {
     return this.sucursales().filter((s) => s.sucursalId !== centralId);
   });
 
-  // Lotes que tienen stock disponible en la sucursal de origen seleccionada (Bodega Central)
-  protected readonly lotesDisponiblesEnOrigen = computed(() => {
-    const origenId = this.sucursalOrigenId();
-    const lotes = this.todosLotes();
-    if (!origenId) return [];
+  // Lotes filtrados en tiempo real por búsqueda y criterio FEFO
+  protected readonly lotesFiltradosEnOrigen = computed(() => {
+    const disponibles = this.lotesDisponibles();
+    const query = this.busquedaLote().trim().toLowerCase();
+    const soloStock = this.soloConStock();
 
-    return lotes
-      .map((lote) => {
-        const inv = (lote.inventarios ?? []).find(
-          (i) => Number(i.sucursal?.sucursalId ?? i.sucursalId) === Number(origenId),
-        );
-        const disp = inv ? Number(inv.cantidadDisponible) : 0;
-        return {
-          lote,
-          stockDisponible: disp,
-        };
-      })
-      .filter((item) => item.stockDisponible > 0);
+    let lista = disponibles;
+    // Si no hay búsqueda de texto activa y tiene activado el filtro de solo stock:
+    if (soloStock && !query) {
+      lista = lista.filter((item) => item.stockDisponible > 0 && !item.agotado);
+    }
+
+    if (!query) {
+      return lista;
+    }
+
+    return lista.filter((item) => {
+      const nombre = (item.producto?.nombre ?? '').toLowerCase();
+      const codigo = (item.producto?.codigoProducto ?? '').toLowerCase();
+      const formula = (item.producto?.principioActivo ?? '').toLowerCase();
+      const numLote = (item.numeroLote ?? '').toLowerCase();
+      const cat = (item.producto?.categoria ?? '').toLowerCase();
+      return nombre.includes(query) || codigo.includes(query) || formula.includes(query) || numLote.includes(query) || cat.includes(query);
+    });
   });
 
-  // Stock disponible del lote seleccionado actualmente
-  protected readonly stockLoteSeleccionado = computed(() => {
+  // Sugerencias rápidas (populares de Bodega Central con existencias)
+  protected readonly sugerenciasRapidas = computed(() => {
+    return this.lotesDisponibles()
+      .filter((l) => l.stockDisponible > 0 && !l.agotado)
+      .slice(0, 6);
+  });
+
+  // Detalle del lote seleccionado actualmente (opcional)
+  protected readonly loteSeleccionadoDetalle = computed(() => {
     const loteId = this.loteSeleccionadoId();
-    if (!loteId) return 0;
-    const encontrado = this.lotesDisponiblesEnOrigen().find(
-      (item) => item.lote.loteId === loteId,
-    );
-    return encontrado?.stockDisponible ?? 0;
+    if (!loteId) return null;
+    return this.lotesDisponibles().find((item) => item.loteId === loteId) ?? null;
   });
-  protected readonly stockDisponibleSeleccionado = this.stockLoteSeleccionado;
+
+  // Total de unidades solicitadas en la guía
+  protected readonly totalUnidadesTransferencia = computed(() => {
+    return this.items().reduce((sum, i) => sum + i.cantidadSolicitada, 0);
+  });
 
   ngOnInit(): void {
+    this.cargando.set(true);
     this.sucursalesService.findAll().subscribe({
       next: (data) => {
         this.sucursales.set(data);
         const central = data.find((s) => s.tipoSucursal === 'BODEGA_CENTRAL') ?? data[0];
         if (central) {
           this.sucursalOrigenId.set(central.sucursalId);
+          this.cargarLotesOrigen(central.sucursalId);
+        } else {
+          this.cargarLotesOrigen();
         }
 
         const userSucId = this.sucursalAsignadaId();
@@ -129,24 +153,30 @@ export class TransferenciaForm implements OnInit {
         if (!esAdmin && userSucId) {
           this.sucursalDestinoId.set(userSucId);
         } else {
-          const primeraFarmacia = data.find(
-            (s) => s.sucursalId !== central?.sucursalId,
-          );
+          const primeraFarmacia = data.find((s) => s.sucursalId !== central?.sucursalId);
           if (primeraFarmacia) {
             this.sucursalDestinoId.set(primeraFarmacia.sucursalId);
           }
         }
       },
-      error: () => this.error.set('No se pudieron cargar las sucursales.'),
+      error: () => {
+        this.error.set('No se pudieron cargar las sucursales.');
+        this.cargando.set(false);
+      },
     });
+  }
 
-    this.lotesService.findAll({ limit: 300 }).subscribe({
+  protected cargarLotesOrigen(origenId?: number): void {
+    this.cargandoLotes.set(true);
+    this.transferenciasService.getLotesDisponibles(origenId).subscribe({
       next: (res) => {
-        this.todosLotes.set(res.data);
+        this.lotesDisponibles.set(res ?? []);
+        this.cargandoLotes.set(false);
         this.cargando.set(false);
       },
       error: () => {
-        this.error.set('No se pudieron cargar los lotes del sistema.');
+        this.error.set('No se pudieron cargar las existencias de Bodega Central.');
+        this.cargandoLotes.set(false);
         this.cargando.set(false);
       },
     });
@@ -164,16 +194,134 @@ export class TransferenciaForm implements OnInit {
     this.error.set(null);
   }
 
-  protected onLoteChange(val: any): void {
-    const id = val !== null && val !== undefined && val !== '' ? Number(val) : null;
-    this.loteSeleccionadoId.set(id);
+  protected onBusquedaInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.busquedaLote.set(input.value);
+    this.error.set(null);
+  }
+
+  protected limpiarBusqueda(): void {
+    this.busquedaLote.set('');
+    this.error.set(null);
+  }
+
+  protected alternarSoloStock(): void {
+    this.soloConStock.set(!this.soloConStock());
+  }
+
+  protected ajustarCantidad(delta: number): void {
+    const maxStock = this.loteSeleccionadoDetalle()?.stockDisponible || 9999;
+    const nueva = this.cantidadItem() + delta;
+    if (nueva >= 1 && nueva <= maxStock) {
+      this.cantidadItem.set(nueva);
+    }
+  }
+
+  protected seleccionarLote(lote: LoteDisponibleTransferencia): void {
+    if (lote.stockDisponible <= 0 || lote.agotado) {
+      this.error.set(`"${lote.producto?.nombre || lote.numeroLote}" se encuentra AGOTADO en Bodega Central.`);
+      return;
+    }
+    this.loteSeleccionadoId.set(lote.loteId);
     this.cantidadItem.set(1);
     this.error.set(null);
   }
 
-  protected onCantidadChange(val: any): void {
-    const cant = Number(val);
-    this.cantidadItem.set(isNaN(cant) || cant < 1 ? 1 : cant);
+  protected deseleccionarLote(): void {
+    this.loteSeleccionadoId.set(null);
+    this.cantidadItem.set(1);
+  }
+
+  /**
+   * Añade directamente un lote/medicamento a la guía de transferencia con validación estricta de stock y FEFO.
+   */
+  protected agregarItemDirecto(item: LoteDisponibleTransferencia, cant = 1): void {
+    if (!item) return;
+
+    if (item.stockDisponible <= 0 || item.agotado) {
+      this.error.set(`"${item.producto?.nombre || item.numeroLote}" se encuentra AGOTADO en Bodega Central. No se puede transferir.`);
+      return;
+    }
+
+    if (cant <= 0) return;
+
+    const items = [...this.items()];
+    const index = items.findIndex((i) => i.loteId === item.loteId);
+    const yaEnGuia = index >= 0 ? items[index].cantidadSolicitada : 0;
+    const cantFinal = yaEnGuia + cant;
+
+    if (cantFinal > item.stockDisponible) {
+      this.error.set(
+        `La cantidad total solicitada (${cantFinal} uds) supera las existencias disponibles en Bodega Central (${item.stockDisponible} uds) para el lote ${item.numeroLote}. Ya tienes ${yaEnGuia} uds en la lista.`,
+      );
+      return;
+    }
+
+    if (index >= 0) {
+      items[index].cantidadSolicitada = cantFinal;
+    } else {
+      items.push({
+        loteId: item.loteId,
+        numeroLote: item.numeroLote,
+        productoNombre: item.producto?.nombre ?? 'Medicamento',
+        codigoProducto: item.producto?.codigoProducto ?? '—',
+        fechaVencimiento: item.fechaVencimiento,
+        categoria: item.producto?.categoria,
+        stockDisponible: item.stockDisponible,
+        cantidadSolicitada: cant,
+      });
+    }
+
+    this.items.set(items);
+    this.loteSeleccionadoId.set(null);
+    this.cantidadItem.set(1);
+    this.error.set(null);
+  }
+
+  /**
+   * Al presionar Enter en el input o pulsar el botón principal "+ Añadir a la Transferencia"
+   */
+  protected onEnterBusqueda(): void {
+    const sel = this.loteSeleccionadoDetalle();
+    if (sel) {
+      this.agregarItemDirecto(sel, this.cantidadItem());
+      return;
+    }
+
+    const filtrados = this.lotesFiltradosEnOrigen();
+    const disponible = filtrados.find((l) => l.stockDisponible > 0 && !l.agotado);
+
+    if (disponible) {
+      this.agregarItemDirecto(disponible, this.cantidadItem());
+    } else if (filtrados.length > 0) {
+      this.error.set(`Los medicamentos o lotes encontrados para "${this.busquedaLote()}" están AGOTADOS en Bodega Central.`);
+    } else if (this.busquedaLote().trim()) {
+      this.error.set(`No se encontró ningún medicamento o lote con el criterio "${this.busquedaLote()}".`);
+    }
+  }
+
+  protected ajustarCantidadTransferencia(index: number, delta: number): void {
+    const items = [...this.items()];
+    const it = items[index];
+    const nueva = it.cantidadSolicitada + delta;
+    if (nueva <= 0) {
+      this.eliminarItem(index);
+      return;
+    }
+    if (nueva > it.stockDisponible) {
+      this.error.set(
+        `No puedes solicitar más de ${it.stockDisponible} unidades (existencia total en Bodega Central).`,
+      );
+      return;
+    }
+    it.cantidadSolicitada = nueva;
+    this.items.set(items);
+    this.error.set(null);
+  }
+
+  protected eliminarItem(index: number): void {
+    this.items.update((prev) => prev.filter((_, i) => i !== index));
+    this.error.set(null);
   }
 
   protected formatearFecha(f: string | Date | null | undefined): string {
@@ -182,60 +330,16 @@ export class TransferenciaForm implements OnInit {
     return s.includes('T') ? s.split('T')[0] : s;
   }
 
-  protected agregarItem(): void {
-    const loteId = this.loteSeleccionadoId();
-    const cant = this.cantidadItem();
-
-    if (!loteId || cant <= 0) {
-      this.error.set('Selecciona un lote y especifica una cantidad válida.');
-      return;
-    }
-
-    const itemEncontrado = this.lotesDisponiblesEnOrigen().find(
-      (l) => l.lote.loteId === Number(loteId),
-    );
-
-    if (!itemEncontrado) {
-      this.error.set('El lote seleccionado no está disponible en la sucursal de origen.');
-      return;
-    }
-
-    if (cant > itemEncontrado.stockDisponible) {
-      this.error.set(
-        `La cantidad solicitada (${cant}) supera las existencias en la farmacia origen (${itemEncontrado.stockDisponible} uds).`,
-      );
-      return;
-    }
-
-    // Verificar si ya está en la lista
-    const yaExiste = this.items().some(
-      (i) => i.loteId === itemEncontrado.lote.loteId,
-    );
-    if (yaExiste) {
-      this.error.set('Este lote ya fue agregado a la lista. Puedes modificar su cantidad o eliminarlo.');
-      return;
-    }
-
-    this.items.update((prev) => [
-      ...prev,
-      {
-        loteId: itemEncontrado.lote.loteId,
-        numeroLote: itemEncontrado.lote.numeroLote,
-        productoNombre: itemEncontrado.lote.producto?.nombre ?? 'Medicamento',
-        codigoProducto: itemEncontrado.lote.producto?.codigoProducto ?? '—',
-        stockDisponible: itemEncontrado.stockDisponible,
-        cantidadSolicitada: cant,
-      },
-    ]);
-
-    // Resetear selector de ítem
-    this.loteSeleccionadoId.set(null);
-    this.cantidadItem.set(1);
-    this.error.set(null);
+  protected calcularDiasParaVencer(f: string | Date | null | undefined): number {
+    if (!f) return 0;
+    const vto = new Date(f);
+    const hoy = new Date();
+    return Math.max(0, Math.ceil((vto.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)));
   }
 
-  protected eliminarItem(index: number): void {
-    this.items.update((prev) => prev.filter((_, i) => i !== index));
+  protected getCantidadYaEnLista(loteId: number): number {
+    const found = this.items().find((i) => i.loteId === loteId);
+    return found ? found.cantidadSolicitada : 0;
   }
 
   protected async submit(): Promise<void> {
@@ -259,7 +363,7 @@ export class TransferenciaForm implements OnInit {
 
     const confirmado = await this.confirmService.confirm({
       title: '¿Enviar Solicitud de Reabastecimiento?',
-      message: `Se creará la solicitud para que Bodega Central suministre ${this.items().length} medicamento(s) a "${this.nombreSucursalDestino()}". La solicitud quedará en estado PENDIENTE para revisión y despacho de Bodega Central.`,
+      message: `Se creará la solicitud para que Bodega Central suministre ${this.items().length} medicamento(s) (${this.totalUnidadesTransferencia()} unidades) a "${this.nombreSucursalDestino()}". La solicitud quedará en estado PENDIENTE para revisión y despacho de Bodega Central.`,
       confirmText: 'Sí, Enviar Solicitud',
       cancelText: 'Cancelar',
       tipo: 'primary',

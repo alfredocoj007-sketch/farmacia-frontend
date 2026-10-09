@@ -59,10 +59,10 @@
           required
           class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-800"
         >
-          <option value="MALL_STAND">🛍️ Centro Comercial (Isla / Local)</option>
-          <option value="GAS_STAND">⛽ Stand Express en Gasolinera (24/7)</option>
-          <option value="FARMACIA">🏥 Farmacia Central / Bodega Matriz</option>
-          <option value="BODEGA_MATRIZ">📦 Bodega Matriz Mayorista</option>
+          <option value="FARMACIA">Farmacia Estándar</option>
+          <option value="MALL_STAND">Centro Comercial</option>
+          <option value="GAS_STAND">Stand en Gasolinera</option>
+          <option value="BODEGA_CENTRAL">Bodega Central</option>
         </select>
       </div>
 
@@ -85,9 +85,19 @@
 
       <!-- Departamento -->
       <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1">
-          Departamento de Guatemala *
-        </label>
+        <div class="flex items-center justify-between mb-1">
+          <label class="block text-xs font-bold text-slate-700">
+            Departamento de Guatemala *
+          </label>
+          <button
+            type="button"
+            (click)="abrirCrearDepartamento()"
+            class="text-[11px] font-bold text-sky-600 hover:text-sky-800 hover:underline cursor-pointer flex items-center gap-0.5"
+            title="Registrar nuevo departamento"
+          >
+            + Nuevo Departamento
+          </button>
+        </div>
         <select
           [(ngModel)]="departamentoId"
           (ngModelChange)="onDepartamentoChange()"
@@ -103,9 +113,20 @@
 
       <!-- Municipio -->
       <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1">
-          Municipio *
-        </label>
+        <div class="flex items-center justify-between mb-1">
+          <label class="block text-xs font-bold text-slate-700">
+            Municipio *
+          </label>
+          <button
+            type="button"
+            (click)="abrirCrearMunicipio()"
+            [disabled]="!departamentoId"
+            class="text-[11px] font-bold text-sky-600 hover:text-sky-800 hover:underline disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-0.5"
+            title="Registrar nuevo municipio para este departamento"
+          >
+            + Nuevo Municipio
+          </button>
+        </div>
         <select
           [(ngModel)]="municipioId"
           name="municipioId"
@@ -169,4 +190,144 @@
       </button>
     </div>
   </form>
+
+  <!-- Sub-Modal: Registrar Nuevo Departamento -->
+  @if (modalNuevoDepartamento()) {
+    <div class="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 space-y-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900">Registrar Nuevo Departamento</h3>
+            <p class="text-[11px] text-slate-500">Agrega un nuevo territorio donde operará la farmacia</p>
+          </div>
+          <button
+            type="button"
+            (click)="cerrarCrearDepartamento()"
+            class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+
+        @if (errorGeo()) {
+          <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
+            {{ errorGeo() }}
+          </div>
+        }
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Nombre del Departamento *</label>
+            <input
+              type="text"
+              [value]="nuevoDepNombre()"
+              (input)="nuevoDepNombre.set($any($event.target).value)"
+              placeholder="Ej. Alta Verapaz, Petén, Izabal..."
+              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-800"
+            />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">
+              Municipio Cabecera / Inicial (Opcional)
+            </label>
+            <input
+              type="text"
+              [value]="nuevoDepMunicipio()"
+              (input)="nuevoDepMunicipio.set($any($event.target).value)"
+              placeholder="Ej. Cobán, Flores, Puerto Barrios..."
+              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
+            />
+            <p class="text-[10px] text-slate-400 mt-1">
+              Si ingresas el municipio, se creará y seleccionará automáticamente.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button
+            type="button"
+            (click)="cerrarCrearDepartamento()"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            (click)="guardarNuevoDepartamento()"
+            [disabled]="guardandoGeo() || !nuevoDepNombre().trim()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-50 transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+          >
+            @if (guardandoGeo()) {
+              <span class="inline-block w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            }
+            <span>Guardar Departamento</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Sub-Modal: Registrar Nuevo Municipio -->
+  @if (modalNuevoMunicipio()) {
+    <div class="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 space-y-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900">Registrar Nuevo Municipio</h3>
+            <p class="text-[11px] text-slate-500">
+              Para el departamento: <strong class="text-sky-700">{{ nombreDepartamentoActual() }}</strong>
+            </p>
+          </div>
+          <button
+            type="button"
+            (click)="cerrarCrearMunicipio()"
+            class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+
+        @if (errorGeo()) {
+          <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
+            {{ errorGeo() }}
+          </div>
+        }
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Nombre del Municipio *</label>
+            <input
+              type="text"
+              [value]="nuevoMunNombre()"
+              (input)="nuevoMunNombre.set($any($event.target).value)"
+              placeholder="Ej. San Cristóbal Verapaz, Santa Cruz del Quiché..."
+              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-800"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button
+            type="button"
+            (click)="cerrarCrearMunicipio()"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            (click)="guardarNuevoMunicipio()"
+            [disabled]="guardandoGeo() || !nuevoMunNombre().trim()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-50 transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+          >
+            @if (guardandoGeo()) {
+              <span class="inline-block w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            }
+            <span>Guardar Municipio</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

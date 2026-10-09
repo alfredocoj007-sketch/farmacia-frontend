@@ -8,6 +8,7 @@ import {
   CreatePedidoCallCenterRequest,
   EstadisticasCallCenter,
   ItemConsultaDisponibilidad,
+  MedicamentoCallCenter,
   PedidoCallCenter,
   QueryPedidosParams,
   SucursalDisponibilidad,
@@ -39,13 +40,21 @@ export class PedidosService {
     return this.http.get<PedidoCallCenter>(`${this.apiUrl}/${id}`);
   }
 
-  obtenerEstadisticas(): Observable<EstadisticasCallCenter> {
-    return this.http.get<EstadisticasCallCenter>(`${this.apiUrl}/estadisticas`);
+  obtenerEstadisticas(sucursalId?: number): Observable<EstadisticasCallCenter> {
+    let params = new HttpParams();
+    if (sucursalId) {
+      params = params.set('sucursalId', sucursalId.toString());
+    }
+    return this.http.get<EstadisticasCallCenter>(`${this.apiUrl}/estadisticas`, { params });
   }
 
   buscarClientes(termino: string): Observable<ClienteSimple[]> {
     const params = new HttpParams().set('q', termino);
     return this.http.get<ClienteSimple[]>(`${this.apiUrl}/clientes/buscar`, { params });
+  }
+
+  obtenerMedicamentosDisponibles(): Observable<MedicamentoCallCenter[]> {
+    return this.http.get<MedicamentoCallCenter[]>(`${this.apiUrl}/medicamentos-disponibles`);
   }
 
   consultarDisponibilidad(items: ItemConsultaDisponibilidad[]): Observable<SucursalDisponibilidad[]> {

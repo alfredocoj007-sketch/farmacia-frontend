@@ -104,6 +104,35 @@
       </div>
     </div>
 
+    <!-- No. de Comprobante / Factura / Vale (Opcional) -->
+    <div class="space-y-1.5">
+      <div class="flex items-center justify-between">
+        <label class="block text-xs font-bold text-slate-700">No. de Comprobante / Factura / Vale:</label>
+        <span class="text-[10px] text-slate-400 font-medium">Opcional para auditoría física</span>
+      </div>
+      <div class="relative">
+        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </span>
+        <input
+          type="text"
+          [(ngModel)]="numeroComprobante"
+          name="numeroComprobante"
+          placeholder="Ej. FAC-4821, REC-104, VALE-03"
+          class="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-indigo-500 text-slate-800 shadow-2xs font-mono uppercase"
+        />
+      </div>
+      <span class="text-[10px] text-slate-400 block">
+        Identificador del documento físico que se resguardará en la gaveta para el arqueo.
+      </span>
+    </div>
+
     <!-- Concepto / Descripción -->
     <div class="space-y-1.5">
       <label class="block text-xs font-bold text-slate-700">Concepto / Motivo de Auditoría:</label>
@@ -111,7 +140,7 @@
         type="text"
         [(ngModel)]="descripcion"
         name="descripcion"
-        placeholder="Ej. Cobro venta receta mostrador / Retiro parcial para depósito bancario"
+        placeholder="Ej. Compra de desinfectante y bolsas / Pago de mensajero express"
         required
         class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-indigo-500 text-slate-800 shadow-2xs"
       />

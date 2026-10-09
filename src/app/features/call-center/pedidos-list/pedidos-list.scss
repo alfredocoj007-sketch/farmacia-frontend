@@ -2,3 +2,9 @@
 :host {
   display: block;
 }
+
+@media print {
+  .pedidos-vista-principal {
+    display: none !important;
+  }
+}

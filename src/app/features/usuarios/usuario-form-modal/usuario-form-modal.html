@@ -1,4 +1,4 @@
-<div class="p-6 sm:p-7 space-y-6">
+<div class="p-6 sm:p-7 space-y-5">
   <!-- Encabezado del Modal -->
   <div class="border-b border-slate-100 pb-4 pr-10">
     <div class="flex items-center gap-3">
@@ -14,7 +14,7 @@
           {{ esEdicion ? 'Editar Usuario y Asignaciones' : 'Registrar Nuevo Usuario' }}
         </h3>
         <p class="text-xs text-slate-400 mt-0.5">
-          {{ esEdicion ? 'Actualice el rol, la sucursal de trabajo o el estado de la cuenta.' : 'Cree las credenciales de acceso al sistema y vincúlelas a una sucursal física.' }}
+          {{ esEdicion ? 'Actualice el rol, la sucursal de trabajo o el estado de la cuenta.' : 'Busque y seleccione un colaborador existente o ingrese uno nuevo para otorgarle credenciales de acceso.' }}
         </p>
       </div>
     </div>
@@ -32,10 +32,237 @@
   }
 
   <form (ngSubmit)="submit()" class="space-y-5">
-    <!-- Bloque 1: Credenciales de Acceso -->
+    <!-- PASO 1 (Solo al crear): Búsqueda y Selección de Colaborador -->
+    @if (!esEdicion) {
+      <div class="p-4 bg-slate-50/90 rounded-2xl border border-slate-200/90 space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">
+              1. Selección de Colaborador
+            </span>
+            @if (totalColaboradoresSinUsuario() > 0) {
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
+                {{ totalColaboradoresSinUsuario() }} disponibles sin cuenta
+              </span>
+            }
+          </div>
+
+          <!-- Switch Modo Manual / Buscar Colaborador -->
+          <button
+            type="button"
+            (click)="alternarModoManual()"
+            class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition cursor-pointer flex items-center gap-1"
+          >
+            @if (modoManual()) {
+              <span>← Buscar colaborador existente</span>
+            } @else {
+              <span>+ Ingreso manual directo</span>
+            }
+          </button>
+        </div>
+
+        @if (!modoManual()) {
+          @if (empleadoSeleccionado(); as emp) {
+            <!-- Tarjeta de Colaborador Seleccionado -->
+            <div class="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
+                  {{ emp.nombre.charAt(0) }}{{ emp.apellido.charAt(0) }}
+                </div>
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-bold text-slate-900 text-sm">{{ emp.nombreCompleto }}</span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      ✓ Colaborador Seleccionado
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2 text-slate-600 text-[11px] flex-wrap">
+                    <span class="font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                      {{ emp.puesto?.nombre || 'Sin puesto' }}
+                    </span>
+                    <span>•</span>
+                    <span class="font-medium text-slate-700">
+                      {{ emp.sucursal?.nombre || 'Sin sucursal' }}
+                    </span>
+                    @if (emp.dpi) {
+                      <span>•</span>
+                      <span class="font-mono text-slate-500 text-[10px]">DPI: {{ emp.dpi }}</span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                <button
+                  type="button"
+                  (click)="deseleccionarColaborador()"
+                  class="px-3 py-1.5 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-100/60 text-emerald-800 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                  title="Cambiar por otro colaborador"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  <span>Cambiar Colaborador</span>
+                </button>
+              </div>
+            </div>
+          } @else {
+            <!-- Buscador Rápido de Colaboradores (Estilo Producto POS / Call Center) -->
+            <div class="space-y-2">
+              <div class="relative w-full">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  [ngModel]="busquedaColaborador()"
+                  (ngModelChange)="busquedaColaborador.set($event)"
+                  name="busquedaColaboradorInput"
+                  autocomplete="off"
+                  placeholder="Buscar colaborador por nombre, apellido, DPI o puesto..."
+                  class="w-full pl-10 pr-9 py-2.5 text-xs rounded-xl border border-slate-200 bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-slate-800 placeholder-slate-400 outline-none shadow-2xs font-medium"
+                />
+                @if (cargandoEmpleados()) {
+                  <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                    <svg class="animate-spin h-3.5 w-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  </div>
+                } @else if (busquedaColaborador()) {
+                  <button
+                    type="button"
+                    (click)="limpiarBusquedaColaborador()"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded cursor-pointer"
+                    title="Limpiar búsqueda"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                }
+              </div>
+
+              <!-- Panel de Resultados del Catálogo de Colaboradores en Vivo -->
+              <div class="rounded-xl border border-slate-200 bg-slate-50/60 p-2 max-h-56 overflow-y-auto space-y-1.5 shadow-2xs">
+                @if (cargandoEmpleados()) {
+                  <div class="p-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+                    <svg class="animate-spin h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Cargando colaboradores…</span>
+                  </div>
+                } @else if (colaboradoresFiltrados().length === 0) {
+                  <div class="p-5 text-center text-xs text-slate-400 space-y-1">
+                    <p>No se encontraron colaboradores para "{{ busquedaColaborador() }}".</p>
+                    <button
+                      type="button"
+                      (click)="alternarModoManual()"
+                      class="text-indigo-600 hover:underline font-semibold text-[11px] cursor-pointer"
+                    >
+                      ¿Deseas registrarlo directamente de forma manual?
+                    </button>
+                  </div>
+                } @else {
+                  <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-0.5 flex items-center justify-between">
+                    <span>Colaboradores Coincidentes ({{ colaboradoresFiltrados().length }})</span>
+                    <span class="text-slate-400 lowercase font-normal">Haga clic en "+ Seleccionar"</span>
+                  </div>
+
+                  @for (emp of colaboradoresFiltrados(); track emp.empleadoId) {
+                    <div
+                      class="p-2.5 rounded-xl border bg-white transition flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                      [class.border-indigo-100]="!emp.tieneUsuario"
+                      [class.hover:border-indigo-300]="!emp.tieneUsuario"
+                      [class.border-slate-200]="emp.tieneUsuario"
+                      [class.opacity-60]="emp.tieneUsuario"
+                      [class.bg-slate-50]="emp.tieneUsuario"
+                    >
+                      <!-- Datos del Colaborador -->
+                      <div class="min-w-0 flex-1 flex items-center gap-2.5">
+                        <div
+                          class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0"
+                          [class]="emp.tieneUsuario ? 'bg-slate-200 text-slate-500' : 'bg-indigo-50 text-indigo-700 border border-indigo-100'"
+                        >
+                          {{ emp.nombre.charAt(0) }}{{ emp.apellido.charAt(0) }}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                          <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="font-bold text-xs" [class]="emp.tieneUsuario ? 'text-slate-500' : 'text-slate-900'">
+                              {{ emp.nombreCompleto }}
+                            </span>
+                            @if (emp.tieneUsuario) {
+                              <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                Ya tiene usuario: @{{ emp.username }} ({{ emp.rolNombre || 'Asignado' }})
+                              </span>
+                            } @else {
+                              <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                Disponible sin cuenta
+                              </span>
+                            }
+                          </div>
+                          <div class="text-[11px] text-slate-500 flex items-center gap-2 flex-wrap mt-0.5">
+                            <span class="font-medium text-slate-600">{{ emp.puesto?.nombre || 'Sin puesto' }}</span>
+                            <span>•</span>
+                            <span>{{ emp.sucursal?.nombre || 'Sin sucursal' }}</span>
+                            @if (emp.dpi) {
+                              <span>•</span>
+                              <span class="font-mono text-[10px]">DPI: {{ emp.dpi }}</span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Acción -->
+                      <div class="shrink-0 self-end sm:self-auto">
+                        @if (emp.tieneUsuario) {
+                          <span class="text-[10px] text-slate-400 font-semibold px-2 py-1 bg-slate-100 rounded-lg">
+                            Registrado
+                          </span>
+                        } @else {
+                          <button
+                            type="button"
+                            (click)="seleccionarColaborador(emp)"
+                            class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs cursor-pointer shadow-xs transition flex items-center gap-1"
+                          >
+                            <span>+ Seleccionar</span>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          }
+        } @else {
+          <!-- Modo Manual Activado -->
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-base">✍</span>
+              <span><strong>Modo Manual Activo:</strong> Se registrarán los datos del colaborador y sus credenciales de acceso directamente.</span>
+            </div>
+            <button
+              type="button"
+              (click)="alternarModoManual()"
+              class="text-indigo-700 hover:underline font-bold text-xs cursor-pointer shrink-0"
+            >
+              Volver a buscar
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- PASO 2: Credenciales de Inicio de Sesión -->
     <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3">
       <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-        1. Credenciales de Inicio de Sesión
+        {{ esEdicion ? '1' : '2' }}. Credenciales de Inicio de Sesión
       </span>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -50,12 +277,14 @@
             (ngModelChange)="username.set($event)"
             name="username"
             [disabled]="esEdicion"
-            placeholder="ej: carlos_z10"
+            placeholder="ej: carlos.lopez"
             class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white disabled:bg-slate-100 disabled:text-slate-400 focus:outline-none focus:border-indigo-500 font-mono font-medium"
             required
           />
           @if (esEdicion) {
             <span class="text-[10px] text-slate-400 mt-0.5 block">El nombre de usuario es inmutable.</span>
+          } @else if (empleadoSeleccionado()) {
+            <span class="text-[10px] text-indigo-600 mt-0.5 block font-medium">Sugerido automáticamente a partir del colaborador.</span>
           }
         </div>
 
@@ -117,7 +346,6 @@
                   }
                 </span>
               </div>
-              <!-- Barra de Progreso -->
               <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden flex">
                 <div
                   class="h-full transition-all duration-300 rounded-full"
@@ -160,11 +388,13 @@
       </div>
     </div>
 
-    <!-- Bloque 2: Información del Empleado -->
+    <!-- PASO 3: Datos Personales del Colaborador -->
     <div class="p-4 bg-white rounded-2xl border border-slate-200 space-y-3 shadow-xs">
-      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-        2. Datos Personales del Colaborador
-      </span>
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+          {{ esEdicion ? '2' : '3' }}. Datos Personales del Colaborador
+        </span>
+      </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <!-- Nombre -->
@@ -178,8 +408,9 @@
             [ngModel]="nombre()"
             (input)="onNombreInput($event)"
             name="nombre"
+            [disabled]="!esEdicion && empleadoSeleccionado() !== null"
             placeholder="ej: Carlos Manuel"
-            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-indigo-500 font-medium"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 disabled:bg-slate-100 disabled:text-slate-600 focus:bg-white focus:outline-none focus:border-indigo-500 font-medium"
             required
           />
         </div>
@@ -195,8 +426,9 @@
             [ngModel]="apellido()"
             (input)="onApellidoInput($event)"
             name="apellido"
+            [disabled]="!esEdicion && empleadoSeleccionado() !== null"
             placeholder="ej: López García"
-            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-indigo-500 font-medium"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 disabled:bg-slate-100 disabled:text-slate-600 focus:bg-white focus:outline-none focus:border-indigo-500 font-medium"
             required
           />
         </div>
@@ -236,8 +468,9 @@
               (input)="onDpiInput($event)"
               name="dpi"
               maxlength="13"
+              [disabled]="empleadoSeleccionado() !== null"
               placeholder="ej: 2450123450101"
-              class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:border-indigo-500 font-mono"
+              class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 disabled:bg-slate-100 disabled:text-slate-600 focus:bg-white focus:outline-none focus:border-indigo-500 font-mono"
             />
             @if (dpi().length > 0) {
               <span class="text-[10px] block mt-0.5" [class]="dpi().length === 13 ? 'text-emerald-700 font-bold' : 'text-amber-600 font-medium'">
@@ -249,24 +482,36 @@
       </div>
     </div>
 
-    <!-- Bloque 3: Asignación Organizacional -->
+    <!-- PASO 4: Asignación Organizacional -->
     <div class="p-4 bg-indigo-50/40 rounded-2xl border border-indigo-100 space-y-3">
       <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">
-        3. Asignación de Rol y Sucursal de Trabajo
+        {{ esEdicion ? '3' : '4' }}. Asignación de Rol y Sucursal de Trabajo
       </span>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <!-- Rol -->
         <div>
-          <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
-            Rol del Sistema: <span class="text-red-500">*</span>
-          </label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+              Rol del Sistema: <span class="text-red-500">*</span>
+            </label>
+            @if (esAdminProtegido) {
+              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Rol Protegido
+              </span>
+            }
+          </div>
           <select
             [ngModel]="rolId()"
             (ngModelChange)="rolId.set($event)"
             name="rolId"
-            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-indigo-500 font-bold text-slate-800 shadow-2xs"
+            [disabled]="esAdminProtegido"
+            class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed focus:outline-none focus:border-indigo-500 font-bold text-slate-800 shadow-2xs"
             required
           >
             @for (r of roles; track r.rolId) {
@@ -276,7 +521,11 @@
             }
           </select>
           <span class="text-[10px] text-slate-500 mt-1 block">
-            Determina los permisos y nivel de acceso en la plataforma.
+            @if (esAdminProtegido) {
+              <span class="text-amber-700 font-medium">El Administrador Principal siempre conserva el rol ADMIN.</span>
+            } @else {
+              Determina los permisos y nivel de acceso en la plataforma.
+            }
           </span>
         </div>
 
@@ -306,26 +555,35 @@
       </div>
 
       @if (esEdicion) {
-        <div class="pt-2 border-t border-indigo-100 flex items-center gap-3">
+        <div class="pt-2 border-t border-indigo-100 flex items-center justify-between">
           <label class="text-xs font-semibold text-slate-700">Estado de la Cuenta:</label>
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              (click)="estado.set('ACTIVO')"
-              [class]="estado() === 'ACTIVO' ? 'bg-emerald-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200'"
-              class="px-3 py-1 text-xs rounded-lg transition-all cursor-pointer"
-            >
-              ✓ Activo
-            </button>
-            <button
-              type="button"
-              (click)="estado.set('INACTIVO')"
-              [class]="estado() === 'INACTIVO' ? 'bg-red-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200'"
-              class="px-3 py-1 text-xs rounded-lg transition-all cursor-pointer"
-            >
-              ✕ Inactivo
-            </button>
-          </div>
+          @if (esAdminProtegido) {
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 text-xs rounded-lg bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 flex items-center gap-1">
+                ✓ Activo (Permanente)
+              </span>
+              <span class="text-[10px] text-slate-400">Protegido contra desactivación</span>
+            </div>
+          } @else {
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                (click)="estado.set('ACTIVO')"
+                [class]="estado() === 'ACTIVO' ? 'bg-emerald-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200'"
+                class="px-3 py-1 text-xs rounded-lg transition-all cursor-pointer"
+              >
+                ✓ Activo
+              </button>
+              <button
+                type="button"
+                (click)="estado.set('INACTIVO')"
+                [class]="estado() === 'INACTIVO' ? 'bg-red-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200'"
+                class="px-3 py-1 text-xs rounded-lg transition-all cursor-pointer"
+              >
+                ✕ Inactivo
+              </button>
+            </div>
+          }
         </div>
       }
     </div>
@@ -355,7 +613,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
-          {{ esEdicion ? 'Guardar Cambios' : 'Crear Usuario' }}
+          {{ esEdicion ? 'Guardar Cambios' : (empleadoSeleccionado() ? 'Crear Usuario y Vincular' : 'Crear Usuario') }}
         }
       </button>
     </div>

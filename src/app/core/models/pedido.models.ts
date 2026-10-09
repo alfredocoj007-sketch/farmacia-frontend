@@ -121,3 +121,35 @@ export interface QueryPedidosParams {
   busqueda?: string;
   limit?: number;
 }
+
+export interface FefoLoteInfo {
+  loteId: number;
+  numeroLote: string;
+  fechaVencimiento: string;
+  diasParaVencer: number;
+  sucursalNombre?: string;
+  cantidadDisponibleEnLote?: number;
+}
+
+export interface MedicamentoCallCenter {
+  productoId: number;
+  codigoProducto: string;
+  nombre: string;
+  principioActivo?: string;
+  presentacion?: string;
+  concentracion?: string;
+  unidadMedida?: string;
+  unidadMedidaAbrev?: string;
+  precioVenta: number;
+  requiereReceta: boolean;
+  categoria?: { categoriaId: number; nombre: string } | null;
+  laboratorio?: { laboratorioId: number; nombre: string } | null;
+  stockTotal: number;
+  agotado: boolean;
+  fefoLote: FefoLoteInfo | null;
+  sucursalesConStock: {
+    sucursalId: number;
+    nombre: string;
+    stock: number;
+  }[];
+}

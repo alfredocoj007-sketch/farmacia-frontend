@@ -3,7 +3,8 @@
   <div class="border-b border-slate-100 pb-4">
     <div class="flex items-center gap-2.5">
       <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
         </svg>
@@ -13,239 +14,191 @@
           {{ modoEdicion() ? 'Editar Producto' : 'Crear Nuevo Producto' }}
         </h2>
         <p class="text-xs text-slate-400">
-          {{ modoEdicion() ? 'Modifica los datos del producto seleccionado' : 'Ingresa la información requerida para registrar el producto en el catálogo' }}
+          {{ modoEdicion() ? 'Modifica los datos del producto seleccionado' : 'Ingresa la información requerida para
+          registrar el producto en el catálogo' }}
         </p>
       </div>
     </div>
   </div>
 
   @if (cargando()) {
-    <div class="py-12 text-center text-slate-400 text-sm animate-pulse">
-      Cargando información del producto…
-    </div>
+  <div class="py-12 text-center text-slate-400 text-sm animate-pulse">
+    Cargando información del producto…
+  </div>
   } @else {
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
-      <!-- Sección 1: Información General -->
-      <div class="space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-          1. Identificación y Clasificación
-        </h3>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Sección 1: Información General -->
+    <div class="space-y-3">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+        1. Identificación y Clasificación
+      </h3>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-semibold text-slate-700 mb-1">
-              Nombre Comercial <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              formControlName="nombre"
-              placeholder="Ej: Amoxicilina 500mg cápsulas"
-              class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800"
-            />
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">
-              Código / SKU <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              formControlName="codigoProducto"
-              placeholder="Ej: MED-00123"
-              class="w-full font-mono text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800 uppercase"
-            />
-          </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Nombre Comercial <span class="text-red-500">*</span>
+          </label>
+          <input type="text" formControlName="nombre" placeholder="Ej: Amoxicilina 500mg cápsulas"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800" />
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Categoría</label>
-            <select
-              formControlName="categoriaId"
-              class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all"
-            >
-              <option [ngValue]="null">— Seleccionar categoría —</option>
-              @for (c of categorias(); track c.categoriaId) {
-                <option [ngValue]="c.categoriaId">{{ c.nombre }}</option>
-              }
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Laboratorio Fabricante</label>
-            <select
-              formControlName="laboratorioId"
-              class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all"
-            >
-              <option [ngValue]="null">— Seleccionar laboratorio —</option>
-              @for (l of laboratorios(); track l.laboratorioId) {
-                <option [ngValue]="l.laboratorioId">{{ l.nombre }}</option>
-              }
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Unidad de Medida</label>
-            <select
-              formControlName="unidadMedidaId"
-              class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all"
-            >
-              <option [ngValue]="null">— Seleccionar unidad —</option>
-              @for (u of unidadesMedida(); track u.unidadMedidaId) {
-                <option [ngValue]="u.unidadMedidaId">{{ u.nombre }} ({{ u.abreviatura }})</option>
-              }
-            </select>
-          </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Código / SKU <span class="text-red-500">*</span>
+          </label>
+          <input type="text" formControlName="codigoProducto" placeholder="Ej: MED-00123"
+            class="w-full font-mono text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800 uppercase" />
         </div>
       </div>
 
-      <!-- Sección 2: Farmacéutica y Control -->
-      <div class="space-y-3 pt-3 border-t border-slate-100">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-          2. Especificaciones Farmacéuticas y Control
-        </h3>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Principio Activo</label>
-            <input
-              type="text"
-              formControlName="principioActivo"
-              placeholder="Ej: Amoxicilina Trihidrato"
-              class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800"
-            />
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Concentración</label>
-            <input
-              type="text"
-              formControlName="concentracion"
-              placeholder="Ej: 500 mg / 5 ml"
-              class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800"
-            />
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Presentación</label>
-            <input
-              type="text"
-              formControlName="presentacion"
-              placeholder="Ej: Caja x 30 cápsulas"
-              class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800"
-            />
-          </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Categoría</label>
+          <select formControlName="categoriaId"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all">
+            <option [ngValue]="null">Seleccionar categoría</option>
+            @for (c of categorias(); track c.categoriaId) {
+            <option [ngValue]="c.categoriaId">{{ c.nombre }}</option>
+            }
+          </select>
         </div>
 
-        <!-- Casilla destacada de Receta Médica -->
-        <div class="p-3.5 rounded-xl border border-amber-200/80 bg-amber-50/40 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-              </svg>
-            </div>
-            <div>
-              <span class="text-xs font-semibold text-slate-800 block">¿Medicamento Bajo Control / Requiere Receta?</span>
-              <p class="text-[11px] text-slate-500">Exige prescripción médica para su dispensación en mostrador</p>
-            </div>
-          </div>
-          <input
-            type="checkbox"
-            formControlName="requiereReceta"
-            id="requiereRecetaToggle"
-            class="w-5 h-5 text-sky-600 rounded-md border-slate-300 focus:ring-sky-500 cursor-pointer"
-          />
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Laboratorio Fabricante</label>
+          <select formControlName="laboratorioId"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all">
+            <option [ngValue]="null">Seleccionar laboratorio</option>
+            @for (l of laboratorios(); track l.laboratorioId) {
+            <option [ngValue]="l.laboratorioId">{{ l.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Unidad de Medida</label>
+          <select formControlName="unidadMedidaId"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all">
+            <option [ngValue]="null">Seleccionar unidad</option>
+            @for (u of unidadesMedida(); track u.unidadMedidaId) {
+            <option [ngValue]="u.unidadMedidaId">{{ u.nombre }} ({{ u.abreviatura }})</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección 2: Farmacéutica y Control -->
+    <div class="space-y-3 pt-3 border-t border-slate-100">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+        2. Especificaciones Farmacéuticas y Control
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Principio Activo</label>
+          <input type="text" formControlName="principioActivo" placeholder="Ej: Amoxicilina Trihidrato"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Concentración / Gramaje</label>
+          <input type="text" formControlName="concentracion" placeholder="Ej: 500 mg, 1 g, 250 mg / 5 ml"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Presentación Comercial</label>
+          <input type="text" formControlName="presentacion" placeholder="Ej: Caja x 12 tabletas, Frasco x 100 ml"
+            class="w-full text-sm bg-slate-50/70 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-800" />
         </div>
       </div>
 
-      <!-- Sección 3: Precio e Impuestos -->
-      <div class="space-y-3 pt-3 border-t border-slate-100">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          3. Precios de Venta e Impuestos
-        </h3>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">
-              Precio de Venta al Público (GTQ) <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-semibold text-sm">
-                Q
-              </span>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                formControlName="precioVenta"
-                placeholder="0.00"
-                class="w-full text-sm font-semibold pl-8 pr-4 py-2.5 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800"
-              />
-            </div>
+      <!-- Casilla destacada de Receta Médica -->
+      <div class="p-3.5 rounded-xl border border-amber-200/80 bg-amber-50/40 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+            </svg>
           </div>
-
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">
-              Porcentaje IVA (%)
-            </label>
-            <div class="relative">
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="100"
-                formControlName="porcentajeIva"
-                placeholder="12.0"
-                class="w-full text-sm pl-4 pr-8 py-2.5 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800"
-              />
-              <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 font-semibold text-sm">
-                %
-              </span>
-            </div>
+            <span class="text-xs font-semibold text-slate-800 block">¿Medicamento Bajo Control / Requiere Receta?</span>
+            <p class="text-[11px] text-slate-500">Exige prescripción médica para su dispensación en mostrador</p>
+          </div>
+        </div>
+        <input type="checkbox" formControlName="requiereReceta" id="requiereRecetaToggle"
+          class="w-5 h-5 text-sky-600 rounded-md border-slate-300 focus:ring-sky-500 cursor-pointer" />
+      </div>
+    </div>
+
+    <!-- Sección 3: Precio e Impuestos -->
+    <div class="space-y-3 pt-3 border-t border-slate-100">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        3. Precios de Venta e Impuestos
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Precio de Venta al Público (GTQ) <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-semibold text-sm">
+              Q
+            </span>
+            <input type="number" step="0.01" min="0" formControlName="precioVenta" placeholder="0.00"
+              class="w-full text-sm font-semibold pl-8 pr-4 py-2.5 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            Porcentaje IVA (%)
+          </label>
+          <div class="relative">
+            <input type="number" step="0.1" min="0" max="100" formControlName="porcentajeIva" placeholder="12.0"
+              class="w-full text-sm pl-4 pr-8 py-2.5 bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-800" />
+            <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 font-semibold text-sm">
+              %
+            </span>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Errores de API -->
-      @if (error()) {
-        <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          {{ error() }}
-        </div>
-      }
+    <!-- Errores de API -->
+    @if (error()) {
+    <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {{ error() }}
+    </div>
+    }
 
-      <!-- Acciones del Formulario -->
-      <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-        <button
-          type="button"
-          (click)="cancelado.emit()"
-          class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          [disabled]="guardando() || form.invalid"
-          class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-xs font-semibold shadow-md shadow-sky-600/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 cursor-pointer"
-        >
-          @if (guardando()) {
-            <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-            <span>Guardando…</span>
-          } @else {
-            <span>{{ modoEdicion() ? 'Actualizar Producto' : 'Guardar Producto' }}</span>
-          }
-        </button>
-      </div>
-    </form>
+    <!-- Acciones del Formulario -->
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+      <button type="button" (click)="cancelado.emit()"
+        class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors">
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="guardando() || form.invalid"
+        class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white text-xs font-semibold shadow-md shadow-sky-600/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 cursor-pointer">
+        @if (guardando()) {
+        <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+        <span>Guardando…</span>
+        } @else {
+        <span>{{ modoEdicion() ? 'Actualizar Producto' : 'Guardar Producto' }}</span>
+        }
+      </button>
+    </div>
+  </form>
   }
 </div>

@@ -41,29 +41,86 @@
 
 /* Reglas de Impresión de Factura Térmica */
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    size: auto;
+    margin: 4mm auto;
   }
 
-  .no-print {
+  :host {
+    display: block !important;
+    width: 100% !important;
+    background: #ffffff !important;
+  }
+
+  .pos-workspace,
+  .no-print,
+  .no-print * {
     display: none !important;
   }
 
-  #ticketTermico,
-  #ticketTermico * {
-    visibility: visible;
+  /* Desactivar el overlay oscuro fijo para que sea una página limpia */
+  .ticket-modal-overlay {
+    position: static !important;
+    inset: auto !important;
+    z-index: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .ticket-modal-container {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    max-width: 80mm !important;
+    width: 80mm !important;
+    background: transparent !important;
+    animation: none !important;
+    transform: none !important;
   }
 
   #ticketTermico {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 80mm;
-    margin: 0 auto;
-    padding: 4mm;
-    border: none !important;
-    background: white !important;
-    color: black !important;
-    font-size: 9pt;
+    display: block !important;
+    position: static !important;
+    width: 78mm !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 4mm 3mm !important;
+    border: 1px dashed #000000 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'Courier New', Courier, monospace, monospace !important;
+    font-size: 8.5pt !important;
+    line-height: 1.25 !important;
+    page-break-inside: avoid !important;
+    box-shadow: none !important;
+  }
+
+  #ticketTermico * {
+    color: #000000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #ticketTermico h3 {
+    font-size: 11pt !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
+  }
+
+  #ticketTermico .border-b,
+  #ticketTermico .border-t,
+  #ticketTermico .border-slate-200,
+  #ticketTermico .border-slate-300,
+  #ticketTermico .border-slate-100 {
+    border-color: #000000 !important;
   }
 }

@@ -139,9 +139,10 @@
         <select [ngModel]="tipoSeleccionado()" (ngModelChange)="tipoSeleccionado.set($event); cargarSucursales()"
           class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-700">
           <option value="">Todos los Tipos</option>
-          <option value="MALL_STAND">🛍️ Centros Comerciales</option>
-          <option value="GAS_STAND">⛽ Stands Gasolinera</option>
-          <option value="FARMACIA">🏥 Farmacia Matriz / Central</option>
+          <option value="FARMACIA">Farmacia Estándar</option>
+          <option value="MALL_STAND">Centro Comercial</option>
+          <option value="GAS_STAND">Stand en Gasolinera</option>
+          <option value="BODEGA_CENTRAL">Bodega Central</option>
         </select>
       </div>
 

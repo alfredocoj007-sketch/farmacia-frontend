@@ -1,99 +1,94 @@
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
 
-  <!-- Header Superior con Selector de Sucursal e Indicador de Caja -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/80 backdrop-blur-md p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-    <div>
-      <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-emerald-500 text-white flex items-center justify-center shadow-md shadow-sky-600/20">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-            <path d="M3 6h18"></path>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-          </svg>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Punto de Venta & Facturación</h1>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
-              DTE FEL SAT
-            </span>
+  <!-- ENTORNO OPERATIVO DEL POS (OCULTO AL IMPRIMIR TICKET) -->
+  <div class="pos-workspace no-print space-y-6">
+
+    <!-- Header Superior con Selector de Sucursal e Indicador de Caja -->
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/80 backdrop-blur-md p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-emerald-500 text-white flex items-center justify-center shadow-md shadow-sky-600/20">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+              <path d="M3 6h18"></path>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
           </div>
-          <p class="text-xs text-slate-500 font-medium">
-            Emisión de facturas electrónicas, control FEFO de caducidades e ingreso directo a turno de caja
-          </p>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Ventas</h1>
+
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Selector de Sucursal y Estado de Caja -->
-    <div class="flex flex-wrap items-center gap-3">
-      <!-- Selector de Sede -->
-      <div class="flex items-center gap-2 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5">
-        <label for="posSucursal" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sede:</label>
-        @if (esAdmin()) {
-          <select
-            id="posSucursal"
-            [ngModel]="sucursalSeleccionadaId()"
-            (ngModelChange)="cambiarSucursal($event)"
-            class="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
-          >
+      <!-- Selector de Sucursal y Estado de Caja -->
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Selector de Sede -->
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5">
+          <label for="posSucursal" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sede:</label>
+          @if (esAdmin()) {
+          <select id="posSucursal" [ngModel]="sucursalSeleccionadaId()" (ngModelChange)="cambiarSucursal($event)"
+            class="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer">
             @for (suc of sucursales(); track suc.sucursalId) {
-              <option [value]="suc.sucursalId">{{ suc.nombre }}</option>
+            <option [value]="suc.sucursalId">{{ suc.nombre }}</option>
             }
           </select>
-        } @else {
+          } @else {
           <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
             {{ nombreSucursalAsignada() }}
-            <span class="px-1.5 py-0.5 text-[9px] font-extrabold bg-sky-100 text-sky-800 rounded uppercase tracking-wider">Asignada</span>
+            <span
+              class="px-1.5 py-0.5 text-[9px] font-extrabold bg-sky-100 text-sky-800 rounded uppercase tracking-wider">Asignada</span>
           </span>
-        }
-      </div>
+          }
+        </div>
 
-      <!-- Estado de Turno de Caja -->
-      @if (cajaInfo(); as caja) {
+        <!-- Estado de Turno de Caja -->
+        @if (cajaInfo(); as caja) {
         @if (caja.abierta) {
-          <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span>Turno Activo: <strong class="font-extrabold">{{ caja.codigoCaja }}</strong> ({{ caja.cajero }})</span>
-          </div>
+        <div
+          class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span>Turno Activo: <strong class="font-extrabold">{{ caja.codigoCaja }}</strong> ({{ caja.cajero }})</span>
+        </div>
         } @else {
-          <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-semibold">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            <span>Caja cerrada</span>
-            <a routerLink="/cajas" class="underline hover:text-amber-900 ml-1 font-bold">Abrir turno</a>
-          </div>
+        <div
+          class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-semibold">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>Caja cerrada</span>
+          <a routerLink="/cajas" class="underline hover:text-amber-900 ml-1 font-bold">Abrir turno</a>
+        </div>
         }
-      }
+        }
 
-      <!-- Botón Alternar Historial -->
-      <button
-        (click)="toggleVistaHistorial()"
-        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-2xs cursor-pointer"
-        [class.bg-sky-600]="vistaHistorial()"
-        [class.text-white]="vistaHistorial()"
-        [class.border-sky-600]="vistaHistorial()"
-        [class.bg-white]="!vistaHistorial()"
-        [class.text-slate-700]="!vistaHistorial()"
-        [class.border-slate-200]="!vistaHistorial()"
-      >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        {{ vistaHistorial() ? 'Volver a Caja POS' : 'Ventas del Día' }}
-      </button>
+        <!-- Botón Alternar Historial -->
+        <button (click)="toggleVistaHistorial()"
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-2xs cursor-pointer"
+          [class.bg-sky-600]="vistaHistorial()" [class.text-white]="vistaHistorial()"
+          [class.border-sky-600]="vistaHistorial()" [class.bg-white]="!vistaHistorial()"
+          [class.text-slate-700]="!vistaHistorial()" [class.border-slate-200]="!vistaHistorial()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          {{ vistaHistorial() ? 'Volver a Caja POS' : 'Ventas del Día' }}
+        </button>
+      </div>
     </div>
-  </div>
 
-  <!-- VISTA: HISTORIAL DE VENTAS -->
-  @if (vistaHistorial()) {
+    <!-- VISTA: HISTORIAL DE VENTAS -->
+    @if (vistaHistorial()) {
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden space-y-4 p-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -101,19 +96,16 @@
           <p class="text-xs text-slate-500">Comprobantes autorizados por el régimen SAT en esta sede</p>
         </div>
         <div class="w-full sm:w-72">
-          <input
-            type="text"
-            placeholder="Buscar por cliente o factura..."
-            [(ngModel)]="filtroHistorial"
+          <input type="text" placeholder="Buscar por cliente o factura..." [(ngModel)]="filtroHistorial"
             (ngModelChange)="cargarHistorial()"
-            class="w-full px-3.5 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500"
-          />
+            class="w-full px-3.5 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500" />
         </div>
       </div>
 
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs text-slate-600">
-          <thead class="bg-slate-50/75 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
+          <thead
+            class="bg-slate-50/75 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
             <tr>
               <th class="px-4 py-3">No. Factura FEL</th>
               <th class="px-4 py-3">Fecha / Hora</th>
@@ -127,38 +119,37 @@
           </thead>
           <tbody class="divide-y divide-slate-100">
             @for (v of historialPaginado(); track v.pedidoId) {
-              <tr class="hover:bg-slate-50/60 transition-colors">
-                <td class="px-4 py-3 font-mono font-extrabold text-sky-700">{{ v.numeroFactura }}</td>
-                <td class="px-4 py-3">{{ v.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
-                <td class="px-4 py-3 font-semibold text-slate-800">{{ v.cliente }}</td>
-                <td class="px-4 py-3">
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">
-                    {{ v.metodoPago }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-right font-mono text-slate-500">Q {{ v.baseImponible | number:'1.2-2' }}</td>
-                <td class="px-4 py-3 text-right font-mono text-emerald-600">Q {{ v.iva | number:'1.2-2' }}</td>
-                <td class="px-4 py-3 text-right font-mono font-black text-slate-900 text-sm">Q {{ v.total | number:'1.2-2' }}</td>
-                <td class="px-4 py-3 text-center">
-                  <button
-                    (click)="verTicketHistorial(v.pedidoId)"
-                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 transition-colors cursor-pointer"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                      <rect x="6" y="14" width="12" height="8"></rect>
-                    </svg>
-                    Ticket
-                  </button>
-                </td>
-              </tr>
+            <tr class="hover:bg-slate-50/60 transition-colors">
+              <td class="px-4 py-3 font-mono font-extrabold text-sky-700">{{ v.numeroFactura }}</td>
+              <td class="px-4 py-3">{{ v.fecha | date:'dd/MM/yyyy, hh:mm a' }}</td>
+              <td class="px-4 py-3 font-semibold text-slate-800">{{ v.cliente }}</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">
+                  {{ v.metodoPago }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right font-mono text-slate-500">Q {{ v.baseImponible | number:'1.2-2' }}</td>
+              <td class="px-4 py-3 text-right font-mono text-emerald-600">Q {{ v.iva | number:'1.2-2' }}</td>
+              <td class="px-4 py-3 text-right font-mono font-black text-slate-900 text-sm">Q {{ v.total | number:'1.2-2'
+                }}</td>
+              <td class="px-4 py-3 text-center">
+                <button (click)="verTicketHistorial(v.pedidoId)"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 transition-colors cursor-pointer">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                  </svg>
+                  Ticket
+                </button>
+              </td>
+            </tr>
             } @empty {
-              <tr>
-                <td colspan="8" class="text-center py-10 text-slate-400 text-xs">
-                  No hay ventas registradas aún con los filtros actuales.
-                </td>
-              </tr>
+            <tr>
+              <td colspan="8" class="text-center py-10 text-slate-400 text-xs">
+                No hay ventas registradas aún con los filtros actuales.
+              </td>
+            </tr>
             }
           </tbody>
         </table>
@@ -166,45 +157,37 @@
 
       <!-- Barra de Paginación Historial -->
       @if (historialVentas().length > 0) {
-        <div class="px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <span>
-            Mostrando página <strong class="text-slate-700 font-semibold">{{ pageHistorial() }}</strong> de <strong class="text-slate-700 font-semibold">{{ totalPaginasHistorial() }}</strong> ({{ historialVentas().length }} ventas registradas)
-          </span>
-          <div class="flex items-center gap-1.5">
-            <button
-              (click)="cambiarPaginaHistorial(-1)"
-              [disabled]="pageHistorial() <= 1"
-              class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
-            >
-              ← Anterior
+      <div
+        class="px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span>
+          Mostrando página <strong class="text-slate-700 font-semibold">{{ pageHistorial() }}</strong> de <strong
+            class="text-slate-700 font-semibold">{{ totalPaginasHistorial() }}</strong> ({{ historialVentas().length }}
+          ventas registradas)
+        </span>
+        <div class="flex items-center gap-1.5">
+          <button (click)="cambiarPaginaHistorial(-1)" [disabled]="pageHistorial() <= 1"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            ← Anterior
+          </button>
+          <div class="hidden sm:flex items-center gap-1">
+            @for (p of listaPaginasHistorial(); track p) {
+            <button (click)="irAPaginaHistorial(p)" [class.bg-sky-600]="p === pageHistorial()"
+              [class.text-white]="p === pageHistorial()" [class.font-semibold]="p === pageHistorial()"
+              [class.shadow-sm]="p === pageHistorial()" [class.border-sky-600]="p === pageHistorial()"
+              class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+              {{ p }}
             </button>
-            <div class="hidden sm:flex items-center gap-1">
-              @for (p of listaPaginasHistorial(); track p) {
-                <button
-                  (click)="irAPaginaHistorial(p)"
-                  [class.bg-sky-600]="p === pageHistorial()"
-                  [class.text-white]="p === pageHistorial()"
-                  [class.font-semibold]="p === pageHistorial()"
-                  [class.shadow-sm]="p === pageHistorial()"
-                  [class.border-sky-600]="p === pageHistorial()"
-                  class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs"
-                >
-                  {{ p }}
-                </button>
-              }
-            </div>
-            <button
-              (click)="cambiarPaginaHistorial(1)"
-              [disabled]="pageHistorial() >= totalPaginasHistorial()"
-              class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
-            >
-              Siguiente →
-            </button>
+            }
           </div>
+          <button (click)="cambiarPaginaHistorial(1)" [disabled]="pageHistorial() >= totalPaginasHistorial()"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            Siguiente →
+          </button>
         </div>
+      </div>
       }
     </div>
-  } @else {
+    } @else {
     <!-- VISTA: PUNTO DE VENTA (LAYOUT DUAL: CATÁLOGO Y TICKET) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
@@ -212,123 +195,327 @@
       <div class="lg:col-span-7 space-y-4">
         <!-- Barra de Búsqueda Rápida de Medicamentos -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div class="relative flex-1">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+              <input type="text" placeholder="Buscar medicamento por nombre, SKU o principio activo..."
+                [(ngModel)]="terminoBusqueda" (input)="onBuscarInput()"
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium" />
             </div>
-            <input
-              type="text"
-              placeholder="Buscar medicamento por nombre, SKU o principio activo..."
-              [(ngModel)]="terminoBusqueda"
-              (input)="onBuscarInput()"
-              class="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium"
-            />
+
+            <!-- Selector de Vista: Tabla Compacta (Default) vs Tarjetas -->
+            <div
+              class="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 shrink-0 self-end sm:self-auto">
+              <button type="button" (click)="vistaProductos.set('tabla')"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                [class.bg-white]="vistaProductos() === 'tabla'" [class.text-sky-700]="vistaProductos() === 'tabla'"
+                [class.shadow-xs]="vistaProductos() === 'tabla'" [class.text-slate-500]="vistaProductos() !== 'tabla'"
+                title="Vista en tabla compacta (ahorra espacio)">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18"></path>
+                </svg>
+                <span>Tabla</span>
+              </button>
+              <button type="button" (click)="vistaProductos.set('tarjetas')"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                [class.bg-white]="vistaProductos() === 'tarjetas'"
+                [class.text-sky-700]="vistaProductos() === 'tarjetas'"
+                [class.shadow-xs]="vistaProductos() === 'tarjetas'"
+                [class.text-slate-500]="vistaProductos() !== 'tarjetas'" title="Vista en tarjetas cuadrícula">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Tarjetas</span>
+              </button>
+            </div>
           </div>
 
           <!-- Filtro de Categorías Horizontales -->
           <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
-            <button
-              (click)="categoriaFiltro.set('TODAS')"
+            <button (click)="categoriaFiltro.set('TODAS')"
               class="px-3 py-1 rounded-lg text-xs font-bold transition-colors shrink-0 cursor-pointer"
-              [class.bg-slate-900]="categoriaFiltro() === 'TODAS'"
-              [class.text-white]="categoriaFiltro() === 'TODAS'"
+              [class.bg-slate-900]="categoriaFiltro() === 'TODAS'" [class.text-white]="categoriaFiltro() === 'TODAS'"
               [class.bg-slate-100]="categoriaFiltro() !== 'TODAS'"
-              [class.text-slate-600]="categoriaFiltro() !== 'TODAS'"
-            >
+              [class.text-slate-600]="categoriaFiltro() !== 'TODAS'">
               Todas
             </button>
             @for (cat of categoriasDisponibles(); track cat) {
-              <button
-                (click)="categoriaFiltro.set(cat)"
-                class="px-3 py-1 rounded-lg text-xs font-semibold transition-colors shrink-0 cursor-pointer"
-                [class.bg-sky-600]="categoriaFiltro() === cat"
-                [class.text-white]="categoriaFiltro() === cat"
-                [class.bg-slate-100]="categoriaFiltro() !== cat"
-                [class.text-slate-600]="categoriaFiltro() !== cat"
-              >
-                {{ cat }}
-              </button>
+            <button (click)="categoriaFiltro.set(cat)"
+              class="px-3 py-1 rounded-lg text-xs font-semibold transition-colors shrink-0 cursor-pointer"
+              [class.bg-sky-600]="categoriaFiltro() === cat" [class.text-white]="categoriaFiltro() === cat"
+              [class.bg-slate-100]="categoriaFiltro() !== cat" [class.text-slate-600]="categoriaFiltro() !== cat">
+              {{ cat }}
+            </button>
             }
           </div>
         </div>
 
-        <!-- Grid de Medicamentos Disponibles en Mostrador -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          @for (p of productosFiltrados(); track p.productoId) {
-            <div
-              (click)="agregarAlCarrito(p)"
-              class="bg-white p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between group hover:shadow-md"
-              [class.border-slate-200]="p.stockDisponible > 0"
-              [class.hover:border-sky-400]="p.stockDisponible > 0"
-              [class.border-rose-200]="p.stockDisponible <= 0"
-              [class.opacity-60]="p.stockDisponible <= 0"
-            >
-              <div>
-                <div class="flex items-start justify-between gap-2">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
-                    {{ p.codigoProducto }}
-                  </span>
-                  @if (p.requiereReceta) {
-                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-rose-100 text-rose-700 border border-rose-200">
-                      Req. Receta
+        <!-- CONTENIDO: VISTA EN TABLA COMPACTA (PREDETERMINADA) -->
+        @if (vistaProductos() === 'tabla') {
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+          <div class="overflow-x-auto max-h-[640px] overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead
+                class="sticky top-0 z-10 bg-slate-50/95 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider backdrop-blur-xs">
+                <tr>
+                  <th class="px-3.5 py-2.5">Código</th>
+                  <th class="px-3.5 py-2.5">Medicamento / Principio</th>
+                  <th class="px-3 py-2.5">Presentación</th>
+                  <th class="px-3 py-2.5 text-right">Precio</th>
+                  <th class="px-3.5 py-2.5 text-center">Stock</th>
+                  <th class="px-3.5 py-2.5 text-right">Acción</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                @for (p of productosFiltrados(); track p.productoId) {
+                <tr (click)="p.stockDisponible > 0 ? agregarAlCarrito(p) : abrirModalStockRed(p)"
+                  class="transition-colors cursor-pointer group" [class.hover:bg-sky-50/60]="p.stockDisponible > 0"
+                  [class.bg-white]="p.stockDisponible > 0" [class.bg-rose-50/20]="p.stockDisponible <= 0"
+                  [class.hover:bg-rose-50/40]="p.stockDisponible <= 0">
+                  <!-- Código -->
+                  <td class="px-3.5 py-2 whitespace-nowrap font-mono text-[10px] font-bold text-slate-500">
+                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      {{ p.codigoProducto }}
                     </span>
-                  }
-                </div>
-                <h3 class="text-sm font-extrabold text-slate-800 group-hover:text-sky-700 transition-colors mt-0.5 leading-snug">
-                  {{ p.nombre }}
-                </h3>
-                @if (p.principioActivo) {
-                  <p class="text-[11px] text-slate-500 italic">{{ p.principioActivo }}</p>
-                }
-                @if (p.presentacion) {
-                  <p class="text-[10px] text-slate-400 font-medium">{{ p.presentacion }}</p>
-                }
-              </div>
+                  </td>
 
-              <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <div>
-                  <span class="text-[10px] text-slate-400 font-semibold block leading-none">Precio</span>
-                  <span class="text-base font-black text-slate-900 font-mono leading-tight">
-                    Q {{ p.precioVenta | number:'1.2-2' }}
-                  </span>
-                </div>
+                  <!-- Nombre y Principio Activo -->
+                  <td class="px-3.5 py-2 min-w-[190px]">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-extrabold text-slate-800 group-hover:text-sky-700 transition-colors text-xs">
+                        {{ p.nombre }}
+                      </span>
+                      @if (p.requiereReceta) {
+                      <span
+                        class="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-rose-100 text-rose-700 border border-rose-200 whitespace-nowrap">
+                        Req. Receta
+                      </span>
+                      }
+                    </div>
+                    @if (p.principioActivo) {
+                    <p class="text-[11px] text-slate-400 italic leading-tight mt-0.5">
+                      {{ p.principioActivo }}
+                    </p>
+                    }
+                  </td>
 
-                <div class="text-right">
-                  @if (p.stockDisponible > 0) {
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      <span>Stock: {{ p.stockDisponible }}</span>
+                  <!-- Presentación y Unidad -->
+                  <td class="px-3 py-2 text-slate-600 whitespace-nowrap">
+                    <span class="font-medium text-slate-700 block text-xs">{{ p.presentacion || '-' }}</span>
+                    @if (p.unidadMedida) {
+                    <span class="text-[10px] text-slate-400 font-semibold block">Unidad: {{ p.unidadMedida }}</span>
+                    }
+                  </td>
+
+                  <!-- Precio Unitario -->
+                  <td class="px-3 py-2 text-right whitespace-nowrap">
+                    <div class="font-black text-slate-900 font-mono text-sm leading-none">
+                      Q {{ p.precioVenta | number:'1.2-2' }}
+                    </div>
+                    <span class="text-[9px] text-slate-400 font-medium block mt-0.5">
+                      por {{ p.unidadMedidaAbrev || 'ud' }}
                     </span>
-                    @if (p.proximoLote) {
-                      <span class="text-[9px] font-bold text-amber-700 block mt-0.5">
+                  </td>
+
+                  <!-- Stock Local & FEFO -->
+                  <td class="px-3.5 py-2 text-center whitespace-nowrap">
+                    @if (p.stockDisponible > 0) {
+                    <div class="inline-flex flex-col items-center">
+                      <span
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span>Stock: {{ p.stockDisponible }} {{ p.unidadMedidaAbrev || 'uds' }}</span>
+                      </span>
+                      @if (p.proximoLote) {
+                      <span class="text-[9px] font-bold text-amber-700 mt-0.5" title="Lote FEFO">
                         FEFO: {{ p.proximoLote.numeroLote }}
                       </span>
-                    }
-                  } @else {
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">
-                      Agotado
+                      }
+                    </div>
+                    } @else {
+                    <span
+                      class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                      Agotado aquí
                     </span>
-                  }
+                    }
+                  </td>
+
+                  <!-- Acciones -->
+                  <td class="px-3.5 py-2 text-right whitespace-nowrap">
+                    <div class="flex items-center justify-end gap-1.5" (click)="$event.stopPropagation()">
+                      @if (p.stockDisponible > 0) {
+                      <button type="button" (click)="agregarAlCarrito(p)"
+                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white transition-all shadow-xs cursor-pointer"
+                        title="Agregar al ticket">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2.5">
+                          <path d="M12 5v14M5 12h14"></path>
+                        </svg>
+                        <span>Agregar</span>
+                      </button>
+                      <button type="button" (click)="abrirModalStockRed(p, $event)"
+                        class="p-1 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-400 hover:text-sky-600 transition-colors cursor-pointer"
+                        title="Ver existencias en toda la red de farmacias">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="2" y1="12" x2="22" y2="12"></line>
+                          <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                          </path>
+                        </svg>
+                      </button>
+                      } @else {
+                      <button type="button" (click)="abrirModalStockRed(p, $event)"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sky-600 hover:bg-sky-700 active:scale-95 text-white transition-all shadow-xs cursor-pointer"
+                        title="Consultar disponibilidad en otras sucursales">
+                        <svg class="w-3.5 h-3.5 text-white shrink-0" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2.2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="2" y1="12" x2="22" y2="12"></line>
+                          <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                          </path>
+                        </svg>
+                        <span>Ver en otras sedes</span>
+                      </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+                } @empty {
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-slate-400">
+                    <p class="text-xs font-bold text-slate-700">No se encontraron medicamentos</p>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Prueba cambiando el término de búsqueda o categoría.
+                    </p>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        } @else {
+        <!-- Grid de Medicamentos Disponibles en Mostrador (Tarjetas) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          @for (p of productosFiltrados(); track p.productoId) {
+          <div (click)="p.stockDisponible > 0 ? agregarAlCarrito(p) : abrirModalStockRed(p)"
+            class="p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between group hover:shadow-md"
+            [class.bg-white]="p.stockDisponible > 0" [class.border-slate-200]="p.stockDisponible > 0"
+            [class.hover:border-sky-400]="p.stockDisponible > 0" [class.bg-rose-50/25]="p.stockDisponible <= 0"
+            [class.border-rose-200]="p.stockDisponible <= 0" [class.hover:border-rose-300]="p.stockDisponible <= 0">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+                  {{ p.codigoProducto }}
+                </span>
+                @if (p.requiereReceta) {
+                <span
+                  class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-rose-100 text-rose-700 border border-rose-200">
+                  Req. Receta
+                </span>
+                }
+              </div>
+              <h3
+                class="text-sm font-extrabold text-slate-800 group-hover:text-sky-700 transition-colors mt-0.5 leading-snug">
+                {{ p.nombre }}
+              </h3>
+              @if (p.principioActivo) {
+              <p class="text-[11px] text-slate-500 italic">{{ p.principioActivo }}</p>
+              }
+              @if (p.presentacion) {
+              <p class="text-[10px] text-slate-400 font-medium">{{ p.presentacion }}</p>
+              }
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 font-semibold block leading-none">Precio</span>
+                <span class="text-base font-black text-slate-900 font-mono leading-tight">
+                  Q {{ p.precioVenta | number:'1.2-2' }}
+                </span>
+                @if (p.unidadMedida) {
+                <span class="text-[9px] text-slate-400 font-medium block leading-none mt-0.5">
+                  por {{ p.unidadMedida }}
+                </span>
+                }
+              </div>
+
+              <div class="text-right">
+                @if (p.stockDisponible > 0) {
+                <div class="flex items-center gap-1.5 justify-end">
+                  <span
+                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span>Stock: {{ p.stockDisponible }} {{ p.unidadMedidaAbrev || 'uds' }}</span>
+                  </span>
+                  <button type="button" (click)="abrirModalStockRed(p, $event)"
+                    class="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-sky-600 transition-colors cursor-pointer"
+                    title="Ver existencias en toda la red de farmacias">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                      </path>
+                    </svg>
+                  </button>
                 </div>
+                @if (p.proximoLote) {
+                <span class="text-[9px] font-bold text-amber-700 block mt-0.5">
+                  FEFO: {{ p.proximoLote.numeroLote }}
+                </span>
+                }
+                } @else {
+                <div class="flex flex-col items-end gap-1.5">
+                  <span
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                    Agotado aquí
+                  </span>
+                  <button type="button" (click)="abrirModalStockRed(p, $event)"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sky-600 hover:bg-sky-700 active:scale-95 text-white transition-all cursor-pointer shadow-xs"
+                    title="Consultar disponibilidad en otras sucursales de la red">
+                    <svg class="w-3.5 h-3.5 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                      </path>
+                    </svg>
+                    <span>Ver en otras sedes</span>
+                  </button>
+                </div>
+                }
               </div>
             </div>
+          </div>
           } @empty {
-            <div class="sm:col-span-2 bg-white rounded-2xl p-10 text-center border border-slate-200/80">
-              <p class="text-sm font-bold text-slate-700">No se encontraron medicamentos</p>
-              <p class="text-xs text-slate-400 mt-1">Prueba cambiando el término de búsqueda o categoría.</p>
-            </div>
+          <div class="sm:col-span-2 bg-white rounded-2xl p-10 text-center border border-slate-200/80">
+            <p class="text-sm font-bold text-slate-700">No se encontraron medicamentos</p>
+            <p class="text-xs text-slate-400 mt-1">Prueba cambiando el término de búsqueda o categoría.</p>
+          </div>
           }
         </div>
+        }
       </div>
 
       <!-- COLUMNA DERECHA: TICKET / CANASTA DE COBRO POS (5 COLS) -->
-      <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden sticky top-20 flex flex-col">
+      <div
+        class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden sticky top-20 flex flex-col">
         <!-- Header del Ticket -->
         <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/75">
           <div class="flex items-center gap-2">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="text-sky-600">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              class="text-sky-600">
               <circle cx="8" cy="21" r="1"></circle>
               <circle cx="19" cy="21" r="1"></circle>
               <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
@@ -343,122 +530,166 @@
         <!-- Selector de Cliente FEL (Consumidor Final vs NIT) -->
         <div class="p-4 border-b border-slate-100 bg-slate-50/40 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Datos del Comprador (FEL):</span>
+            <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Datos del Comprador
+              (FEL):</span>
             <div class="flex items-center gap-1">
-              <button
-                type="button"
-                (click)="setConsumidorFinal(true)"
+              <button type="button" (click)="setConsumidorFinal(true)"
                 class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all cursor-pointer"
-                [class.bg-emerald-600]="esConsumidorFinal()"
-                [class.text-white]="esConsumidorFinal()"
-                [class.bg-white]="!esConsumidorFinal()"
-                [class.text-slate-600]="!esConsumidorFinal()"
-                [class.border]="!esConsumidorFinal()"
-              >
+                [class.bg-emerald-600]="esConsumidorFinal()" [class.text-white]="esConsumidorFinal()"
+                [class.bg-white]="!esConsumidorFinal()" [class.text-slate-600]="!esConsumidorFinal()"
+                [class.border]="!esConsumidorFinal()">
                 C/F (Rápido)
               </button>
-              <button
-                type="button"
-                (click)="setConsumidorFinal(false)"
+              <button type="button" (click)="setConsumidorFinal(false)"
                 class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all cursor-pointer"
-                [class.bg-sky-600]="!esConsumidorFinal()"
-                [class.text-white]="!esConsumidorFinal()"
-                [class.bg-white]="esConsumidorFinal()"
-                [class.text-slate-600]="esConsumidorFinal()"
-                [class.border]="esConsumidorFinal()"
-              >
+                [class.bg-sky-600]="!esConsumidorFinal()" [class.text-white]="!esConsumidorFinal()"
+                [class.bg-white]="esConsumidorFinal()" [class.text-slate-600]="esConsumidorFinal()"
+                [class.border]="esConsumidorFinal()">
                 Con NIT
               </button>
             </div>
           </div>
 
           @if (!esConsumidorFinal()) {
-            <div class="grid grid-cols-2 gap-2 pt-1 animate-fadeIn">
-              <div>
-                <label for="posNit" class="text-[10px] font-semibold text-slate-500 block mb-0.5">NIT:</label>
-                <input
-                  id="posNit"
-                  type="text"
-                  placeholder="Ej: 7894561-2"
-                  [(ngModel)]="clienteNit"
-                  class="w-full px-2.5 py-1.5 rounded-lg text-xs bg-white border border-slate-200 focus:ring-1 focus:ring-sky-500 font-mono uppercase"
-                />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1 animate-fadeIn">
+            <div>
+              <div class="flex items-center justify-between mb-0.5">
+                <label for="posNit" class="text-[10px] font-bold text-slate-600 block">
+                  NIT <span class="text-rose-500">*</span>:
+                </label>
+                <span class="text-[9px] text-slate-400 font-mono">
+                  {{ (clienteNit() || '').length }}/12
+                </span>
               </div>
-              <div>
-                <label for="posNombreCli" class="text-[10px] font-semibold text-slate-500 block mb-0.5">Nombre / Razón:</label>
-                <input
-                  id="posNombreCli"
-                  type="text"
-                  placeholder="Nombre del cliente"
-                  [(ngModel)]="clienteNombre"
-                  class="w-full px-2.5 py-1.5 rounded-lg text-xs bg-white border border-slate-200 focus:ring-1 focus:ring-sky-500"
-                />
+              <div class="relative">
+                <input id="posNit" type="text" maxlength="14" placeholder="Ej: 1234567-K" [ngModel]="clienteNit()"
+                  (ngModelChange)="onNitChange($event)"
+                  class="w-full px-2.5 py-1.5 rounded-lg text-xs bg-white border font-mono uppercase transition-colors"
+                  [class.border-rose-400]="nitError() && (clienteTouched() || clienteNit())"
+                  [class.bg-rose-50/20]="nitError() && (clienteTouched() || clienteNit())"
+                  [class.focus:ring-rose-400]="nitError() && (clienteTouched() || clienteNit())"
+                  [class.border-slate-200]="!nitError() || (!clienteTouched() && !clienteNit())"
+                  [class.focus:ring-sky-500]="!nitError() || (!clienteTouched() && !clienteNit())"
+                  (blur)="clienteTouched.set(true)" />
+                @if (clienteNit() && !nitError()) {
+                <span class="absolute right-2 top-2 text-emerald-500 text-xs font-bold">✓</span>
+                }
               </div>
+              <!-- Mensajes de Validación NIT -->
+              @if (nitError() && (clienteTouched() || clienteNit())) {
+              <p class="text-[10px] text-rose-600 font-semibold mt-1 flex items-start gap-1 leading-tight">
+                <svg class="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>{{ nitError() }}</span>
+              </p>
+              } @else {
+              <p class="text-[9px] text-slate-400 mt-0.5">Mínimo 4 y máximo 12 caracteres (ej: 123456-7)</p>
+              }
             </div>
+
+            <div>
+              <label for="posNombreCli" class="text-[10px] font-bold text-slate-600 block mb-0.5">
+                Nombre o Razón Social <span class="text-rose-500">*</span>:
+              </label>
+              <div class="relative">
+                <input id="posNombreCli" type="text" placeholder="Nombre completo del cliente"
+                  [ngModel]="clienteNombre()" (ngModelChange)="onNombreChange($event)"
+                  class="w-full px-2.5 py-1.5 rounded-lg text-xs bg-white border transition-colors"
+                  [class.border-rose-400]="nombreError() && (clienteTouched() || clienteNombre())"
+                  [class.bg-rose-50/20]="nombreError() && (clienteTouched() || clienteNombre())"
+                  [class.focus:ring-rose-400]="nombreError() && (clienteTouched() || clienteNombre())"
+                  [class.border-slate-200]="!nombreError() || (!clienteTouched() && !clienteNombre())"
+                  [class.focus:ring-sky-500]="!nombreError() || (!clienteTouched() && !clienteNombre())"
+                  (blur)="clienteTouched.set(true)" />
+                @if (clienteNombre() && !nombreError()) {
+                <span class="absolute right-2 top-2 text-emerald-500 text-xs font-bold">✓</span>
+                }
+              </div>
+              <!-- Mensajes de Validación Nombre -->
+              @if (nombreError() && (clienteTouched() || clienteNombre())) {
+              <p class="text-[10px] text-rose-600 font-semibold mt-1 flex items-start gap-1 leading-tight">
+                <svg class="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>{{ nombreError() }}</span>
+              </p>
+              } @else {
+              <p class="text-[9px] text-slate-400 mt-0.5">Nombre requerido para facturación fiscal SAT.</p>
+              }
+            </div>
+          </div>
           } @else {
-            <div class="flex items-center justify-between text-xs text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-200/80">
-              <span class="font-bold text-slate-800">Consumidor Final</span>
-              <span class="font-mono text-slate-400">NIT: C/F</span>
-            </div>
+          <div
+            class="flex items-center justify-between text-xs text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-200/80">
+            <span class="font-bold text-slate-800">Consumidor Final</span>
+            <span class="font-mono text-slate-400">NIT: C/F</span>
+          </div>
           }
         </div>
 
         <!-- Lista de Medicamentos en el Carrito (Scrollable) -->
         <div class="p-4 space-y-2.5 max-h-80 overflow-y-auto divide-y divide-slate-100 flex-1">
           @for (item of carrito(); track item.producto.productoId; let idx = $index) {
-            <div class="pt-2.5 first:pt-0 flex items-center justify-between gap-2">
-              <div class="flex-1 min-w-0">
-                <h4 class="text-xs font-bold text-slate-800 truncate leading-tight">{{ item.producto.nombre }}</h4>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                  <span class="text-[11px] font-mono text-slate-400">Q{{ item.precioUnitario | number:'1.2-2' }} c/u</span>
-                  @if (item.producto.proximoLote) {
-                    <span class="text-[9px] font-mono text-emerald-700 bg-emerald-50 px-1 rounded">
-                      Lote: {{ item.producto.proximoLote.numeroLote }}
-                    </span>
-                  }
-                </div>
-              </div>
-
-              <!-- Contador de Cantidad -->
-              <div class="flex items-center gap-1.5 shrink-0">
-                <button
-                  (click)="modificarCantidad(idx, -1)"
-                  class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center transition-colors cursor-pointer"
-                >
-                  -
-                </button>
-                <span class="w-6 text-center text-xs font-extrabold font-mono text-slate-900">{{ item.cantidad }}</span>
-                <button
-                  (click)="modificarCantidad(idx, 1)"
-                  class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center transition-colors cursor-pointer"
-                >
-                  +
-                </button>
-              </div>
-
-              <!-- Subtotal y Eliminar -->
-              <div class="text-right shrink-0 w-20">
-                <span class="text-xs font-black text-slate-900 font-mono block">
-                  Q {{ item.subtotal | number:'1.2-2' }}
+          <div class="pt-2.5 first:pt-0 flex items-center justify-between gap-2">
+            <div class="flex-1 min-w-0">
+              <h4 class="text-xs font-bold text-slate-800 truncate leading-tight">{{ item.producto.nombre }}</h4>
+              <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                <span class="text-[11px] font-mono text-slate-400">
+                  Q{{ item.precioUnitario | number:'1.2-2' }} / {{ item.producto.unidadMedidaAbrev || 'ud' }}
                 </span>
-                <button
-                  (click)="removerItem(idx)"
-                  class="text-[10px] text-red-500 hover:text-red-700 font-semibold cursor-pointer"
-                >
-                  Quitar
-                </button>
+                @if (item.producto.presentacion) {
+                <span class="text-[9px] text-slate-500 font-medium bg-slate-100 px-1.5 py-0.2 rounded">
+                  {{ item.producto.presentacion }}
+                </span>
+                }
+                @if (item.producto.proximoLote) {
+                <span class="text-[9px] font-mono text-emerald-700 bg-emerald-50 px-1 rounded">
+                  Lote: {{ item.producto.proximoLote.numeroLote }}
+                </span>
+                }
               </div>
             </div>
-          } @empty {
-            <div class="text-center py-12 text-slate-400">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto mb-2 opacity-50">
-                <circle cx="8" cy="21" r="1"></circle>
-                <circle cx="19" cy="21" r="1"></circle>
-                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-              </svg>
-              <p class="text-xs font-bold text-slate-600">Ticket Vacío</p>
-              <p class="text-[11px] text-slate-400">Haz clic en los medicamentos para agregarlos.</p>
+
+            <!-- Contador de Cantidad -->
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button (click)="modificarCantidad(idx, -1)"
+                class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center transition-colors cursor-pointer">
+                -
+              </button>
+              <span class="w-6 text-center text-xs font-extrabold font-mono text-slate-900">{{ item.cantidad }}</span>
+              <button (click)="modificarCantidad(idx, 1)"
+                class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center transition-colors cursor-pointer">
+                +
+              </button>
             </div>
+
+            <!-- Subtotal y Eliminar -->
+            <div class="text-right shrink-0 w-20">
+              <span class="text-xs font-black text-slate-900 font-mono block">
+                Q {{ item.subtotal | number:'1.2-2' }}
+              </span>
+              <button (click)="removerItem(idx)"
+                class="text-[10px] text-red-500 hover:text-red-700 font-semibold cursor-pointer">
+                Quitar
+              </button>
+            </div>
+          </div>
+          } @empty {
+          <div class="text-center py-12 text-slate-400">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+              class="mx-auto mb-2 opacity-50">
+              <circle cx="8" cy="21" r="1"></circle>
+              <circle cx="19" cy="21" r="1"></circle>
+              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+            </svg>
+            <p class="text-xs font-bold text-slate-600">Ticket Vacío</p>
+            <p class="text-[11px] text-slate-400">Haz clic en los medicamentos para agregarlos.</p>
+          </div>
           }
         </div>
 
@@ -482,43 +713,91 @@
             </div>
           </div>
 
+          <!-- Alerta de Turno de Caja Inactivo -->
+          @if (!cajaInfo()?.abierta) {
+          <div
+            class="p-3 bg-amber-50 border border-amber-300 rounded-xl flex items-start gap-2.5 text-amber-900 animate-fadeIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="text-amber-600 shrink-0 mt-0.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div class="text-xs space-y-1">
+              <span class="font-extrabold block text-amber-950">Turno de Caja Inactivo</span>
+              <p class="text-amber-800 text-[11px] leading-tight">
+                No es posible cobrar porque no existe un turno de caja abierto en esta sucursal.
+              </p>
+              <a routerLink="/cajas"
+                class="inline-flex items-center gap-1 font-extrabold text-amber-900 underline hover:text-amber-950 mt-0.5">
+                <span>Abrir turno en Cajas</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </div>
+          }
+
           <!-- Botones de Acción -->
           <div class="flex gap-2 pt-1">
-            <button
-              (click)="vaciarCarrito()"
-              [disabled]="carrito().length === 0"
-              class="px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40 cursor-pointer"
-            >
+            <button (click)="vaciarCarrito()" [disabled]="carrito().length === 0"
+              class="px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40 cursor-pointer">
               Vaciar
             </button>
-            <button
-              (click)="iniciarCobro()"
-              [disabled]="carrito().length === 0"
-              class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-extrabold text-sm shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-40 cursor-pointer active:scale-98"
-            >
+            <button (click)="iniciarCobro()" [disabled]="carrito().length === 0 || !cajaInfo()?.abierta"
+              class="flex-1 py-3 px-4 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
+              [class.bg-gradient-to-r]="cajaInfo()?.abierta" [class.from-emerald-600]="cajaInfo()?.abierta"
+              [class.to-teal-500]="cajaInfo()?.abierta" [class.hover:from-emerald-700]="cajaInfo()?.abierta"
+              [class.hover:to-teal-600]="cajaInfo()?.abierta" [class.text-white]="cajaInfo()?.abierta"
+              [class.shadow-md]="cajaInfo()?.abierta" [class.shadow-emerald-600/25]="cajaInfo()?.abierta"
+              [class.bg-slate-200]="!cajaInfo()?.abierta" [class.text-slate-400]="!cajaInfo()?.abierta"
+              [class.cursor-not-allowed]="!cajaInfo()?.abierta"
+              [class.opacity-50]="carrito().length === 0 && cajaInfo()?.abierta">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                 <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                 <path d="M7 15h0M2 9.5h20"></path>
               </svg>
-              <span>Cobrar & Facturar (F2)</span>
+              <span>{{ cajaInfo()?.abierta ? 'Cobrar & Facturar (F2)' : 'Caja Cerrada (Requiere Turno)' }}</span>
             </button>
           </div>
         </div>
       </div>
 
     </div>
-  }
+    }
 
-  <!-- MODAL DE COBRO Y CÁLCULO DE CAMBIO -->
-  @if (modalCobroAbierto()) {
-    <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
-      <div class="bg-white rounded-3xl shadow-2xl border border-slate-200/90 max-w-md w-full overflow-hidden p-6 space-y-5 animate-modalScaleUp">
+    <!-- MODAL DE COBRO Y CÁLCULO DE CAMBIO -->
+    @if (modalCobroAbierto()) {
+    <div
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+      <div
+        class="bg-white rounded-3xl shadow-2xl border border-slate-200/90 max-w-md w-full overflow-hidden p-6 space-y-5 animate-modalScaleUp">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
             <h3 class="text-base font-extrabold text-slate-900">Cobro en Mostrador & Emisión FEL</h3>
             <p class="text-xs text-slate-500">Selecciona forma de pago e ingresa el efectivo recibido</p>
           </div>
-          <button (click)="cerrarModalCobro()" class="text-slate-400 hover:text-slate-600 text-lg cursor-pointer">&times;</button>
+          <button (click)="cerrarModalCobro()"
+            class="text-slate-400 hover:text-slate-600 text-lg cursor-pointer">&times;</button>
+        </div>
+
+        <!-- Resumen del Comprador en Modal de Cobro -->
+        <div
+          class="px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded font-extrabold text-[10px]" [class.bg-emerald-100]="esConsumidorFinal()"
+              [class.text-emerald-800]="esConsumidorFinal()" [class.bg-sky-100]="!esConsumidorFinal()"
+              [class.text-sky-800]="!esConsumidorFinal()">
+              {{ esConsumidorFinal() ? 'C/F' : 'CON NIT' }}
+            </span>
+            <span class="font-bold text-slate-800 truncate max-w-[200px]">
+              {{ clienteNombre() || 'Consumidor Final' }}
+            </span>
+          </div>
+          <span class="font-mono text-slate-500 font-semibold text-[11px]">
+            NIT: {{ clienteNit() || 'CF' }}
+          </span>
         </div>
 
         <!-- Monto Total Grande -->
@@ -534,19 +813,16 @@
           <label class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">Forma de Pago:</label>
           <div class="grid grid-cols-3 gap-2">
             @for (m of metodosPago(); track m.metodoPagoId) {
-              <button
-                type="button"
-                (click)="metodoPagoSeleccionadoId.set(m.metodoPagoId)"
-                class="p-2.5 rounded-xl border text-xs font-bold text-center transition-all cursor-pointer"
-                [class.bg-sky-50]="metodoPagoSeleccionadoId() === m.metodoPagoId"
-                [class.border-sky-500]="metodoPagoSeleccionadoId() === m.metodoPagoId"
-                [class.text-sky-800]="metodoPagoSeleccionadoId() === m.metodoPagoId"
-                [class.bg-white]="metodoPagoSeleccionadoId() !== m.metodoPagoId"
-                [class.border-slate-200]="metodoPagoSeleccionadoId() !== m.metodoPagoId"
-                [class.text-slate-600]="metodoPagoSeleccionadoId() !== m.metodoPagoId"
-              >
-                {{ m.nombre.split(' ')[0] }}
-              </button>
+            <button type="button" (click)="metodoPagoSeleccionadoId.set(m.metodoPagoId)"
+              class="p-2.5 rounded-xl border text-xs font-bold text-center transition-all cursor-pointer"
+              [class.bg-sky-50]="metodoPagoSeleccionadoId() === m.metodoPagoId"
+              [class.border-sky-500]="metodoPagoSeleccionadoId() === m.metodoPagoId"
+              [class.text-sky-800]="metodoPagoSeleccionadoId() === m.metodoPagoId"
+              [class.bg-white]="metodoPagoSeleccionadoId() !== m.metodoPagoId"
+              [class.border-slate-200]="metodoPagoSeleccionadoId() !== m.metodoPagoId"
+              [class.text-slate-600]="metodoPagoSeleccionadoId() !== m.metodoPagoId">
+              {{ m.nombre.split(' ')[0] }}
+            </button>
             }
           </div>
         </div>
@@ -554,46 +830,30 @@
         <!-- Calculadora de Cambio en Efectivo -->
         <div class="space-y-2.5">
           <div class="flex items-center justify-between">
-            <label for="posMontoRecibido" class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Efectivo Recibido (Q):</label>
+            <label for="posMontoRecibido" class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Efectivo
+              Recibido (Q):</label>
             <div class="flex gap-1">
-              <button
-                type="button"
-                (click)="seleccionarEfectivoRapido(totalVenta())"
-                class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
-              >
+              <button type="button" (click)="seleccionarEfectivoRapido(totalVenta())"
+                class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">
                 Exacto
               </button>
-              <button
-                type="button"
-                (click)="seleccionarEfectivoRapido(50)"
-                class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
-              >
+              <button type="button" (click)="seleccionarEfectivoRapido(50)"
+                class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">
                 Q50
               </button>
-              <button
-                type="button"
-                (click)="seleccionarEfectivoRapido(100)"
-                class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
-              >
+              <button type="button" (click)="seleccionarEfectivoRapido(100)"
+                class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">
                 Q100
               </button>
-              <button
-                type="button"
-                (click)="seleccionarEfectivoRapido(200)"
-                class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
-              >
+              <button type="button" (click)="seleccionarEfectivoRapido(200)"
+                class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">
                 Q200
               </button>
             </div>
           </div>
 
-          <input
-            id="posMontoRecibido"
-            type="number"
-            step="0.01"
-            [(ngModel)]="montoRecibido"
-            class="w-full px-4 py-2.5 rounded-xl text-lg font-black font-mono text-slate-900 bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center"
-          />
+          <input id="posMontoRecibido" type="number" step="0.01" [(ngModel)]="montoRecibido"
+            class="w-full px-4 py-2.5 rounded-xl text-lg font-black font-mono text-slate-900 bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center" />
 
           <!-- Cambio a Devolver -->
           <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
@@ -606,146 +866,454 @@
 
         <!-- Botón Confirmar Venta -->
         <div class="flex gap-2 pt-2">
-          <button
-            type="button"
-            (click)="cerrarModalCobro()"
-            class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
-          >
+          <button type="button" (click)="cerrarModalCobro()"
+            class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer">
             Cancelar
           </button>
-          <button
-            type="button"
-            (click)="confirmarVenta()"
-            [disabled]="procesandoVenta()"
-            class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
+          <button type="button" (click)="confirmarVenta()" [disabled]="procesandoVenta()"
+            class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
             @if (procesandoVenta()) {
-              <span class="animate-spin text-sm">⏳</span>
-              <span>Procesando FEL...</span>
+            <span class="animate-spin text-sm">⏳</span>
+            <span>Procesando FEL...</span>
             } @else {
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M20 6 9 17l-5-5"></path>
-              </svg>
-              <span>Confirmar y Emitir Factura</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M20 6 9 17l-5-5"></path>
+            </svg>
+            <span>Confirmar y Emitir Factura</span>
             }
           </button>
         </div>
       </div>
     </div>
-  }
+    }
+
+  </div> <!-- /pos-workspace -->
 
   <!-- MODAL DE FACTURA ELECTRÓNICA FEL / TICKET TÉRMICO (PRINT VIEW) -->
   @if (modalTicketAbierto() && ventaEmitida(); as v) {
-    <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-      <div class="bg-white rounded-3xl shadow-2xl border border-slate-200/90 max-w-md w-full overflow-hidden p-6 space-y-4 animate-modalScaleUp my-8">
+  <div
+    class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn ticket-modal-overlay">
+    <div
+      class="bg-white rounded-3xl shadow-2xl border border-slate-200/90 max-w-md w-full overflow-hidden p-6 space-y-4 animate-modalScaleUp my-8 ticket-modal-container">
 
-        <div class="flex items-center justify-between no-print border-b border-slate-100 pb-2">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span class="text-xs font-extrabold text-slate-800">Factura Electrónica FEL Autorizada</span>
-          </div>
-          <button (click)="cerrarModalTicket()" class="text-slate-400 hover:text-slate-600 text-lg cursor-pointer">&times;</button>
+      <div class="flex items-center justify-between no-print border-b border-slate-100 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="text-xs font-extrabold text-slate-800">Factura Electrónica FEL Autorizada</span>
+        </div>
+        <button (click)="cerrarModalTicket()"
+          class="text-slate-400 hover:text-slate-600 text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <!-- CONTENIDO DEL TICKET TÉRMICO IMPRIMIBLE (80MM STYLE) -->
+      <div id="ticketTermico"
+        class="p-4 bg-slate-50/70 border border-dashed border-slate-300 rounded-2xl space-y-3 font-mono text-[11px] text-slate-800">
+        <!-- Cabecera Fiscal -->
+        <div class="text-center space-y-0.5 border-b border-slate-200 pb-2.5">
+          <h3 class="text-sm font-black tracking-tight text-slate-900 uppercase">Farmacia ProSalud S.A.</h3>
+          <p class="text-[10px] text-slate-600 font-semibold">{{ v.fel?.emisor?.nombreComercial || ('Farmacia ProSalud -
+            ' + (v.sucursal?.nombre || 'Central')) }}</p>
+          <p class="text-[10px] text-slate-500">NIT: 9845120-K</p>
+          <p class="text-[10px] text-slate-500 leading-tight">{{ v.fel?.emisor?.direccion || v.sucursal?.direccion ||
+            'Ciudad de Guatemala' }}</p>
+          <p class="text-[10px] font-bold text-sky-800 pt-1">DOCUMENTO TRIBUTARIO ELECTRÓNICO (DTE)</p>
+          <p class="text-[9px] font-extrabold text-slate-700">
+            SERIE: {{ v.fel?.serie || v.serie || 'FARM01' }} · NO: {{ v.fel?.numeroFactura || v.numeroFactura ||
+            ('FARM01-' + v.pedidoId) }}
+          </p>
+          <p class="text-[8px] text-slate-400 break-all">
+            AUTORIZACIÓN: {{ v.fel?.autorizacionDte || v.autorizacionDte || ('DTE-' + v.pedidoId + '-CERT') }}
+          </p>
+          <p class="text-[9px] text-slate-500 font-medium">{{ (v.fechaVenta || v.fechaEmision) | date:'dd/MM/yyyy, hh:mm:ss a' }}</p>
         </div>
 
-        <!-- CONTENIDO DEL TICKET TÉRMICO IMPRIMIBLE (80MM STYLE) -->
-        <div id="ticketTermico" class="p-4 bg-slate-50/70 border border-dashed border-slate-300 rounded-2xl space-y-3 font-mono text-[11px] text-slate-800">
-          <!-- Cabecera Fiscal -->
-          <div class="text-center space-y-0.5 border-b border-slate-200 pb-2.5">
-            <h3 class="text-sm font-black tracking-tight text-slate-900 uppercase">FarmaGest S.A.</h3>
-            <p class="text-[10px] text-slate-500 font-semibold">{{ v.fel?.emisor?.nombreComercial || v.sucursal.nombre }}</p>
-            <p class="text-[10px] text-slate-500">NIT: 9845120-K</p>
-            <p class="text-[10px] text-slate-500 leading-tight">{{ v.fel?.emisor?.direccion || 'Ciudad de Guatemala' }}</p>
-            <p class="text-[10px] font-bold text-sky-800 pt-1">DOCUMENTO TRIBUTARIO ELECTRÓNICO (DTE)</p>
-            <p class="text-[9px] font-extrabold text-slate-600">SERIE: {{ v.fel?.serie }} · NO: {{ v.fel?.numeroFactura }}</p>
-            <p class="text-[8px] text-slate-400 break-all">AUTORIZACIÓN: {{ v.fel?.autorizacionDte }}</p>
-            <p class="text-[9px] text-slate-500">{{ v.fechaVenta | date:'dd/MM/yyyy HH:mm:ss' }}</p>
-          </div>
+        <!-- Datos del Receptor -->
+        <div class="border-b border-slate-200 pb-2 text-[10px] space-y-0.5">
+          <p><strong>NIT:</strong> {{ v.fel?.receptor?.nit || v.cliente?.nit || 'CF' }}</p>
+          <p><strong>CLIENTE:</strong> {{ v.fel?.receptor?.nombre || v.cliente?.nombre || 'Consumidor Final' }}</p>
+          <p><strong>PAGO:</strong> {{ v.metodoPago }}</p>
+        </div>
 
-          <!-- Datos del Receptor -->
-          <div class="border-b border-slate-200 pb-2 text-[10px] space-y-0.5">
-            <p><strong>NIT:</strong> {{ v.fel?.receptor?.nit || 'CF' }}</p>
-            <p><strong>CLIENTE:</strong> {{ v.fel?.receptor?.nombre || 'Consumidor Final' }}</p>
-            <p><strong>PAGO:</strong> {{ v.metodoPago }}</p>
+        <!-- Tabla de Artículos -->
+        <div class="border-b border-slate-200 pb-2 space-y-1.5">
+          <div class="flex justify-between font-bold border-b border-slate-200/80 pb-0.5 text-[10px]">
+            <span>CANT / DESCRIPCIÓN</span>
+            <span>TOTAL</span>
           </div>
-
-          <!-- Tabla de Artículos -->
-          <div class="border-b border-slate-200 pb-2 space-y-1.5">
-            <div class="flex justify-between font-bold border-b border-slate-200/80 pb-0.5 text-[10px]">
-              <span>CANT / DESCRIPCIÓN</span>
-              <span>TOTAL</span>
+          @for (item of v.items; track item.productoId) {
+          <div class="flex justify-between items-start text-[10px]">
+            <div class="pr-2">
+              <p class="font-bold">{{ item.cantidad }} x {{ item.nombre }}</p>
+              @if (item.lote) {
+              <p class="text-[9px] text-slate-400">Lote: {{ item.lote }}</p>
+              }
             </div>
-            @for (item of v.items; track item.productoId) {
-              <div class="flex justify-between items-start text-[10px]">
-                <div class="pr-2">
-                  <p class="font-bold">{{ item.cantidad }} x {{ item.nombre }}</p>
-                  @if (item.lote) {
-                    <p class="text-[9px] text-slate-400">Lote: {{ item.lote }}</p>
+            <span class="font-black shrink-0">Q{{ item.subtotal | number:'1.2-2' }}</span>
+          </div>
+          }
+        </div>
+
+        <!-- Desglose Tributario -->
+        <div class="space-y-1 text-[10px] pt-1 border-b border-slate-200 pb-2">
+          <div class="flex justify-between">
+            <span>BASE IMPONIBLE:</span>
+            <span>Q {{ (v.fel?.totales?.baseImponible || v.totales?.baseImponible || (v.total / 1.12)) | number:'1.2-2'
+              }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>IVA (12% INCLUIDO):</span>
+            <span>Q {{ (v.fel?.totales?.iva || v.totales?.iva || (v.total - (v.total / 1.12))) | number:'1.2-2'
+              }}</span>
+          </div>
+          <div class="flex justify-between font-black text-xs pt-1 border-t border-slate-200">
+            <span>TOTAL FACTURADO:</span>
+            <span>Q {{ (v.total || v.totales?.total) | number:'1.2-2' }}</span>
+          </div>
+          @if (v.fel?.totales?.montoRecibido) {
+          <div class="flex justify-between text-slate-500 text-[9px] pt-1">
+            <span>EFECTIVO RECIBIDO:</span>
+            <span>Q {{ v.fel.totales.montoRecibido | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between font-bold text-emerald-700 text-[10px]">
+            <span>CAMBIO ENTREGADO:</span>
+            <span>Q {{ v.fel.totales.cambio | number:'1.2-2' }}</span>
+          </div>
+          }
+        </div>
+
+        <!-- Código de Validación SAT y Pie Fiscal -->
+        <div class="text-center text-[9px] text-slate-400 space-y-1 pt-1">
+          <p class="uppercase font-semibold">Sujeto a pagos trimestrales ISR</p>
+          <p>Certificador SAT: INFILE S.A.</p>
+          <div
+            class="pt-1.5 pb-1 flex flex-col items-center justify-center gap-0.5 border-t border-dashed border-slate-300">
+            <div class="font-mono text-[9px] tracking-widest text-slate-700 font-bold">||| | |||| | ||| || |||| ||| ||||
+              | ||| || ||||</div>
+            <span class="text-[8px] text-slate-400 font-mono">Consulte su DTE en portal SAT con el número de
+              autorización</span>
+          </div>
+          <p class="font-bold text-slate-600">¡Gracias por su compra en Farmacia ProSalud!</p>
+        </div>
+      </div>
+
+      <!-- Botones de Acción Post-Venta -->
+      <div class="flex gap-2 pt-2 no-print">
+        <button type="button" (click)="imprimirTicket()"
+          class="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          <span>Imprimir Ticket</span>
+        </button>
+        <button type="button" (click)="cerrarModalTicket()"
+          class="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+          <span>➕ Nueva Venta</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+  }
+
+  <!-- ========================================== -->
+  <!-- MODAL DE CONSULTA DE STOCK EN RED DE SEDES -->
+  <!-- ========================================== -->
+  @if (modalStockRedAbierto()) {
+  <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+    <div
+      class="bg-white rounded-3xl shadow-2xl border border-slate-200/90 w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] animate-scaleUp">
+
+      <!-- Header del Modal -->
+      <div
+        class="p-5 sm:p-6 border-b border-slate-100 flex items-start justify-between gap-4 bg-gradient-to-r from-sky-50/80 via-white to-indigo-50/40">
+        <div class="flex items-start gap-3.5">
+          <div
+            class="w-10 h-10 rounded-2xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-sky-600/20">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+              </path>
+            </svg>
+          </div>
+          <div>
+            <span
+              class="text-[10px] font-extrabold uppercase tracking-wider text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-full inline-block mb-1">
+              Consulta Multisede en Tiempo Real
+            </span>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 leading-snug">
+              {{ productoConsultadoStockRed()?.nombre }}
+            </h3>
+            <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
+              <span class="font-mono font-semibold">{{ productoConsultadoStockRed()?.codigoProducto }}</span>
+              @if (productoConsultadoStockRed()?.principioActivo) {
+              <span>· {{ productoConsultadoStockRed()?.principioActivo }}</span>
+              }
+              @if (productoConsultadoStockRed()?.presentacion) {
+              <span>· {{ productoConsultadoStockRed()?.presentacion }}</span>
+              }
+              @if (productoConsultadoStockRed()?.unidadMedida) {
+              <span
+                class="px-1.5 py-0.2 rounded-md bg-slate-100 text-slate-700 font-semibold text-[10px] border border-slate-200">
+                {{ productoConsultadoStockRed()?.unidadMedida }}
+              </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <button type="button" (click)="cerrarModalStockRed()"
+          class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+          title="Cerrar (Esc)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Contenido del Modal -->
+      <div class="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs">
+        @if (cargandoStockRed()) {
+        <div class="py-12 flex flex-col items-center justify-center gap-3">
+          <div class="w-8 h-8 rounded-full border-3 border-sky-600 border-t-transparent animate-spin"></div>
+          <p class="text-slate-500 font-medium">Consultando existencias en tiempo real en toda la red farmacéutica...
+          </p>
+        </div>
+        } @else if (errorStockRed()) {
+        <div class="p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-center space-y-2">
+          <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <p class="font-bold text-sm">{{ errorStockRed() }}</p>
+          <button type="button" (click)="abrirModalStockRed(productoConsultadoStockRed()!)"
+            class="mt-1 px-4 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 cursor-pointer shadow-xs">
+            Reintentar consulta
+          </button>
+        </div>
+        } @else if (detalleStockRed(); as detalle) {
+        <!-- Bloque de Advertencia de Auditoría y Bloqueo de Cobro Local -->
+        <div
+          class="p-4 rounded-2xl bg-amber-50/90 border border-amber-200/90 text-amber-950 flex items-start gap-3.5 shadow-2xs">
+          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-black text-amber-900 tracking-wide uppercase text-[11px]">
+                Aviso de Seguridad: Bloqueo de Cobro Local Activo
+              </span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-200/90 text-amber-900">
+                Estrictamente Informativo
+              </span>
+            </div>
+            <p class="text-amber-800 leading-relaxed text-[11px]">
+              Por control estricto de cuadre físico de inventario y trazabilidad FEFO por sede, <strong>no es posible
+                facturar ni despachar mercadería de otra sucursal en esta caja</strong>.
+              Refiere al cliente a la sucursal indicada, comunícate vía telefónica para apartar las unidades, o solicita
+              a Regencia una <em>Transferencia Oficial de Mercadería</em> desde Bodega Central.
+            </p>
+          </div>
+        </div>
+
+        <!-- Resumen Rápido de Stock en Red -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Stock Total en Red</span>
+            <span class="text-lg font-black text-slate-900 font-mono">{{ detalle.stockTotalRed }} uds</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Precio Mostrador</span>
+            <span class="text-lg font-black text-sky-700 font-mono">Q {{ detalle.producto.precioVenta | number:'1.2-2'
+              }}</span>
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Sedes con Existencias</span>
+            <span class="text-lg font-black text-emerald-700 font-mono">
+              {{ sedesConStockCount(detalle.sedes) }} de {{ detalle.sedes.length }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Barra de Filtros y Acciones -->
+        <div class="flex items-center justify-between gap-3 pt-1">
+          <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+            <button type="button" (click)="filtroSoloConStock.set(true)"
+              class="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer"
+              [class.bg-white]="filtroSoloConStock()" [class.text-slate-800]="filtroSoloConStock()"
+              [class.shadow-2xs]="filtroSoloConStock()" [class.text-slate-500]="!filtroSoloConStock()">
+              Con existencias ({{ sedesConStockCount(detalle.sedes) }})
+            </button>
+            <button type="button" (click)="filtroSoloConStock.set(false)"
+              class="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer"
+              [class.bg-white]="!filtroSoloConStock()" [class.text-slate-800]="!filtroSoloConStock()"
+              [class.shadow-2xs]="!filtroSoloConStock()" [class.text-slate-500]="filtroSoloConStock()">
+              Todas las sedes ({{ detalle.sedes.length }})
+            </button>
+          </div>
+
+          @if (sedesConStockCount(detalle.sedes) > 0) {
+          <button type="button" (click)="copiarTodasSedesConStock()"
+            class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-sky-700 cursor-pointer"
+            title="Copiar lista de sucursales con existencias">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copiar lista</span>
+          </button>
+          }
+        </div>
+
+        <!-- Lista de Sucursales -->
+        <div class="space-y-2.5">
+          @for (sede of sedesFiltradasModal(); track sede.sucursalId) {
+          <div class="p-4 rounded-2xl border transition-all flex flex-col gap-3"
+            [class.bg-sky-50/40]="sede.sucursalId === sucursalSeleccionadaId()"
+            [class.border-sky-300]="sede.sucursalId === sucursalSeleccionadaId()"
+            [class.ring-2]="sede.sucursalId === sucursalSeleccionadaId()"
+            [class.ring-sky-100]="sede.sucursalId === sucursalSeleccionadaId()"
+            [class.bg-white]="sede.sucursalId !== sucursalSeleccionadaId()"
+            [class.border-slate-200]="sede.sucursalId !== sucursalSeleccionadaId()">
+            <!-- Cabecera de la Sede -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h4 class="font-extrabold text-slate-900 text-sm">
+                  {{ sede.nombre }}
+                </h4>
+                @if (sede.sucursalId === sucursalSeleccionadaId()) {
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-sky-600 text-white">
+                  Tu Sede Actual
+                </span>
+                }
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase"
+                  [class.bg-indigo-100]="sede.tipoSucursal === 'BODEGA_CENTRAL'"
+                  [class.text-indigo-800]="sede.tipoSucursal === 'BODEGA_CENTRAL'"
+                  [class.bg-emerald-100]="sede.tipoSucursal === 'FARMACIA'"
+                  [class.text-emerald-800]="sede.tipoSucursal === 'FARMACIA'"
+                  [class.bg-amber-100]="sede.tipoSucursal === 'STAND'"
+                  [class.text-amber-800]="sede.tipoSucursal === 'STAND'">
+                  {{ sede.tipoSucursal === 'BODEGA_CENTRAL' ? 'Bodega Central (Matriz)' : (sede.tipoSucursal === 'STAND'
+                  ? 'Stand Hospitalario' : 'Farmacia') }}
+                </span>
+              </div>
+
+              <!-- Badge de Stock -->
+              <div class="text-left sm:text-right shrink-0">
+                @if (sede.stockDisponible > 0) {
+                <span
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>{{ sede.stockDisponible }} uds disponibles</span>
+                </span>
+                } @else {
+                <span
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  <span>Sin stock (0 uds)</span>
+                </span>
+                }
+              </div>
+            </div>
+
+            <!-- Ubicación y Teléfono con Botón de Llamada Directa -->
+            <div
+              class="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[11px]">
+              <div class="space-y-1 text-slate-600">
+                @if (sede.direccion) {
+                <div class="flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span>{{ sede.direccion }}</span>
+                  <button type="button" (click)="copiarDireccion(sede.direccion)"
+                    class="text-slate-400 hover:text-sky-600 cursor-pointer p-0.5" title="Copiar dirección">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  </button>
+                </div>
+                }
+                @if (sede.totalLotes > 0 && sede.stockDisponible > 0) {
+                <div class="text-[10px] text-slate-400 font-medium">
+                  Desglosado en {{ sede.totalLotes }} lote(s)
+                  @if (sede.proximoVencimiento) {
+                  · Próx. vto: {{ sede.proximoVencimiento | date:'dd/MM/yyyy' }}
                   }
                 </div>
-                <span class="font-black shrink-0">Q{{ item.subtotal | number:'1.2-2' }}</span>
+                }
               </div>
-            }
-          </div>
 
-          <!-- Desglose Tributario -->
-          <div class="space-y-1 text-[10px] pt-1 border-b border-slate-200 pb-2">
-            <div class="flex justify-between">
-              <span>BASE IMPONIBLE:</span>
-              <span>Q {{ v.fel?.totales?.baseImponible || (v.total / 1.12) | number:'1.2-2' }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span>IVA (12% INCLUIDO):</span>
-              <span>Q {{ v.fel?.totales?.iva || (v.total - (v.total / 1.12)) | number:'1.2-2' }}</span>
-            </div>
-            <div class="flex justify-between font-black text-xs pt-1 border-t border-slate-200">
-              <span>TOTAL FACTURADO:</span>
-              <span>Q {{ v.total | number:'1.2-2' }}</span>
-            </div>
-            @if (v.fel?.totales?.montoRecibido) {
-              <div class="flex justify-between text-slate-500 text-[9px] pt-1">
-                <span>EFECTIVO RECIBIDO:</span>
-                <span>Q {{ v.fel.totales.montoRecibido | number:'1.2-2' }}</span>
+              <!-- Botones de Acción de Contacto -->
+              <div class="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                @if (sede.telefono) {
+                <a [href]="'tel:' + sede.telefono"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-bold text-xs transition-colors shadow-2xs"
+                  title="Llamar directamente a la sucursal">
+                  <svg class="w-3.5 h-3.5 text-sky-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path
+                      d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                    </path>
+                  </svg>
+                  <span>Llamar: {{ sede.telefono }}</span>
+                </a>
+                }
+                @if (sede.stockDisponible > 0) {
+                <button type="button" (click)="copiarInfoCliente(sede)"
+                  class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors cursor-pointer"
+                  title="Copiar ficha de la sede para enviar al cliente por WhatsApp">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span>Copiar info</span>
+                </button>
+                }
               </div>
-              <div class="flex justify-between font-bold text-emerald-700 text-[10px]">
-                <span>CAMBIO ENTREGADO:</span>
-                <span>Q {{ v.fel.totales.cambio | number:'1.2-2' }}</span>
-              </div>
-            }
+            </div>
           </div>
-
-          <!-- Pie Fiscal -->
-          <div class="text-center text-[9px] text-slate-400 space-y-0.5 pt-1">
-            <p>SUJETO A PAGOS TRIMESTRALES ISR</p>
-            <p>Certificador SAT: INFILE S.A.</p>
-            <p class="font-bold text-slate-600">¡Gracias por su compra en FarmaGest!</p>
+          } @empty {
+          <div class="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-500">
+            <p class="font-bold text-sm text-slate-700">No hay sucursales con existencias activas</p>
+            <p class="text-xs text-slate-400 mt-1">Este medicamento está agotado en toda la red farmacéutica o no cumple
+              los criterios de filtro.</p>
+            <button type="button" (click)="filtroSoloConStock.set(false)"
+              class="mt-3 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-bold cursor-pointer">
+              Ver todas las sedes
+            </button>
           </div>
+          }
         </div>
+        }
+      </div>
 
-        <!-- Botones de Acción Post-Venta -->
-        <div class="flex gap-2 pt-2 no-print">
-          <button
-            type="button"
-            (click)="imprimirTicket()"
-            class="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 6 2 18 2 18 9"></polyline>
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-              <rect x="6" y="14" width="12" height="8"></rect>
-            </svg>
-            <span>Imprimir Ticket</span>
-          </button>
-          <button
-            type="button"
-            (click)="cerrarModalTicket()"
-            class="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
-          >
-            <span>➕ Nueva Venta</span>
-          </button>
-        </div>
-
+      <!-- Footer del Modal -->
+      <div class="p-4 sm:p-5 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+        <span class="text-[11px] text-slate-500">
+          💡 Presiona <kbd
+            class="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-[10px] font-mono shadow-2xs">Esc</kbd> o
+          el botón para volver al POS.
+        </span>
+        <button type="button" (click)="cerrarModalStockRed()"
+          class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer">
+          Cerrar y Continuar Venta
+        </button>
       </div>
     </div>
+  </div>
   }
 
 </div>

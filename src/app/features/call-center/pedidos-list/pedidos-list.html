@@ -1,38 +1,29 @@
-<div class="space-y-6">
-  <!-- Encabezado de Página -->
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div>
+  <!-- Vista Principal del Call Center (Oculta al Imprimir la Guía) -->
+  <div class="pedidos-vista-principal space-y-6">
+    <!-- Encabezado de Página -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <div class="flex items-center space-x-2">
-        <span class="inline-flex items-center rounded-md bg-sky-50 px-2 py-1 text-xs font-semibold text-sky-700 ring-1 ring-inset ring-sky-700/10">
-          Call Center Centralizado
-        </span>
-        <span class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-700/10">
-          Red Nacional Malls & Stands
-        </span>
-      </div>
+
       <h1 class="text-2xl font-bold tracking-tight text-slate-900 mt-1">Coordinación de Entrega de Medicamentos</h1>
-      <p class="text-sm text-slate-500">
-        Recepción de órdenes telefónicas, verificación de stock multisede en tiempo real y asignación a la farmacia más cercana para evitar entregas tardías.
-      </p>
+
     </div>
 
     <div class="flex items-center space-x-3">
-      <button
-        (click)="cargarDatosIniciales()"
-        class="inline-flex items-center space-x-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition"
-      >
+      <button (click)="cargarDatosIniciales()"
+        class="inline-flex items-center space-x-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition">
         <svg class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
         <span>Refrescar</span>
       </button>
 
-      <button
-        (click)="abrirNuevoPedido()"
-        class="inline-flex items-center space-x-2 rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition cursor-pointer"
-      >
+      <button (click)="abrirNuevoPedido()"
+        class="inline-flex items-center space-x-2 rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition cursor-pointer">
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
         </svg>
         <span>Atender Llamada / Tomar Pedido</span>
       </button>
@@ -47,7 +38,8 @@
         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Órdenes</span>
         <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
       </div>
@@ -56,7 +48,8 @@
           {{ estadisticas()?.totalPedidos ?? pedidos().length }}
         </div>
         <p class="text-xs text-slate-500 mt-1">
-          Monto total: <strong class="text-emerald-600">Q {{ estadisticas()?.montoTotal || totalMontoPedidos() | number: '1.2-2' }}</strong>
+          Monto total: <strong class="text-emerald-600">Q {{ estadisticas()?.montoTotal || totalMontoPedidos() | number:
+            '1.2-2' }}</strong>
         </p>
       </div>
     </div>
@@ -67,7 +60,8 @@
         <span class="text-xs font-bold uppercase tracking-wider text-amber-800">En Preparación</span>
         <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
         </div>
       </div>
@@ -107,7 +101,8 @@
         <span class="text-xs font-bold uppercase tracking-wider text-emerald-800">Entregados a Tiempo</span>
         <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
       </div>
@@ -129,41 +124,32 @@
       <div class="md:col-span-5 relative">
         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-        <input
-          type="text"
-          [ngModel]="busqueda()"
-          (ngModelChange)="busqueda.set($event); onFiltroChange()"
+        <input type="text" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event); onFiltroChange()"
           placeholder="Buscar por cliente, teléfono, dirección o # folio..."
-          class="w-full rounded-xl border border-slate-200 pl-9 pr-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition outline-none"
-        />
+          class="w-full rounded-xl border border-slate-200 pl-9 pr-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition outline-none" />
       </div>
 
       <!-- Filtro Sucursal -->
       <div class="md:col-span-4">
-        <select
-          [ngModel]="filtroSucursalId()"
-          (ngModelChange)="filtroSucursalId.set($event); onFiltroChange()"
-          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 focus:border-sky-500 outline-none bg-white"
-        >
+        <select [ngModel]="filtroSucursalId()" (ngModelChange)="filtroSucursalId.set($event); onFiltroChange()"
+          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 focus:border-sky-500 outline-none bg-white">
           <option [ngValue]="null">Todas las Farmacias de Preparación</option>
           @for (suc of sucursales(); track suc.sucursalId) {
-            <option [ngValue]="suc.sucursalId">
-              {{ suc.nombre }} ({{ suc.tipoSucursal || 'SUCURSAL' }})
-            </option>
+          <option [ngValue]="suc.sucursalId">
+            {{ suc.nombre }} ({{ suc.tipoSucursal || 'SUCURSAL' }})
+          </option>
           }
         </select>
       </div>
 
       <!-- Filtro Estado -->
       <div class="md:col-span-3 flex items-center space-x-2">
-        <select
-          [ngModel]="filtroEstado()"
-          (ngModelChange)="filtroEstado.set($event); onFiltroChange()"
-          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 focus:border-sky-500 outline-none bg-white"
-        >
+        <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event); onFiltroChange()"
+          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 focus:border-sky-500 outline-none bg-white">
           <option [ngValue]="null">Todos los Estados</option>
           <option value="RECIBIDO">Recibido</option>
           <option value="EN_PREPARACION">En Preparación</option>
@@ -173,13 +159,12 @@
         </select>
 
         @if (filtroEstado() || filtroSucursalId() || busqueda()) {
-          <button
-            (click)="limpiarFiltros()"
-            title="Limpiar filtros"
-            class="rounded-xl border border-slate-200 p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
-          >
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
+        <button (click)="limpiarFiltros()" title="Limpiar filtros"
+          class="rounded-xl border border-slate-200 p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
         }
       </div>
     </div>
@@ -188,205 +173,184 @@
   <!-- Tabla de Pedidos del Call Center -->
   <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
     @if (cargando()) {
-      <div class="flex flex-col items-center justify-center py-16 space-y-3">
-        <div class="h-8 w-8 animate-spin rounded-full border-4 border-sky-600 border-t-transparent"></div>
-        <p class="text-sm font-medium text-slate-500">Cargando órdenes del Call Center...</p>
-      </div>
+    <div class="flex flex-col items-center justify-center py-16 space-y-3">
+      <div class="h-8 w-8 animate-spin rounded-full border-4 border-sky-600 border-t-transparent"></div>
+      <p class="text-sm font-medium text-slate-500">Cargando órdenes del Call Center...</p>
+    </div>
     } @else if (error()) {
-      <div class="p-8 text-center">
-        <h3 class="text-sm font-semibold text-slate-900">{{ error() }}</h3>
-        <button
-          (click)="cargarPedidos()"
-          class="mt-4 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition"
-        >
-          Reintentar
-        </button>
-      </div>
+    <div class="p-8 text-center">
+      <h3 class="text-sm font-semibold text-slate-900">{{ error() }}</h3>
+      <button (click)="cargarPedidos()"
+        class="mt-4 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition">
+        Reintentar
+      </button>
+    </div>
     } @else if (pedidos().length === 0) {
-      <div class="p-12 text-center">
-        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-          </svg>
+    <div class="p-12 text-center">
+      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        </svg>
+      </div>
+      <h3 class="mt-3 text-sm font-bold text-slate-900">No hay pedidos registrados</h3>
+      <p class="mt-1 text-xs text-slate-500">Atienda una nueva llamada telefónica o pedido digital para coordinar la
+        entrega.</p>
+      <button (click)="abrirNuevoPedido()"
+        class="mt-4 inline-flex items-center space-x-2 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 transition cursor-pointer">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Atender primera llamada</span>
+      </button>
+    </div>
+    } @else {
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs text-slate-600">
+        <thead
+          class="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+          <tr>
+            <th class="px-4 py-3.5">Folio & Fecha</th>
+            <th class="px-4 py-3.5">Cliente & Contacto</th>
+            <th class="px-4 py-3.5">Dirección de Entrega</th>
+            <th class="px-4 py-3.5">Farmacia Despachadora</th>
+            <th class="px-4 py-3.5 text-right">Monto Total</th>
+            <th class="px-4 py-3.5">Tiempo Estimado</th>
+            <th class="px-4 py-3.5 text-center">Estado</th>
+            <th class="px-4 py-3.5 text-right">Acción</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (p of pedidosPaginados(); track p.pedidoId) {
+          <tr class="hover:bg-slate-50/80 transition group">
+            <!-- Folio -->
+            <td class="px-4 py-3.5">
+              <span class="font-mono font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-100">
+                #PED-{{ p.pedidoId }}
+              </span>
+              <div class="text-[10px] text-slate-400 mt-1">
+                {{ p.fechaPedido | date: 'dd/MM/yyyy, hh:mm a' }}
+              </div>
+            </td>
+
+            <!-- Cliente -->
+            <td class="px-4 py-3.5">
+              <div class="font-bold text-slate-800">{{ p.cliente?.nombre }}</div>
+              <div class="font-mono text-[11px] text-slate-500 mt-0.5">📞 {{ p.cliente?.telefono }}</div>
+            </td>
+
+            <!-- Dirección -->
+            <td class="px-4 py-3.5 max-w-xs">
+              <div class="text-slate-800 line-clamp-1">📍 {{ p.cliente?.direccion }}</div>
+              @if (p.cliente?.referenciaDireccion) {
+              <div class="text-[10px] text-slate-400 italic line-clamp-1">Ref: {{ p.cliente?.referenciaDireccion }}
+              </div>
+              }
+            </td>
+
+            <!-- Farmacia Preparadora -->
+            <td class="px-4 py-3.5">
+              <div class="font-semibold text-slate-800">{{ p.sucursalPreparacion?.nombre }}</div>
+              <span
+                class="inline-block mt-0.5 text-[9px] font-bold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+                {{ p.sucursalPreparacion?.tipoSucursal }}
+              </span>
+            </td>
+
+            <!-- Monto -->
+            <td class="px-4 py-3.5 text-right whitespace-nowrap">
+              <div class="font-bold text-emerald-600 text-sm">Q {{ p.total | number: '1.2-2' }}</div>
+              <div class="text-[10px] text-slate-400">{{ p.metodoPago }}</div>
+            </td>
+
+            <!-- Estimado -->
+            <td class="px-4 py-3.5 whitespace-nowrap">
+              <div class="font-medium text-slate-800">
+                {{ p.fechaEstimadaEntrega | date: 'hh:mm a' }}
+              </div>
+              <div class="text-[10px] text-slate-400">
+                {{ p.fechaEstimadaEntrega | date: 'dd/MM/yyyy' }}
+              </div>
+            </td>
+
+            <!-- Estado -->
+            <td class="px-4 py-3.5 text-center whitespace-nowrap">
+              <span class="inline-flex items-center space-x-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold"
+                [class.bg-sky-50]="p.estado === 'RECIBIDO'" [class.text-sky-700]="p.estado === 'RECIBIDO'"
+                [class.ring-1]="p.estado === 'RECIBIDO'" [class.ring-sky-600/20]="p.estado === 'RECIBIDO'"
+                [class.bg-amber-50]="p.estado === 'EN_PREPARACION'"
+                [class.text-amber-700]="p.estado === 'EN_PREPARACION'"
+                [class.ring-amber-600/20]="p.estado === 'EN_PREPARACION'" [class.bg-blue-50]="p.estado === 'EN_RUTA'"
+                [class.text-blue-700]="p.estado === 'EN_RUTA'" [class.ring-blue-600/20]="p.estado === 'EN_RUTA'"
+                [class.bg-emerald-50]="p.estado === 'ENTREGADO'" [class.text-emerald-700]="p.estado === 'ENTREGADO'"
+                [class.ring-emerald-600/20]="p.estado === 'ENTREGADO'" [class.bg-red-50]="p.estado === 'CANCELADO'"
+                [class.text-red-700]="p.estado === 'CANCELADO'" [class.ring-red-600/20]="p.estado === 'CANCELADO'">
+                <span>{{ p.estado }}</span>
+              </span>
+            </td>
+
+            <!-- Acción -->
+            <td class="px-4 py-3.5 text-right whitespace-nowrap">
+              <button (click)="abrirDetalle(p.pedidoId)" title="Ver Ficha y Seguimiento Logístico"
+                class="rounded-lg p-1.5 text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Barra de Paginación -->
+    <div
+      class="px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <span>
+        Mostrando página <strong class="text-slate-700 font-semibold">{{ page() }}</strong> de <strong
+          class="text-slate-700 font-semibold">{{ totalPaginas() }}</strong> ({{ pedidos().length }} pedidos)
+      </span>
+      <div class="flex items-center gap-1.5">
+        <button (click)="cambiarPagina(-1)" [disabled]="page() <= 1"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+          ← Anterior
+        </button>
+        <div class="hidden sm:flex items-center gap-1">
+          @for (p of listaPaginas(); track p) {
+          <button (click)="irAPagina(p)" [class.bg-sky-600]="p === page()" [class.text-white]="p === page()"
+            [class.font-semibold]="p === page()" [class.shadow-sm]="p === page()" [class.border-sky-600]="p === page()"
+            class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+            {{ p }}
+          </button>
+          }
         </div>
-        <h3 class="mt-3 text-sm font-bold text-slate-900">No hay pedidos registrados</h3>
-        <p class="mt-1 text-xs text-slate-500">Atienda una nueva llamada telefónica o pedido digital para coordinar la entrega.</p>
-        <button
-          (click)="abrirNuevoPedido()"
-          class="mt-4 inline-flex items-center space-x-2 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 transition cursor-pointer"
-        >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          <span>Atender primera llamada</span>
+        <button (click)="cambiarPagina(1)" [disabled]="page() >= totalPaginas()"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+          Siguiente →
         </button>
       </div>
-    } @else {
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs text-slate-600">
-          <thead class="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200">
-            <tr>
-              <th class="px-4 py-3.5">Folio & Fecha</th>
-              <th class="px-4 py-3.5">Cliente & Contacto</th>
-              <th class="px-4 py-3.5">Dirección de Entrega</th>
-              <th class="px-4 py-3.5">Farmacia Despachadora</th>
-              <th class="px-4 py-3.5 text-right">Monto Total</th>
-              <th class="px-4 py-3.5">Tiempo Estimado</th>
-              <th class="px-4 py-3.5 text-center">Estado</th>
-              <th class="px-4 py-3.5 text-right">Acción</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            @for (p of pedidosPaginados(); track p.pedidoId) {
-              <tr class="hover:bg-slate-50/80 transition group">
-                <!-- Folio -->
-                <td class="px-4 py-3.5">
-                  <span class="font-mono font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-100">
-                    #PED-{{ p.pedidoId }}
-                  </span>
-                  <div class="text-[10px] text-slate-400 mt-1">
-                    {{ p.fechaPedido | date: 'dd/MM/yyyy HH:mm' }}
-                  </div>
-                </td>
-
-                <!-- Cliente -->
-                <td class="px-4 py-3.5">
-                  <div class="font-bold text-slate-800">{{ p.cliente?.nombre }}</div>
-                  <div class="font-mono text-[11px] text-slate-500 mt-0.5">📞 {{ p.cliente?.telefono }}</div>
-                </td>
-
-                <!-- Dirección -->
-                <td class="px-4 py-3.5 max-w-xs">
-                  <div class="text-slate-800 line-clamp-1">📍 {{ p.cliente?.direccion }}</div>
-                  @if (p.cliente?.referenciaDireccion) {
-                    <div class="text-[10px] text-slate-400 italic line-clamp-1">Ref: {{ p.cliente?.referenciaDireccion }}</div>
-                  }
-                </td>
-
-                <!-- Farmacia Preparadora -->
-                <td class="px-4 py-3.5">
-                  <div class="font-semibold text-slate-800">{{ p.sucursalPreparacion?.nombre }}</div>
-                  <span class="inline-block mt-0.5 text-[9px] font-bold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
-                    {{ p.sucursalPreparacion?.tipoSucursal }}
-                  </span>
-                </td>
-
-                <!-- Monto -->
-                <td class="px-4 py-3.5 text-right whitespace-nowrap">
-                  <div class="font-bold text-emerald-600 text-sm">Q {{ p.total | number: '1.2-2' }}</div>
-                  <div class="text-[10px] text-slate-400">{{ p.metodoPago }}</div>
-                </td>
-
-                <!-- Estimado -->
-                <td class="px-4 py-3.5 whitespace-nowrap">
-                  <div class="font-medium text-slate-800">
-                    {{ p.fechaEstimadaEntrega | date: 'HH:mm' }} hrs
-                  </div>
-                  <div class="text-[10px] text-slate-400">
-                    {{ p.fechaEstimadaEntrega | date: 'dd/MM/yyyy' }}
-                  </div>
-                </td>
-
-                <!-- Estado -->
-                <td class="px-4 py-3.5 text-center whitespace-nowrap">
-                  <span
-                    class="inline-flex items-center space-x-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold"
-                    [class.bg-sky-50]="p.estado === 'RECIBIDO'"
-                    [class.text-sky-700]="p.estado === 'RECIBIDO'"
-                    [class.ring-1]="p.estado === 'RECIBIDO'"
-                    [class.ring-sky-600/20]="p.estado === 'RECIBIDO'"
-                    [class.bg-amber-50]="p.estado === 'EN_PREPARACION'"
-                    [class.text-amber-700]="p.estado === 'EN_PREPARACION'"
-                    [class.ring-amber-600/20]="p.estado === 'EN_PREPARACION'"
-                    [class.bg-blue-50]="p.estado === 'EN_RUTA'"
-                    [class.text-blue-700]="p.estado === 'EN_RUTA'"
-                    [class.ring-blue-600/20]="p.estado === 'EN_RUTA'"
-                    [class.bg-emerald-50]="p.estado === 'ENTREGADO'"
-                    [class.text-emerald-700]="p.estado === 'ENTREGADO'"
-                    [class.ring-emerald-600/20]="p.estado === 'ENTREGADO'"
-                    [class.bg-red-50]="p.estado === 'CANCELADO'"
-                    [class.text-red-700]="p.estado === 'CANCELADO'"
-                    [class.ring-red-600/20]="p.estado === 'CANCELADO'"
-                  >
-                    <span>{{ p.estado }}</span>
-                  </span>
-                </td>
-
-                <!-- Acción -->
-                <td class="px-4 py-3.5 text-right whitespace-nowrap">
-                  <button
-                    (click)="abrirDetalle(p.pedidoId)"
-                    title="Ver Ficha y Seguimiento Logístico"
-                    class="rounded-lg p-1.5 text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition"
-                  >
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Barra de Paginación -->
-      <div class="px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-        <span>
-          Mostrando página <strong class="text-slate-700 font-semibold">{{ page() }}</strong> de <strong class="text-slate-700 font-semibold">{{ totalPaginas() }}</strong> ({{ pedidos().length }} pedidos)
-        </span>
-        <div class="flex items-center gap-1.5">
-          <button
-            (click)="cambiarPagina(-1)"
-            [disabled]="page() <= 1"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
-          >
-            ← Anterior
-          </button>
-          <div class="hidden sm:flex items-center gap-1">
-            @for (p of listaPaginas(); track p) {
-              <button
-                (click)="irAPagina(p)"
-                [class.bg-sky-600]="p === page()"
-                [class.text-white]="p === page()"
-                [class.font-semibold]="p === page()"
-                [class.shadow-sm]="p === page()"
-                [class.border-sky-600]="p === page()"
-                class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs"
-              >
-                {{ p }}
-              </button>
-            }
-          </div>
-          <button
-            (click)="cambiarPagina(1)"
-            [disabled]="page() >= totalPaginas()"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
-          >
-            Siguiente →
-          </button>
-        </div>
-      </div>
+    </div>
     }
+  </div>
   </div>
 
   <!-- Modal Atender Llamada / Tomar Pedido -->
   @if (modalNuevoPedidoAbierto()) {
-    <app-modal maxWidthClass="max-w-3xl" (cerrar)="cerrarNuevoPedido()">
-      <app-pedido-callcenter-modal
-        (pedidoCreado)="onPedidoCreado()"
-        (cancelar)="cerrarNuevoPedido()"
-      ></app-pedido-callcenter-modal>
-    </app-modal>
+  <app-modal maxWidthClass="max-w-3xl" (cerrar)="cerrarNuevoPedido()">
+    <app-pedido-callcenter-modal (pedidoCreado)="onPedidoCreado()"
+      (cancelar)="cerrarNuevoPedido()"></app-pedido-callcenter-modal>
+  </app-modal>
   }
 
   <!-- Modal Detalle y Seguimiento -->
   @if (pedidoSeleccionadoId()) {
-    <app-modal maxWidthClass="max-w-3xl" (cerrar)="cerrarDetalle()">
-      <app-pedido-detalle-modal
-        [pedidoId]="pedidoSeleccionadoId()!"
-        (cerrar)="cerrarDetalle()"
-        (estadoCambiado)="onEstadoCambiado()"
-      ></app-pedido-detalle-modal>
-    </app-modal>
+  <app-modal maxWidthClass="max-w-3xl" (cerrar)="cerrarDetalle()">
+    <app-pedido-detalle-modal [pedidoId]="pedidoSeleccionadoId()!" (cerrar)="cerrarDetalle()"
+      (estadoCambiado)="onEstadoCambiado()"></app-pedido-detalle-modal>
+  </app-modal>
   }
 </div>

@@ -7,7 +7,7 @@ import { Modal } from '../../../shared/modal/modal';
 import { LotesService } from '../../../core/services/lotes.service';
 import { SucursalesService } from '../../../core/services/sucursales.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Lote, Sucursal } from '../../../core/models/lote.models';
+import { Lote, QueryLotes, Sucursal } from '../../../core/models/lote.models';
 import { LoteEntradaForm } from '../lote-entrada-form/lote-entrada-form';
 import { LoteSalidaForm } from '../lote-salida-form/lote-salida-form';
 
@@ -15,7 +15,7 @@ type ModalAbierto = 'entrada' | 'salida' | null;
 
 export interface LoteItemViewModel extends Lote {
   diasParaVencer: number;
-  estadoVencimiento: 'VENCIDO' | 'CRITICO' | 'ALERTA' | 'VIGENTE';
+  estadoVencimiento: 'VENCIDO' | 'CRITICO' | 'ALERTA' | 'VIGENTE' | 'AGOTADO';
   stockTotal: number;
 }
 
@@ -32,6 +32,7 @@ export class LotesList implements OnInit {
   private readonly toastService = inject(ToastService);
 
   protected readonly usuario = this.authService.currentUser;
+  protected readonly esAdmin = computed(() => this.usuario()?.rol === 'ADMIN');
   protected readonly todosLosLotes = signal<LoteItemViewModel[]>([]);
   protected readonly sucursales = signal<Sucursal[]>([]);
   protected readonly cargando = signal(true);
@@ -41,7 +42,7 @@ export class LotesList implements OnInit {
 
   // Filtros reactivos con Angular Signals
   protected readonly q = signal('');
-  protected readonly filtroVencimiento = signal<'' | 'VENCIDO' | 'URGENTE' | 'POR_VENCER' | 'VIGENTE'>('');
+  protected readonly filtroVencimiento = signal<'' | 'VENCIDO' | 'URGENTE' | 'POR_VENCER' | 'VIGENTE' | 'AGOTADO'>('');
   protected readonly filtroStock = signal<'' | 'CON_STOCK' | 'SIN_STOCK'>('');
   protected readonly sucursalSeleccionada = signal<number | ''>('');
 
@@ -55,24 +56,31 @@ export class LotesList implements OnInit {
     this.todosLosLotes().reduce((sum, l) => sum + l.stockTotal, 0),
   );
 
-  // Conteo de lotes por categoría de vencimiento FEFO
+  // Conteo de lotes por categoría de vencimiento FEFO (Exclusivo para lotes con existencias físicas > 0)
   protected readonly conteoFiltros = computed(() => {
     const lotes = this.todosLosLotes();
     let vigentes = 0;
     let porVencer = 0;
     let urgentes = 0;
     let vencidos = 0;
+    let agotados = 0;
 
     for (const l of lotes) {
+      if (l.stockTotal === 0) {
+        agotados++;
+        continue; // Lotes agotados son registros históricos, no alertas de caducidad física
+      }
+
       if (l.diasParaVencer < 0) {
         vencidos++;
       } else {
-        vigentes++;
-        if (l.diasParaVencer <= 90) {
-          porVencer++;
-        }
         if (l.diasParaVencer <= 30) {
           urgentes++;
+        }
+        if (l.diasParaVencer <= 90) {
+          porVencer++;
+        } else {
+          vigentes++;
         }
       }
     }
@@ -83,6 +91,7 @@ export class LotesList implements OnInit {
       porVencer,
       urgentes,
       vencidos,
+      agotados,
     };
   });
 
@@ -115,13 +124,19 @@ export class LotesList implements OnInit {
     // 2. Filtro de caducidad FEFO
     if (venc) {
       if (venc === 'VENCIDO') {
-        list = list.filter((l) => l.diasParaVencer < 0);
+        if (stock === 'SIN_STOCK') {
+          list = list.filter((l) => l.diasParaVencer < 0 && l.stockTotal === 0);
+        } else {
+          list = list.filter((l) => l.diasParaVencer < 0 && l.stockTotal > 0);
+        }
       } else if (venc === 'URGENTE') {
-        list = list.filter((l) => l.diasParaVencer >= 0 && l.diasParaVencer <= 30);
+        list = list.filter((l) => l.diasParaVencer >= 0 && l.diasParaVencer <= 30 && l.stockTotal > 0);
       } else if (venc === 'POR_VENCER') {
-        list = list.filter((l) => l.diasParaVencer >= 0 && l.diasParaVencer <= 90);
+        list = list.filter((l) => l.diasParaVencer >= 0 && l.diasParaVencer <= 90 && l.stockTotal > 0);
       } else if (venc === 'VIGENTE') {
-        list = list.filter((l) => l.diasParaVencer >= 0);
+        list = list.filter((l) => l.diasParaVencer > 90 && l.stockTotal > 0);
+      } else if (venc === 'AGOTADO') {
+        list = list.filter((l) => l.stockTotal === 0);
       }
     }
 
@@ -166,11 +181,14 @@ export class LotesList implements OnInit {
     if (this.q().trim()) count++;
     if (this.filtroVencimiento()) count++;
     if (this.filtroStock()) count++;
-    if (this.sucursalSeleccionada() !== '') count++;
+    if (this.esAdmin() && this.sucursalSeleccionada() !== '') count++;
     return count;
   });
 
   ngOnInit(): void {
+    if (!this.esAdmin() && this.usuario()?.sucursalId) {
+      this.sucursalSeleccionada.set(this.usuario()!.sucursalId!);
+    }
     this.cargarSucursales();
     this.cargar();
   }
@@ -180,7 +198,7 @@ export class LotesList implements OnInit {
     this.page.set(1);
   }
 
-  protected cambiarFiltroVencimiento(valor: '' | 'VENCIDO' | 'URGENTE' | 'POR_VENCER' | 'VIGENTE'): void {
+  protected cambiarFiltroVencimiento(valor: '' | 'VENCIDO' | 'URGENTE' | 'POR_VENCER' | 'VIGENTE' | 'AGOTADO'): void {
     this.filtroVencimiento.set(valor);
     this.page.set(1);
   }
@@ -194,14 +212,20 @@ export class LotesList implements OnInit {
     const num = valor === '' || valor === null || valor === undefined ? '' : Number(valor);
     this.sucursalSeleccionada.set(num);
     this.page.set(1);
+    this.cargar();
   }
 
   protected limpiarFiltros(): void {
     this.q.set('');
     this.filtroVencimiento.set('');
     this.filtroStock.set('');
-    this.sucursalSeleccionada.set('');
+    if (this.esAdmin()) {
+      this.sucursalSeleccionada.set('');
+    } else if (this.usuario()?.sucursalId) {
+      this.sucursalSeleccionada.set(this.usuario()!.sucursalId!);
+    }
     this.page.set(1);
+    this.cargar();
   }
 
   protected cambiarPagina(delta: number): void {
@@ -227,10 +251,6 @@ export class LotesList implements OnInit {
       paginas.push(i);
     }
     return paginas;
-  }
-
-  protected esAdmin(): boolean {
-    return this.usuario()?.rol === 'ADMIN';
   }
 
   protected abrirEntrada(): void {
@@ -263,6 +283,25 @@ export class LotesList implements OnInit {
     );
   }
 
+  protected textoSemaforoBadge(lote: LoteItemViewModel): string {
+    if (lote.stockTotal === 0) {
+      return 'Agotado (0 stock)';
+    }
+
+    const dias = lote.diasParaVencer;
+    if (dias < 0) {
+      const abs = Math.abs(dias);
+      return abs === 1 ? 'Venció ayer' : `Venció hace ${abs} días`;
+    }
+    if (dias === 0) {
+      return '¡Vence hoy!';
+    }
+    if (dias === 1) {
+      return 'Vence mañana';
+    }
+    return `Vence en ${dias} días`;
+  }
+
   protected textoDiasVencimiento(dias: number): string {
     if (dias < 0) return `Venció hace ${Math.abs(dias)} días`;
     if (dias === 0) return 'Vence hoy';
@@ -283,8 +322,17 @@ export class LotesList implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
 
-    // Cargamos lotes para indexar el catálogo completo de inventario
-    this.lotesService.findAll({ limit: 500 }).subscribe({
+    const sucId = !this.esAdmin()
+      ? (this.usuario()?.sucursalId ?? undefined)
+      : (this.sucursalSeleccionada() !== '' ? Number(this.sucursalSeleccionada()) : undefined);
+
+    const query: QueryLotes = { limit: 500 };
+    if (sucId) {
+      query.sucursalId = sucId;
+    }
+
+    // Cargamos lotes para indexar el catálogo de inventario
+    this.lotesService.findAll(query).subscribe({
       next: (respuesta) => {
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
@@ -307,8 +355,10 @@ export class LotesList implements OnInit {
             0,
           );
 
-          let estadoV: 'VENCIDO' | 'CRITICO' | 'ALERTA' | 'VIGENTE';
-          if (dias < 0) {
+          let estadoV: 'VENCIDO' | 'CRITICO' | 'ALERTA' | 'VIGENTE' | 'AGOTADO';
+          if (stock === 0) {
+            estadoV = 'AGOTADO';
+          } else if (dias < 0) {
             estadoV = 'VENCIDO';
           } else if (dias <= 30) {
             estadoV = 'CRITICO';

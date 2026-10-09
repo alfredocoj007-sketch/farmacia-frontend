@@ -41,6 +41,7 @@ export class LoteSalidaForm implements OnInit {
   private readonly confirmService = inject(ConfirmService);
 
   protected readonly usuario = this.authService.currentUser;
+  protected readonly esAdmin = computed(() => this.usuario()?.rol === 'ADMIN');
 
   // Modo de despacho: 'FEFO' (Automático por caducidad) o 'MANUAL' (Excepción justificada)
   protected readonly modoDespacho = signal<'FEFO' | 'MANUAL'>('FEFO');
@@ -146,7 +147,9 @@ export class LoteSalidaForm implements OnInit {
 
     this.sucursalesService.findAll().subscribe((sucursales) => {
       this.sucursales.set(sucursales);
-      const preseleccion = this.sucursalIdInicial ?? this.usuario()?.sucursalId;
+      const preseleccion = !this.esAdmin()
+        ? this.usuario()?.sucursalId
+        : (this.sucursalIdInicial ?? this.usuario()?.sucursalId);
       const idFinal = preseleccion
         ? Number(preseleccion)
         : sucursales.length > 0
@@ -179,9 +182,6 @@ export class LoteSalidaForm implements OnInit {
     }
   }
 
-  protected esAdmin(): boolean {
-    return this.usuario()?.rol === 'ADMIN';
-  }
 
   protected cambiarModoDespacho(modo: 'FEFO' | 'MANUAL'): void {
     this.modoDespacho.set(modo);
@@ -209,6 +209,9 @@ export class LoteSalidaForm implements OnInit {
     }
 
     const v = this.form.getRawValue();
+    if (!this.esAdmin() && this.usuario()?.sucursalId) {
+      v.sucursalId = this.usuario()!.sucursalId!;
+    }
 
     // Validaciones específicas para el modo Excepción Manual
     if (this.modoDespacho() === 'MANUAL') {

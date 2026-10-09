@@ -68,3 +68,42 @@ export interface QueryTransferencias {
   sucursalOrigenId?: number;
   sucursalDestinoId?: number;
 }
+
+export interface LoteDisponibleTransferencia {
+  loteId: number;
+  numeroLote: string;
+  fechaVencimiento: string | Date;
+  stockDisponible: number;
+  agotado?: boolean;
+  producto?: {
+    productoId: number;
+    nombre: string;
+    codigoProducto: string;
+    principioActivo?: string;
+    categoria?: string;
+    unidadMedida?: string;
+  };
+}
+
+export interface ConteoPendientesTransferencia {
+  pendientesDespacho: number;
+  pendientesRecepcion: number;
+  conteoBadge: number;
+  tipoBadge: 'DESPACHO' | 'RECEPCION' | 'NINGUNO';
+  ultimoDespacho?: {
+    transferenciaId: number;
+    origenNombre?: string;
+    fechaEnvio?: string | Date | null;
+  } | null;
+  ultimaSolicitud?: {
+    transferenciaId: number;
+    origenNombre?: string;
+    fechaSolicitud?: string | Date | null;
+  } | null;
+  ultimaCancelacion?: {
+    transferenciaId: number;
+    destinoNombre?: string;
+    observacion?: string | null;
+    fecha?: string | Date | null;
+  } | null;
+}

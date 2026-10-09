@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CajasService } from '../../../core/services/cajas.service';
@@ -13,11 +13,14 @@ import { CajaMovimientoModal } from '../caja-movimiento-modal/caja-movimiento-mo
 import { CajaArqueoModal } from '../caja-arqueo-modal/caja-arqueo-modal';
 import { CajaHistorialModal } from '../caja-historial-modal/caja-historial-modal';
 
+import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-cajas-list',
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     Modal,
     CajaAperturaModal,
     CajaMovimientoModal,
@@ -27,7 +30,7 @@ import { CajaHistorialModal } from '../caja-historial-modal/caja-historial-modal
   templateUrl: './cajas-list.html',
   styleUrl: './cajas-list.scss',
 })
-export class CajasList implements OnInit {
+export class CajasList implements OnInit, OnDestroy {
   private readonly cajasService = inject(CajasService);
   private readonly sucursalesService = inject(SucursalesService);
   private readonly toastService = inject(ToastService);
@@ -38,6 +41,10 @@ export class CajasList implements OnInit {
   protected readonly cajas = signal<Caja[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+
+  // Reloj reactivo en vivo para cálculo de turnos y sincronía
+  protected readonly ahora = signal<Date>(new Date());
+  private relojTimer: any = null;
 
   protected readonly esAdmin = computed(() => this.authService.currentUser()?.rol === 'ADMIN');
   protected readonly sucursalAsignadaId = computed(() => this.authService.currentUser()?.sucursalId);
@@ -81,6 +88,30 @@ export class CajasList implements OnInit {
 
   ngOnInit(): void {
     this.cargarSucursales();
+    this.relojTimer = setInterval(() => {
+      this.ahora.set(new Date());
+    }, 1000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.relojTimer) {
+      clearInterval(this.relojTimer);
+      this.relojTimer = null;
+    }
+  }
+
+  protected calcularTiempoEnTurno(fechaIso: string): string {
+    if (!fechaIso) return '';
+    const inicio = new Date(fechaIso).getTime();
+    const actual = this.ahora().getTime();
+    const diffMs = Math.max(0, actual - inicio);
+    const diffMins = Math.floor(diffMs / 60000);
+    const horas = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+    if (horas === 0) {
+      return mins <= 1 ? '1 min' : `${mins} min`;
+    }
+    return `${horas}h ${mins}m`;
   }
 
   protected cargarSucursales(): void {

@@ -20,6 +20,7 @@ export class CajaMovimientoModal implements OnInit {
   protected tipoMovimiento: 'INGRESO' | 'EGRESO' = 'INGRESO';
   protected monto: number | null = null;
   protected metodoPagoId: number | null = null;
+  protected numeroComprobante = '';
   protected descripcion = '';
   protected metodosPago = signal<MetodoPago[]>([]);
   protected guardando = signal(false);
@@ -66,13 +67,19 @@ export class CajaMovimientoModal implements OnInit {
     this.guardando.set(true);
     this.error.set(null);
 
+    const doc = this.numeroComprobante.trim().toUpperCase();
+    const descFinal = doc
+      ? `[Doc: ${doc}] ${this.descripcion.trim()}`
+      : this.descripcion.trim();
+
     this.cajasService
       .registrarMovimiento({
         sesionCajaId: this.sesionCajaId,
         tipoMovimiento: this.tipoMovimiento,
         monto: Number(this.monto),
         metodoPagoId: Number(this.metodoPagoId),
-        descripcion: this.descripcion.trim(),
+        descripcion: descFinal,
+        referenciaTipo: doc ? 'COMPROBANTE' : undefined,
       })
       .subscribe({
         next: () => {

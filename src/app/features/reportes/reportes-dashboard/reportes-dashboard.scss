@@ -1,0 +1,75 @@
+.only-print {
+  display: none;
+}
+
+@media print {
+  /* Ocultar elementos que no deben salir en la impresión */
+  .no-print,
+  .kpis-grid,
+  .desgloses-grid,
+  .search-filter-row {
+    display: none !important;
+  }
+
+  /* Mostrar exclusivamente el encabezado de reporte formal */
+  .only-print {
+    display: block !important;
+  }
+
+  .reportes-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Quitar sombras y bordes redondeados al contenedor de la tabla para imprimir */
+  .tabla-reporte-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    margin-top: 0 !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 8.5pt !important;
+    line-height: 1.25 !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+  }
+
+  th {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid #94a3b8 !important;
+    padding: 5px 6px !important;
+    font-weight: 800 !important;
+    font-size: 8pt !important;
+    text-transform: uppercase !important;
+  }
+
+  td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 4px 6px !important;
+    color: #0f172a !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    margin: 0.8cm !important;
+  }
+
+  @page {
+    margin: 1cm;
+    size: landscape;
+  }
+}

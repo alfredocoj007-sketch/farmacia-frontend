@@ -1,19 +1,18 @@
-import { Component, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PedidosService } from '../../../core/services/pedidos.service';
-import { ProductosService } from '../../../core/services/productos.service';
 import { CajasService } from '../../../core/services/cajas.service';
 import {
   ClienteSimple,
   CreatePedidoCallCenterRequest,
+  MedicamentoCallCenter,
   SucursalDisponibilidad,
 } from '../../../core/models/pedido.models';
-import { Producto } from '../../../core/models/producto.models';
 import { MetodoPago } from '../../../core/models/caja.models';
 
-interface ItemCarrito {
-  producto: Producto;
+export interface ItemCarrito {
+  producto: MedicamentoCallCenter;
   cantidad: number;
   precioUnitario: number;
   subtotal: number;
@@ -27,7 +26,6 @@ interface ItemCarrito {
 })
 export class PedidoCallcenterModal implements OnInit {
   private readonly pedidosService = inject(PedidosService);
-  private readonly productosService = inject(ProductosService);
   private readonly cajasService = inject(CajasService);
 
   @Output() pedidoCreado = new EventEmitter<void>();
@@ -35,11 +33,50 @@ export class PedidoCallcenterModal implements OnInit {
 
   protected readonly guardando = signal(false);
   protected readonly consultandoStock = signal(false);
+  protected readonly cargandoMedicamentos = signal(false);
   protected readonly error = signal<string | null>(null);
 
   // Catálogos
-  protected readonly productos = signal<Producto[]>([]);
+  protected readonly productos = signal<MedicamentoCallCenter[]>([]);
   protected readonly metodosPago = signal<MetodoPago[]>([]);
+
+  // Búsqueda de medicamentos con reactividad pura
+  protected readonly busquedaTexto = signal<string>('');
+  protected readonly cantidadAgregar = signal<number>(1);
+  protected readonly soloConStock = signal<boolean>(false);
+
+  // Medicamento actualmente seleccionado (opcional, para confirmar antes de agregar)
+  protected readonly productoSeleccionado = signal<MedicamentoCallCenter | null>(null);
+
+  // Filtrado reactivo en tiempo real
+  protected readonly medicamentosFiltrados = computed(() => {
+    const query = this.busquedaTexto().trim().toLowerCase();
+    const todos = this.productos();
+    const soloStock = this.soloConStock();
+
+    let lista = todos;
+    if (soloStock) {
+      lista = lista.filter((p) => !p.agotado && p.stockTotal > 0);
+    }
+
+    if (!query) {
+      return lista;
+    }
+
+    return lista.filter((p) => {
+      const matchNombre = (p.nombre || '').toLowerCase().includes(query);
+      const matchFormula = (p.principioActivo || '').toLowerCase().includes(query);
+      const matchSku = (p.codigoProducto || '').toLowerCase().includes(query);
+      const matchCat = (p.categoria?.nombre || '').toLowerCase().includes(query);
+      const matchLab = (p.laboratorio?.nombre || '').toLowerCase().includes(query);
+      return matchNombre || matchFormula || matchSku || matchCat || matchLab;
+    });
+  });
+
+  // Sugerencias rápidas (populares con existencias)
+  protected readonly sugerenciasRapidas = computed(() => {
+    return this.productos().filter((p) => !p.agotado && p.stockTotal > 0).slice(0, 6);
+  });
 
   // Búsqueda de cliente
   protected busquedaCliente = '';
@@ -56,8 +93,6 @@ export class PedidoCallcenterModal implements OnInit {
 
   // Carrito de medicamentos
   protected itemsCarrito = signal<ItemCarrito[]>([]);
-  protected productoIdSeleccionado = 0;
-  protected cantidadAgregar = 1;
 
   // Disponibilidad por farmacia
   protected sucursalesDisponibles = signal<SucursalDisponibilidad[]>([]);
@@ -77,12 +112,27 @@ export class PedidoCallcenterModal implements OnInit {
   private inicializarFechaEstimada(): void {
     const ahora = new Date();
     ahora.setMinutes(ahora.getMinutes() + 45); // Estimado 45 min por defecto
-    this.fechaEstimadaEntrega = ahora.toISOString().substring(0, 16);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const anio = ahora.getFullYear();
+    const mes = pad(ahora.getMonth() + 1);
+    const dia = pad(ahora.getDate());
+    const hora = pad(ahora.getHours());
+    const min = pad(ahora.getMinutes());
+    this.fechaEstimadaEntrega = `${anio}-${mes}-${dia}T${hora}:${min}`;
   }
 
   private cargarCatalogos(): void {
-    this.productosService.findAll({ limit: 100 }).subscribe({
-      next: (res) => this.productos.set(res.data),
+    this.cargandoMedicamentos.set(true);
+    this.pedidosService.obtenerMedicamentosDisponibles().subscribe({
+      next: (prods) => {
+        this.productos.set(prods);
+        this.cargandoMedicamentos.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargando medicamentos:', err);
+        this.cargandoMedicamentos.set(false);
+        this.error.set('Error al cargar catálogo de medicamentos: ' + (err.error?.message || err.message));
+      },
     });
 
     this.cajasService.listarMetodosPago().subscribe({
@@ -95,6 +145,146 @@ export class PedidoCallcenterModal implements OnInit {
     });
   }
 
+  protected onInputBusqueda(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.busquedaTexto.set(input.value);
+    this.error.set(null);
+  }
+
+  protected limpiarBusqueda(): void {
+    this.busquedaTexto.set('');
+    this.error.set(null);
+  }
+
+  protected alternarSoloStock(): void {
+    this.soloConStock.set(!this.soloConStock());
+  }
+
+  protected seleccionarMedicamento(prod: MedicamentoCallCenter): void {
+    if (prod.agotado || prod.stockTotal <= 0) {
+      this.error.set(`"${prod.nombre}" se encuentra AGOTADO en la red de farmacias. No se puede seleccionar.`);
+      return;
+    }
+    this.error.set(null);
+    this.productoSeleccionado.set(prod);
+    this.cantidadAgregar.set(1);
+  }
+
+  protected deseleccionarMedicamento(): void {
+    this.productoSeleccionado.set(null);
+    this.cantidadAgregar.set(1);
+  }
+
+  protected ajustarCantidad(delta: number): void {
+    const maxStock = this.productoSeleccionado()?.stockTotal || 999;
+    const nueva = this.cantidadAgregar() + delta;
+    if (nueva >= 1 && nueva <= maxStock) {
+      this.cantidadAgregar.set(nueva);
+    }
+  }
+
+  /**
+   * Agrega directamente un medicamento al pedido con control estricto de FEFO y stock.
+   */
+  protected agregarMedicamentoDirecto(prod: MedicamentoCallCenter, cantidad = 1): void {
+    if (prod.agotado || prod.stockTotal <= 0) {
+      this.error.set(`"${prod.nombre}" se encuentra AGOTADO en toda la red de farmacias.`);
+      return;
+    }
+
+    if (cantidad <= 0) return;
+
+    const items = [...this.itemsCarrito()];
+    const index = items.findIndex((i) => i.producto.productoId === prod.productoId);
+    const cantidadEnCarrito = index >= 0 ? items[index].cantidad : 0;
+    const cantidadFinal = cantidadEnCarrito + cantidad;
+
+    if (cantidadFinal > prod.stockTotal) {
+      this.error.set(
+        `Stock insuficiente en la red para "${prod.nombre}". Existencias: ${prod.stockTotal} uds. (Ya agregadas en orden: ${cantidadEnCarrito}).`,
+      );
+      return;
+    }
+
+    const precioUnitario = Number(prod.precioVenta);
+    if (index >= 0) {
+      items[index].cantidad = cantidadFinal;
+      items[index].subtotal = Number((items[index].cantidad * precioUnitario).toFixed(2));
+    } else {
+      items.push({
+        producto: prod,
+        cantidad,
+        precioUnitario,
+        subtotal: Number((cantidad * precioUnitario).toFixed(2)),
+      });
+    }
+
+    this.itemsCarrito.set(items);
+    this.productoSeleccionado.set(null);
+    this.cantidadAgregar.set(1);
+    this.error.set(null);
+
+    // Actualizar disponibilidad por farmacia automáticamente
+    this.evaluarDisponibilidadFarmacias();
+  }
+
+  /**
+   * Auto-resolución cuando se presiona Enter en el input de búsqueda o se pulsa botón general.
+   */
+  protected onEnterBusqueda(): void {
+    // Si ya hay un producto seleccionado explícitamente:
+    const sel = this.productoSeleccionado();
+    if (sel) {
+      this.agregarMedicamentoDirecto(sel, this.cantidadAgregar());
+      return;
+    }
+
+    // Si no hay seleccionado, buscar la mejor coincidencia del texto escrito
+    const query = this.busquedaTexto().trim().toLowerCase();
+    if (!query) return;
+
+    const filtrados = this.medicamentosFiltrados();
+    const disponible = filtrados.find((p) => !p.agotado && p.stockTotal > 0);
+
+    if (disponible) {
+      this.agregarMedicamentoDirecto(disponible, this.cantidadAgregar());
+    } else if (filtrados.length > 0) {
+      this.error.set(`Todos los medicamentos coincidentes con "${this.busquedaTexto()}" están agotados.`);
+    } else {
+      this.error.set(`No se encontró ningún medicamento con el nombre "${this.busquedaTexto()}".`);
+    }
+  }
+
+  protected ajustarCantidadCarrito(index: number, delta: number): void {
+    const items = [...this.itemsCarrito()];
+    const item = items[index];
+    const nueva = item.cantidad + delta;
+    if (nueva <= 0) {
+      this.eliminarItem(index);
+      return;
+    }
+    if (nueva > item.producto.stockTotal) {
+      this.error.set(`Stock máximo disponible para "${item.producto.nombre}" es ${item.producto.stockTotal} uds.`);
+      return;
+    }
+    item.cantidad = nueva;
+    item.subtotal = Number((nueva * item.precioUnitario).toFixed(2));
+    this.itemsCarrito.set(items);
+    this.evaluarDisponibilidadFarmacias();
+  }
+
+  protected eliminarItem(index: number): void {
+    const items = [...this.itemsCarrito()];
+    items.splice(index, 1);
+    this.itemsCarrito.set(items);
+    this.evaluarDisponibilidadFarmacias();
+  }
+
+  protected totalOrden(): number {
+    return this.itemsCarrito().reduce((sum, i) => sum + i.subtotal, 0);
+  }
+
+  // Clientes
   protected buscarClientes(): void {
     if (this.busquedaCliente.trim().length < 2) {
       this.clientesEncontrados.set([]);
@@ -122,47 +312,7 @@ export class PedidoCallcenterModal implements OnInit {
     }
   }
 
-  protected agregarProducto(): void {
-    if (!this.productoIdSeleccionado || this.cantidadAgregar <= 0) return;
-
-    const prod = this.productos().find((p) => p.productoId === Number(this.productoIdSeleccionado));
-    if (!prod) return;
-
-    const items = [...this.itemsCarrito()];
-    const index = items.findIndex((i) => i.producto.productoId === prod.productoId);
-
-    const precioUnitario = Number(prod.precioVenta);
-    if (index >= 0) {
-      items[index].cantidad += Number(this.cantidadAgregar);
-      items[index].subtotal = Number((items[index].cantidad * precioUnitario).toFixed(2));
-    } else {
-      items.push({
-        producto: prod,
-        cantidad: Number(this.cantidadAgregar),
-        precioUnitario,
-        subtotal: Number((this.cantidadAgregar * precioUnitario).toFixed(2)),
-      });
-    }
-
-    this.itemsCarrito.set(items);
-    this.productoIdSeleccionado = 0;
-    this.cantidadAgregar = 1;
-
-    // Actualizar disponibilidad por farmacia automáticamente
-    this.evaluarDisponibilidadFarmacias();
-  }
-
-  protected eliminarItem(index: number): void {
-    const items = [...this.itemsCarrito()];
-    items.splice(index, 1);
-    this.itemsCarrito.set(items);
-    this.evaluarDisponibilidadFarmacias();
-  }
-
-  protected totalOrden(): number {
-    return this.itemsCarrito().reduce((sum, i) => sum + i.subtotal, 0);
-  }
-
+  // Evaluación FEFO por farmacia
   protected evaluarDisponibilidadFarmacias(): void {
     if (this.itemsCarrito().length === 0) {
       this.sucursalesDisponibles.set([]);

@@ -1,6 +1,6 @@
 <div class="p-6 sm:p-7 space-y-6">
   <!-- Header Modal -->
-  <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+  <div class="flex items-start justify-between border-b border-slate-100 pb-4 no-print">
     <div class="flex items-center space-x-3">
       <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-500/20">
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -14,19 +14,44 @@
         <p class="text-xs text-slate-500">Trazabilidad de entrega a domicilio y preparación en sucursal</p>
       </div>
     </div>
+
+    <!-- Botón Imprimir en Cabecera -->
+    @if (pedido()) {
+      <button
+        type="button"
+        (click)="imprimirGuia()"
+        class="inline-flex items-center space-x-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-xs hover:bg-slate-50 transition cursor-pointer"
+        title="Imprimir Guía de Despacho para el Repartidor"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>Imprimir Guía</span>
+      </button>
+    }
   </div>
 
   @if (cargando()) {
-    <div class="flex flex-col items-center justify-center py-12 space-y-3">
+    <div class="flex flex-col items-center justify-center py-12 space-y-3 no-print">
       <div class="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
       <p class="text-sm font-medium text-slate-500">Cargando guía de entrega...</p>
     </div>
-  } @else if (error()) {
-    <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+  } @else if (!pedido() && error()) {
+    <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 no-print">
       {{ error() }}
     </div>
   } @else if (pedido()) {
-    <div class="space-y-6">
+    @if (error()) {
+      <div class="rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs text-red-700 flex items-center justify-between no-print">
+        <span>{{ error() }}</span>
+        <button type="button" (click)="error.set(null)" class="text-red-500 hover:text-red-700 font-bold ml-2 cursor-pointer">✕</button>
+      </div>
+    }
+
+    <!-- Vista de Pantalla Interactiva -->
+    <div class="vista-pantalla space-y-6">
       <!-- Stepper del Ciclo de Vida de la Entrega -->
       <div class="rounded-2xl bg-slate-50 border border-slate-200/80 p-4">
         <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-bold">
@@ -108,7 +133,7 @@
           <div class="text-slate-600 mt-1">📍 Ubicación: {{ pedido()!.sucursalPreparacion?.direccion }}</div>
           <div class="text-slate-600">
             ⏰ Estimado de Entrega:
-            <strong>{{ pedido()!.fechaEstimadaEntrega | date: 'dd/MM/yyyy HH:mm' }}</strong>
+            <strong>{{ pedido()!.fechaEstimadaEntrega | date: 'dd/MM/yyyy, hh:mm a' }}</strong>
           </div>
         </div>
       </div>
@@ -169,7 +194,7 @@
               type="button"
               (click)="avanzarEstado('EN_PREPARACION')"
               [disabled]="actualizando()"
-              class="inline-flex items-center space-x-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white hover:bg-amber-600 transition"
+              class="inline-flex items-center space-x-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white hover:bg-amber-600 transition cursor-pointer"
             >
               <span>Empezar Preparación en Farmacia</span>
             </button>
@@ -180,7 +205,7 @@
               type="button"
               (click)="avanzarEstado('EN_RUTA')"
               [disabled]="actualizando()"
-              class="inline-flex items-center space-x-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition"
+              class="inline-flex items-center space-x-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition cursor-pointer"
             >
               <span>Despachar a Domicilio con Repartidor</span>
             </button>
@@ -198,7 +223,7 @@
                 type="button"
                 (click)="avanzarEstado('ENTREGADO')"
                 [disabled]="actualizando()"
-                class="inline-flex items-center space-x-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition"
+                class="inline-flex items-center space-x-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition cursor-pointer"
               >
                 <span>Confirmar Entrega al Cliente</span>
               </button>
@@ -210,7 +235,7 @@
               type="button"
               (click)="avanzarEstado('CANCELADO')"
               [disabled]="actualizando()"
-              class="inline-flex items-center space-x-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-100 transition ml-auto"
+              class="inline-flex items-center space-x-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-100 transition ml-auto cursor-pointer"
             >
               <span>Cancelar Orden</span>
             </button>
@@ -218,14 +243,176 @@
         </div>
       </div>
     </div>
+
+    <!-- Documento Oficial para Impresión de la Guía de Despacho -->
+    <div class="guia-impresion">
+      <!-- Encabezado Institucional -->
+      <div class="guia-header">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <img src="assets/images/logo-prosalud.png" alt="Logo ProSalud" class="guia-logo" />
+          <div>
+            <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: #1e293b; text-transform: uppercase;">
+              Farmacia ProSalud
+            </h2>
+            <div style="font-size: 13px; font-weight: 700; color: #0284c7; margin-top: 2px;">
+              GUÍA DE DESPACHO Y ENTREGA A DOMICILIO
+            </div>
+            <div style="font-size: 11px; color: #475569; margin-top: 2px;">
+              Sede Despachadora: <strong>{{ pedido()!.sucursalPreparacion?.nombre }}</strong> ({{ pedido()!.sucursalPreparacion?.tipoSucursal }})
+            </div>
+            <div style="font-size: 10px; color: #64748b;">
+              {{ pedido()!.sucursalPreparacion?.direccion || 'Guatemala' }} | Tel: {{ pedido()!.sucursalPreparacion?.telefono || '2200-0000' }}
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: right; border: 1.5px solid #0284c7; padding: 6px 12px; border-radius: 8px; background-color: #f0f9ff;">
+          <div style="font-size: 16px; font-weight: 900; color: #0369a1; font-family: monospace;">
+            #PED-{{ pedido()!.pedidoId }}
+          </div>
+          <div style="font-size: 10px; color: #475569; margin-top: 2px;">
+            Emisión: <strong>{{ pedido()!.fechaPedido | date: 'dd/MM/yyyy, hh:mm a' }}</strong>
+          </div>
+          <div style="font-size: 10px; color: #475569;">
+            Estado: <strong>{{ pedido()!.estado }}</strong>
+          </div>
+          <div style="font-size: 10px; color: #0369a1; font-weight: 700;">
+            Canal: {{ pedido()!.origen }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos del Cliente y Logística -->
+      <div class="guia-grid-info">
+        <div class="guia-card">
+          <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #475569; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; margin-bottom: 6px;">
+            DATOS DEL DESTINATARIO / CLIENTE
+          </div>
+          <div style="font-size: 12px; font-weight: 800; color: #0f172a;">
+            {{ pedido()!.cliente?.nombre }}
+          </div>
+          <div style="font-size: 11px; color: #1e293b; margin-top: 2px;">
+            Teléfono: <strong>{{ pedido()!.cliente?.telefono }}</strong>
+          </div>
+          <div style="font-size: 11px; color: #1e293b; margin-top: 2px;">
+            Dirección de Entrega: <strong>{{ pedido()!.cliente?.direccion }}</strong>
+          </div>
+          @if (pedido()!.cliente?.referenciaDireccion) {
+            <div style="font-size: 10px; color: #475569; font-style: italic; margin-top: 2px;">
+              Ref: {{ pedido()!.cliente?.referenciaDireccion }}
+            </div>
+          }
+        </div>
+
+        <div class="guia-card">
+          <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #0369a1; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; margin-bottom: 6px;">
+            COORDINACIÓN DE ENTREGA Y PAGO
+          </div>
+          <div style="font-size: 11px; color: #1e293b;">
+            Persona que Recibe: <strong>{{ pedido()!.entrega?.personaRecibe || pedido()!.cliente?.nombre }}</strong>
+          </div>
+          <div style="font-size: 11px; color: #1e293b; margin-top: 2px;">
+            Forma de Pago: <strong style="color: #047857;">{{ pedido()!.metodoPago }}</strong>
+          </div>
+          @if (pedido()!.observacion) {
+            <div style="font-size: 10px; color: #475569; margin-top: 2px;">
+              Instrucciones: {{ pedido()!.observacion }}
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Detalle de Medicamentos -->
+      <div style="margin-top: 8px;">
+        <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #1e293b; margin-bottom: 4px;">
+          MEDICAMENTOS DESPACHADOS (CONTROL FEFO)
+        </div>
+        <table class="guia-tabla">
+          <thead>
+            <tr>
+              <th style="width: 25px; text-align: center;">#</th>
+              <th style="text-align: left;">Medicamento / Principio Activo</th>
+              <th style="text-align: center; width: 140px;">Lote Asignado</th>
+              <th style="text-align: center; width: 45px;">Cant.</th>
+              <th style="text-align: right; width: 85px;">Precio Unit.</th>
+              <th style="text-align: right; width: 95px;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (det of pedido()!.detalles; track det.pedidoDetalleId; let idx = $index) {
+            <tr>
+              <td style="text-align: center; font-weight: 600;">{{ idx + 1 }}</td>
+              <td>
+                <div style="font-weight: 700; color: #0f172a;">{{ det.productoNombre }}</div>
+                <div style="font-size: 9px; color: #64748b;">{{ det.principioActivo || 'Medicamento' }}</div>
+              </td>
+              <td style="text-align: center; font-family: monospace; font-size: 10px;">
+                {{ det.loteNumero || 'Asignación Automática' }}
+              </td>
+              <td style="text-align: center; font-weight: 700;">{{ det.cantidad }}</td>
+              <td style="text-align: right;">Q {{ det.precioUnitario | number: '1.2-2' }}</td>
+              <td style="text-align: right; font-weight: 700;">Q {{ det.subtotal | number: '1.2-2' }}</td>
+            </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr style="background-color: #f8fafc; font-weight: 800;">
+              <td colspan="4" style="text-align: right; text-transform: uppercase; padding: 7px; font-size: 11px;">
+                TOTAL A COBRAR EN ENTREGA ({{ pedido()!.metodoPago }}):
+              </td>
+              <td colspan="2" style="text-align: right; color: #047857; font-size: 13px; padding: 7px;">
+                Q {{ pedido()!.total | number: '1.2-2' }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Talonario de Firmas -->
+      <div class="guia-firmas">
+        <div class="guia-firma-bloque">
+          <div style="height: 30px;"></div>
+          <div style="font-weight: 700; color: #1e293b;">Firma de Repartidor / Despacho</div>
+          <div style="font-size: 10px; color: #64748b;">Responsable de Entrega y Cobro</div>
+        </div>
+
+        <div class="guia-firma-bloque">
+          <div style="height: 30px;"></div>
+          <div style="font-weight: 700; color: #1e293b;">Firma y Nombre de Quien Recibe</div>
+          <div style="font-size: 10px; color: #64748b;">DPI / Teléfono: ___________________________</div>
+        </div>
+      </div>
+
+      <!-- Pie de Página Legal -->
+      <div style="margin-top: 14px; border-top: 1px dashed #cbd5e1; padding-top: 5px; font-size: 9px; color: #64748b; text-align: center;">
+        Constancia oficial de entrega a domicilio para Farmacia ProSalud. El cliente declara recibir el producto conforme y sellado. La factura electrónica FEL se emite al liquidar en caja.
+      </div>
+    </div>
   }
 
   <!-- Footer -->
-  <div class="flex items-center justify-end border-t border-slate-100 pt-4">
+  <div class="flex items-center justify-between border-t border-slate-100 pt-4 no-print">
+    @if (pedido()) {
+      <button
+        type="button"
+        (click)="imprimirGuia()"
+        class="inline-flex items-center space-x-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 transition cursor-pointer shadow-xs"
+        title="Imprimir Guía de Despacho"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>Imprimir Guía de Despacho</span>
+      </button>
+    } @else {
+      <div></div>
+    }
     <button
       type="button"
       (click)="cerrar.emit()"
-      class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
+      class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 transition cursor-pointer"
     >
       Cerrar
     </button>

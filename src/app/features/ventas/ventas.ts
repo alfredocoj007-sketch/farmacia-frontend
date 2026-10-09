@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -10,6 +10,8 @@ import {
   MetodoPagoSimple,
   ProductoPosItem,
   SesionCajaInfo,
+  StockRedRespuesta,
+  StockSucursalRed,
   VentaListadoItem,
   VentaRespuesta,
 } from '../../core/models/venta.models';
@@ -50,12 +52,59 @@ export class Ventas implements OnInit {
   // Canasta / Ticket de Venta
   readonly carrito = signal<ItemCarrito[]>([]);
 
+  // Vista de Catálogo (Tabla compacta por defecto vs Tarjetas)
+  readonly vistaProductos = signal<'tabla' | 'tarjetas'>('tabla');
+
   // Datos del Cliente (FEL Guatemala)
   readonly esConsumidorFinal = signal<boolean>(true);
   readonly clienteNit = signal<string>('CF');
   readonly clienteNombre = signal<string>('Consumidor Final');
   readonly clienteDireccion = signal<string>('Ciudad de Guatemala');
   readonly clienteTelefono = signal<string>('2000-0000');
+  readonly clienteTouched = signal<boolean>(false);
+
+  // Parámetros de validación de NIT SAT
+  readonly nitMinLength = 4;
+  readonly nitMaxLength = 12;
+
+  readonly nitError = computed<string | null>(() => {
+    if (this.esConsumidorFinal()) return null;
+    const raw = (this.clienteNit() || '').trim();
+    if (!raw) {
+      return 'El NIT es obligatorio para emitir factura con NIT.';
+    }
+    const clean = raw.replace(/\s+/g, '').toUpperCase();
+    if (clean === 'CF' || clean === 'C/F') {
+      return 'Para emitir con NIT ingresa un número válido (o selecciona el botón C/F).';
+    }
+    if (clean.length < this.nitMinLength) {
+      return `Mínimo ${this.nitMinLength} caracteres para el NIT (has ingresado ${clean.length}). Ej: 123456-7`;
+    }
+    if (clean.length > this.nitMaxLength) {
+      return `Máximo ${this.nitMaxLength} caracteres permitidos para el NIT (has ingresado ${clean.length}).`;
+    }
+    if (!/^[0-9A-Z-]+$/.test(clean)) {
+      return 'El NIT solo debe contener números, letras y guión (-).';
+    }
+    return null;
+  });
+
+  readonly nombreError = computed<string | null>(() => {
+    if (this.esConsumidorFinal()) return null;
+    const nom = (this.clienteNombre() || '').trim();
+    if (!nom) {
+      return 'El nombre o razón social es obligatorio cuando se emite con NIT.';
+    }
+    if (nom.length < 3) {
+      return `El nombre debe tener al menos 3 caracteres (has ingresado ${nom.length}).`;
+    }
+    return null;
+  });
+
+  readonly datosClienteValidos = computed<boolean>(() => {
+    if (this.esConsumidorFinal()) return true;
+    return !this.nitError() && !this.nombreError();
+  });
 
   // Modal de Cobro y Facturación
   readonly modalCobroAbierto = signal<boolean>(false);
@@ -67,6 +116,22 @@ export class Ventas implements OnInit {
   // Modal de Factura FEL / Ticket Térmico
   readonly modalTicketAbierto = signal<boolean>(false);
   readonly ventaEmitida = signal<VentaRespuesta | null>(null);
+
+  // Modal de Consulta de Stock en Red de Sucursales
+  readonly modalStockRedAbierto = signal<boolean>(false);
+  readonly productoConsultadoStockRed = signal<ProductoPosItem | null>(null);
+  readonly detalleStockRed = signal<StockRedRespuesta | null>(null);
+  readonly cargandoStockRed = signal<boolean>(false);
+  readonly errorStockRed = signal<string | null>(null);
+  readonly filtroSoloConStock = signal<boolean>(true);
+  readonly sedesFiltradasModal = computed(() => {
+    const detalle = this.detalleStockRed();
+    if (!detalle) return [];
+    if (this.filtroSoloConStock()) {
+      return detalle.sedes.filter((s) => s.stockDisponible > 0);
+    }
+    return detalle.sedes;
+  });
 
   // Historial de Ventas del Día
   readonly vistaHistorial = signal<boolean>(false);
@@ -257,9 +322,10 @@ export class Ventas implements OnInit {
   agregarAlCarrito(prod: ProductoPosItem): void {
     if (prod.stockDisponible <= 0) {
       this.toastService.warning(
-        'Sin existencias disponibles',
-        `No hay stock de "${prod.nombre}" en esta sede.`,
+        'Sin existencias en esta sede',
+        `No hay stock disponible de "${prod.nombre}". Abriendo consulta en red...`,
       );
+      this.abrirModalStockRed(prod);
       return;
     }
 
@@ -326,6 +392,7 @@ export class Ventas implements OnInit {
   // Selector de Cliente
   setConsumidorFinal(esCF: boolean): void {
     this.esConsumidorFinal.set(esCF);
+    this.clienteTouched.set(false);
     if (esCF) {
       this.clienteNit.set('CF');
       this.clienteNombre.set('Consumidor Final');
@@ -339,11 +406,39 @@ export class Ventas implements OnInit {
     }
   }
 
+  onNitChange(valor: string): void {
+    this.clienteNit.set(valor);
+  }
+
+  onNombreChange(valor: string): void {
+    this.clienteNombre.set(valor);
+  }
+
   // Flujo de Cobro
   iniciarCobro(): void {
+    if (!this.cajaInfo()?.abierta) {
+      this.toastService.warning(
+        'Turno de caja cerrado',
+        'No puedes cobrar porque la caja se encuentra cerrada en esta sucursal. Abre tu turno en el módulo de Cajas.',
+      );
+      return;
+    }
+
     if (this.carrito().length === 0) {
       this.toastService.warning('Canasta vacía', 'Agrega medicamentos antes de cobrar.');
       return;
+    }
+
+    if (!this.esConsumidorFinal()) {
+      this.clienteTouched.set(true);
+      if (this.nitError()) {
+        this.toastService.warning('NIT inválido', this.nitError()!);
+        return;
+      }
+      if (this.nombreError()) {
+        this.toastService.warning('Nombre requerido', this.nombreError()!);
+        return;
+      }
     }
 
     const total = this.totalVenta();
@@ -360,6 +455,15 @@ export class Ventas implements OnInit {
   }
 
   confirmarVenta(): void {
+    if (!this.esConsumidorFinal() && !this.datosClienteValidos()) {
+      this.clienteTouched.set(true);
+      this.toastService.error(
+        'Datos fiscales incompletos',
+        'Verifica el NIT y nombre del comprador antes de continuar.',
+      );
+      return;
+    }
+
     const total = this.totalVenta();
     const recibido = Number(this.montoRecibido() || 0);
 
@@ -406,9 +510,10 @@ export class Ventas implements OnInit {
         this.verificarCaja(this.sucursalSeleccionadaId());
 
         // Alerta flotante moderna
+        const numFactura = resp.fel?.numeroFactura || resp.numeroFactura || resp.pedidoId;
         this.toastService.success(
           '¡Venta registrada con éxito!',
-          `Factura FEL #${resp.fel.numeroFactura} por Q${resp.total.toFixed(2)} emitida correctamente.`,
+          `Factura FEL #${numFactura} por Q${resp.total.toFixed(2)} emitida correctamente.`,
         );
       },
       error: (err) => {
@@ -466,5 +571,97 @@ export class Ventas implements OnInit {
       },
       error: () => this.toastService.error('No se pudo cargar el ticket.'),
     });
+  }
+
+  // Consulta de Stock en Red de Sucursales
+  abrirModalStockRed(p: ProductoPosItem, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.productoConsultadoStockRed.set(p);
+    this.detalleStockRed.set(null);
+    this.errorStockRed.set(null);
+    this.filtroSoloConStock.set(true);
+    this.cargandoStockRed.set(true);
+    this.modalStockRedAbierto.set(true);
+
+    this.ventasService.obtenerStockRed(p.productoId).subscribe({
+      next: (res) => {
+        this.detalleStockRed.set(res);
+        this.cargandoStockRed.set(false);
+      },
+      error: (err) => {
+        if (err.status === 403) {
+          this.errorStockRed.set('Acceso Restringido: Tu perfil no cuenta con permisos de auditoría multisede.');
+        } else {
+          this.errorStockRed.set('No se pudo consultar el stock en la red de sucursales en este momento.');
+        }
+        this.cargandoStockRed.set(false);
+      },
+    });
+  }
+
+  cerrarModalStockRed(): void {
+    this.modalStockRedAbierto.set(false);
+    this.productoConsultadoStockRed.set(null);
+    this.detalleStockRed.set(null);
+    this.errorStockRed.set(null);
+  }
+
+  sedesConStockCount(sedes: StockSucursalRed[]): number {
+    return sedes.filter((s) => s.stockDisponible > 0).length;
+  }
+
+  copiarInfoCliente(sede: StockSucursalRed): void {
+    const prod = this.detalleStockRed()?.producto;
+    if (!prod) return;
+    const direccionTexto = sede.direccion ? `📍 Dirección: ${sede.direccion}` : '';
+    const telTexto = sede.telefono ? `📞 Teléfono: ${sede.telefono}` : '';
+    const unidadTexto = prod.unidadMedida ? ` / ${prod.unidadMedida}` : '';
+    const texto = `🏥 *Farmacia ProSalud - Disponibilidad de Medicamento*\n💊 *Producto:* ${prod.nombre} (${prod.presentacion || ''})\n🏢 *Sucursal disponible:* ${sede.nombre}\n${direccionTexto}\n${telTexto}\n📦 *Stock:* ${sede.stockDisponible} ${prod.unidadMedidaAbrev || 'uds'} disponibles\n💰 *Precio:* Q ${prod.precioVenta.toFixed(2)}${unidadTexto}`;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(texto).then(() => {
+        this.toastService.success('Copiado al portapapeles', `Datos de ${sede.nombre} listos para compartir al cliente.`);
+      }).catch(() => {
+        this.toastService.info('Datos listos', texto);
+      });
+    }
+  }
+
+  copiarDireccion(direccion: string): void {
+    if (!direccion) return;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(direccion).then(() => {
+        this.toastService.success('Dirección copiada', direccion);
+      });
+    }
+  }
+
+  copiarTodasSedesConStock(): void {
+    const detalle = this.detalleStockRed();
+    if (!detalle) return;
+    const conStock = detalle.sedes.filter((s) => s.stockDisponible > 0);
+    if (conStock.length === 0) {
+      this.toastService.warning('Sin existencias', 'No hay ninguna sede con stock disponible.');
+      return;
+    }
+    const unidadTexto = detalle.producto.unidadMedida ? ` / ${detalle.producto.unidadMedida}` : '';
+    let texto = `🏥 *Farmacia ProSalud - Disponibilidad en Red*\n💊 *Producto:* ${detalle.producto.nombre}\n💰 *Precio:* Q ${detalle.producto.precioVenta.toFixed(2)}${unidadTexto}\n\n*Sucursales disponibles:*\n`;
+    conStock.forEach((s) => {
+      texto += `• *${s.nombre}*: ${s.stockDisponible} ${detalle.producto.unidadMedidaAbrev || 'uds'} disponibles\n  Dirección: ${s.direccion || 'N/A'}\n  Tel: ${s.telefono || 'N/A'}\n\n`;
+    });
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(texto).then(() => {
+        this.toastService.success('Copiado', 'Lista de sucursales copiada al portapapeles.');
+      });
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapePressed(): void {
+    if (this.modalStockRedAbierto()) {
+      this.cerrarModalStockRed();
+    }
   }
 }

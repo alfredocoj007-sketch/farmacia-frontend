@@ -41,22 +41,85 @@ export class TransferenciasList implements OnInit {
   protected readonly modalCrearAbierto = signal(false);
   protected readonly transferenciaSeleccionada = signal<Transferencia | null>(null);
 
+  // Transferencias visibles según la sede del usuario (Bodega Central y Admin ven todas; cada farmacia ve las suyas)
+  protected readonly transferenciasVisibles = computed(() => {
+    const todas = this.transferencias();
+    if (this.esAdmin()) return todas;
+
+    const miSucId = this.sucursalAsignadaId();
+    if (!miSucId) return todas;
+
+    const esBodegaCentral = this.sucursales().find(
+      (s) =>
+        Number(s.sucursalId) === Number(miSucId) &&
+        (s.tipoSucursal === 'BODEGA_CENTRAL' || s.nombre?.toLowerCase().includes('central')),
+    );
+    if (esBodegaCentral) return todas;
+
+    return todas.filter(
+      (t) =>
+        Number(t.sucursalDestino?.sucursalId) === Number(miSucId) ||
+        Number(t.sucursalOrigen?.sucursalId) === Number(miSucId),
+    );
+  });
+
+  // Identificación clara de sede central vs farmacia receptora
+  protected readonly esBodegaCentral = computed(() => {
+    const miSucId = this.sucursalAsignadaId();
+    if (!miSucId) return false;
+    return !!this.sucursales().find(
+      (s) =>
+        Number(s.sucursalId) === Number(miSucId) &&
+        (s.tipoSucursal === 'BODEGA_CENTRAL' || s.nombre?.toLowerCase().includes('central')),
+    );
+  });
+
+  protected readonly esSucursalReceptora = computed(() => {
+    return !this.esAdmin() && !this.esBodegaCentral() && !!this.sucursalAsignadaId();
+  });
+
+  // Envíos en tránsito que van dirigidos específicamente a la sede del usuario
+  protected readonly totalEnTransitoHaciaMiSede = computed(() => {
+    const miSucId = this.sucursalAsignadaId();
+    if (!miSucId) return 0;
+    return this.transferenciasVisibles().filter(
+      (t) =>
+        t.estado === 'EN_TRANSITO' &&
+        Number(t.sucursalDestino?.sucursalId) === Number(miSucId),
+    ).length;
+  });
+
+  // Solicitudes pendientes de autorización y despacho para Bodega Central o Administradores
+  protected readonly solicitudesPendientesDespacho = computed(() => {
+    return this.transferenciasVisibles().filter((t) => t.estado === 'SOLICITADA').length;
+  });
+
   // KPIs
   protected readonly totalTransferencias = computed(
-    () => this.transferencias().length,
+    () => this.transferenciasVisibles().length,
   );
 
   protected readonly totalEnTransito = computed(
-    () => this.transferencias().filter((t) => t.estado === 'EN_TRANSITO').length,
+    () => this.transferenciasVisibles().filter((t) => t.estado === 'EN_TRANSITO').length,
   );
 
   protected readonly totalSolicitadas = computed(
-    () => this.transferencias().filter((t) => t.estado === 'SOLICITADA').length,
+    () => this.transferenciasVisibles().filter((t) => t.estado === 'SOLICITADA').length,
   );
 
   protected readonly totalRecibidas = computed(
-    () => this.transferencias().filter((t) => t.estado === 'RECIBIDA').length,
+    () => this.transferenciasVisibles().filter((t) => t.estado === 'RECIBIDA').length,
   );
+
+  protected readonly transferenciasCanceladasOrigen = computed(() => {
+    return this.transferenciasVisibles().filter((t) => t.estado === 'CANCELADA');
+  });
+
+  protected readonly totalCanceladas = computed(
+    () => this.transferenciasCanceladasOrigen().length,
+  );
+
+
 
   // Lista filtrada
   protected readonly transferenciasFiltradas = computed(() => {
@@ -65,7 +128,7 @@ export class TransferenciasList implements OnInit {
     const destinoId = this.filtroDestinoId();
     const q = this.busqueda().trim().toLowerCase();
 
-    return this.transferencias().filter((t) => {
+    return this.transferenciasVisibles().filter((t) => {
       if (estado && t.estado !== estado) return false;
       if (origenId && t.sucursalOrigen?.sucursalId !== origenId) return false;
       if (destinoId && t.sucursalDestino?.sucursalId !== destinoId) return false;
@@ -127,6 +190,7 @@ export class TransferenciasList implements OnInit {
   protected cargarTransferencias(): void {
     this.cargando.set(true);
     this.error.set(null);
+    this.transferenciasService.actualizarConteoPendientes().subscribe({ error: () => {} });
 
     this.transferenciasService.findAll({ limit: 200 }).subscribe({
       next: (res) => {

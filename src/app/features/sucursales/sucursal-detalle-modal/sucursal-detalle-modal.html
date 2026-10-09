@@ -11,19 +11,22 @@
         <div class="flex items-start gap-3">
           <div
             class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md shrink-0"
-            [class.bg-emerald-500]="d.sucursal.tipoSucursal === 'FARMACIA' || d.sucursal.tipoSucursal === 'BODEGA_MATRIZ'"
-            [class.text-white]="d.sucursal.tipoSucursal === 'FARMACIA' || d.sucursal.tipoSucursal === 'BODEGA_MATRIZ'"
+            [class.bg-emerald-500]="d.sucursal.tipoSucursal === 'FARMACIA'"
+            [class.text-white]="d.sucursal.tipoSucursal === 'FARMACIA'"
             [class.bg-sky-500]="d.sucursal.tipoSucursal === 'MALL_STAND'"
             [class.text-white]="d.sucursal.tipoSucursal === 'MALL_STAND'"
-            [class.bg-amber-500]="d.sucursal.tipoSucursal === 'GAS_STAND'"
-            [class.text-white]="d.sucursal.tipoSucursal === 'GAS_STAND'"
+            [class.bg-amber-500]="d.sucursal.tipoSucursal === 'GAS_STAND' || d.sucursal.tipoSucursal === 'STAND'"
+            [class.text-white]="d.sucursal.tipoSucursal === 'GAS_STAND' || d.sucursal.tipoSucursal === 'STAND'"
+            [class.bg-purple-600]="d.sucursal.tipoSucursal === 'BODEGA_MATRIZ' || d.sucursal.tipoSucursal === 'BODEGA_CENTRAL'"
           >
-            @if (d.sucursal.tipoSucursal === 'GAS_STAND') {
+            @if (d.sucursal.tipoSucursal === 'GAS_STAND' || d.sucursal.tipoSucursal === 'STAND') {
               ⛽
             } @else if (d.sucursal.tipoSucursal === 'MALL_STAND') {
               🛍️
+            } @else if (d.sucursal.tipoSucursal === 'BODEGA_MATRIZ' || d.sucursal.tipoSucursal === 'BODEGA_CENTRAL') {
+              📦
             } @else {
-              🏥
+              🏪
             }
           </div>
           <div>

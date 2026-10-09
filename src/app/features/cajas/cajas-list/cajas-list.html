@@ -16,8 +16,30 @@
       </p>
     </div>
 
-    <!-- Selector de Sucursal en la Cabecera -->
-    <div class="flex items-center gap-2 self-start sm:self-auto">
+    <!-- Controles de Cabecera: Selector y Hora Guatemala -->
+    <div class="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
+      <!-- Widget Hora -->
+      <div class="flex items-center bg-white px-3.5 py-2 rounded-2xl border border-slate-200/90 shadow-xs font-mono text-xs">
+        <div class="leading-none text-left">
+          <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Hora</span>
+          <span class="text-xs font-black text-slate-800">{{ ahora() | date: 'hh:mm:ss a' }}</span>
+        </div>
+      </div>
+
+      <!-- Acceso a Bitácora General de Turnos -->
+      <a
+        routerLink="/reportes"
+        [queryParams]="{ tab: 'cajas' }"
+        class="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-xs cursor-pointer"
+        title="Ver reporte general consolidado de turnos y arqueos de todas las cajas"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>Bitácora General de Turnos</span>
+      </a>
+
       <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-2xl border border-slate-200/90 shadow-xs">
         <span class="text-xs font-bold text-slate-500 shrink-0 flex items-center gap-1.5">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -177,13 +199,46 @@
                   <span class="font-bold text-slate-800">{{ s.cajeroNombre }}</span>
                 </div>
 
-                <!-- Hora Apertura -->
+                <!-- Hora Apertura del Turno -->
                 <div class="flex items-center justify-between text-xs">
-                  <span class="text-slate-400">Hora de Apertura:</span>
-                  <span class="font-medium text-slate-600">
-                    {{ s.fechaApertura | date: 'dd/MM/yy HH:mm' }}
+                  <span class="text-slate-400 flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    Apertura de Turno:
+                  </span>
+                  <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                    <span>{{ s.fechaApertura | date: 'dd/MM/yy, hh:mm:ss a' }}</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Hace {{ calcularTiempoEnTurno(s.fechaApertura) }}
+                    </span>
                   </span>
                 </div>
+
+                <!-- Último Movimiento Registrado -->
+                @if (s.ultimoMovimiento) {
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-400 flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline>
+                      </svg>
+                      Último Movimiento:
+                    </span>
+                    <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                      <span>{{ s.ultimoMovimiento.fecha | date: 'hh:mm:ss a' }}</span>
+                      <span class="text-[10px] font-extrabold px-1.5 py-0.2 rounded border"
+                        [class.bg-emerald-50]="s.ultimoMovimiento.tipo === 'INGRESO'"
+                        [class.text-emerald-700]="s.ultimoMovimiento.tipo === 'INGRESO'"
+                        [class.border-emerald-200]="s.ultimoMovimiento.tipo === 'INGRESO'"
+                        [class.bg-red-50]="s.ultimoMovimiento.tipo === 'EGRESO'"
+                        [class.text-red-700]="s.ultimoMovimiento.tipo === 'EGRESO'"
+                        [class.border-red-200]="s.ultimoMovimiento.tipo === 'EGRESO'">
+                        {{ s.ultimoMovimiento.tipo === 'INGRESO' ? '+' : '-' }}Q {{ s.ultimoMovimiento.monto.toFixed(2) }}
+                      </span>
+                    </span>
+                  </div>
+                }
 
                 <!-- Desglose de Fondos -->
                 <div class="p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200/70 space-y-2">
@@ -261,13 +316,14 @@
               <button
                 type="button"
                 (click)="abrirModalHistorial(c)"
-                title="Ver historial de cortes de esta caja"
-                class="p-2 text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+                title="Ver historial de turnos y cortes de esta caja"
+                class="px-3 py-2 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200/80 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
+                <span>Historial</span>
               </button>
             } @else {
               <!-- Abrir Turno -->
@@ -288,13 +344,14 @@
               <button
                 type="button"
                 (click)="abrirModalHistorial(c)"
-                title="Ver historial de cortes anteriores"
-                class="p-2 text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+                title="Ver historial de turnos anteriores de esta caja"
+                class="px-3 py-2 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200/80 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
+                <span>Historial</span>
               </button>
             }
           </div>

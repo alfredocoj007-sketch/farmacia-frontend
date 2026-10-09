@@ -46,6 +46,7 @@ export class LoteEntradaForm implements OnInit {
   private readonly confirmService = inject(ConfirmService);
 
   protected readonly usuario = this.authService.currentUser;
+  protected readonly esAdmin = computed(() => this.usuario()?.rol === 'ADMIN');
 
   protected readonly productos = signal<Producto[]>([]);
   protected readonly sucursales = signal<Sucursal[]>([]);
@@ -102,7 +103,9 @@ export class LoteEntradaForm implements OnInit {
     // 3. Cargar sucursales de la red y preseleccionar
     this.sucursalesService.findAll().subscribe((sucursales) => {
       this.sucursales.set(sucursales);
-      const preseleccion = this.sucursalIdInicial ?? this.usuario()?.sucursalId;
+      const preseleccion = !this.esAdmin()
+        ? this.usuario()?.sucursalId
+        : (this.sucursalIdInicial ?? this.usuario()?.sucursalId);
       const idFinal = preseleccion
         ? Number(preseleccion)
         : sucursales.length > 0
@@ -124,6 +127,15 @@ export class LoteEntradaForm implements OnInit {
 
   protected fechaHoy(): string {
     const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  protected fechaMinimaVencimiento(): string {
+    const d = new Date();
+    d.setDate(d.getDate() + 1); // La fecha de vencimiento debe ser al menos a partir de mañana
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -192,6 +204,9 @@ export class LoteEntradaForm implements OnInit {
     }
 
     const v = this.form.getRawValue();
+    if (!this.esAdmin() && this.usuario()?.sucursalId) {
+      v.sucursalId = this.usuario()!.sucursalId!;
+    }
 
     const itemsPayload = (v.items ?? []).map((it: any) => ({
       productoId: Number(it.productoId),
@@ -201,6 +216,9 @@ export class LoteEntradaForm implements OnInit {
       costoUnitario: Number(it.costoUnitario),
       cantidad: Number(it.cantidad),
     }));
+
+    const hoyDate = new Date();
+    hoyDate.setHours(0, 0, 0, 0);
 
     for (let i = 0; i < itemsPayload.length; i++) {
       const it = itemsPayload[i];
@@ -216,6 +234,29 @@ export class LoteEntradaForm implements OnInit {
         this.error.set(`En el renglón #${i + 1} debes indicar la fecha de vencimiento.`);
         return;
       }
+
+      // Validar que la fecha de vencimiento sea estrictamente futura
+      const [vYear, vMonth, vDay] = it.fechaVencimiento.split('-').map(Number);
+      const fVenc = new Date(vYear, vMonth - 1, vDay);
+      if (isNaN(fVenc.getTime()) || fVenc <= hoyDate) {
+        this.error.set(
+          `En el renglón #${i + 1} (Lote "${it.numeroLote}"), la fecha de vencimiento (${it.fechaVencimiento}) ya caducó o es hoy. Por regulación sanitaria no se permite la compra de medicamentos vencidos.`,
+        );
+        return;
+      }
+
+      // Si se especificó fecha de fabricación, vencimiento debe ser posterior
+      if (it.fechaFabricacion) {
+        const [fYear, fMonth, fDay] = it.fechaFabricacion.split('-').map(Number);
+        const fFab = new Date(fYear, fMonth - 1, fDay);
+        if (fVenc <= fFab) {
+          this.error.set(
+            `En el renglón #${i + 1} (Lote "${it.numeroLote}"), la fecha de vencimiento debe ser posterior a la fecha de fabricación.`,
+          );
+          return;
+        }
+      }
+
       if (it.cantidad <= 0) {
         this.error.set(`En el renglón #${i + 1} la cantidad de unidades debe ser mayor a cero.`);
         return;

@@ -45,6 +45,7 @@ export class AuditoriaList implements OnInit {
 
   // Modal de Detalle
   protected readonly eventoSeleccionado = signal<AuditoriaEvento | null>(null);
+  protected readonly fechaReporte = new Date();
 
   // Filtros reactivos
   protected readonly busqueda = signal('');
@@ -185,6 +186,7 @@ export class AuditoriaList implements OnInit {
     return (
       op === 'UPDATE' ||
       op === 'TRANSFERENCIA' ||
+      op === 'CANCELADA' ||
       op === 'ARQUEO' ||
       op === 'INSERT'
     );

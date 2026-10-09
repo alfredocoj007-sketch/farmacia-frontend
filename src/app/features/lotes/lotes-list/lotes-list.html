@@ -16,9 +16,6 @@
         </span>
         Control de Lotes e Inventario
       </h1>
-      <p class="text-sm text-slate-500 mt-1">
-        Monitoreo de existencias por sucursal, alertas de vencimiento (FEFO) y trazabilidad de Kardex
-      </p>
     </div>
 
     <div class="flex items-center gap-2.5 flex-wrap">
@@ -43,7 +40,7 @@
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
-        Entrada (Compra)
+        Entrada/Compra
       </button>
       }
 
@@ -60,9 +57,7 @@
 
   <!-- Métricas Rápidas (KPIs) de Inventario -->
   <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-    <div
-      (click)="cambiarFiltroVencimiento('')"
-      [class.ring-2]="filtroVencimiento() === ''"
+    <div (click)="cambiarFiltroVencimiento('')" [class.ring-2]="filtroVencimiento() === ''"
       [class.ring-violet-500]="filtroVencimiento() === ''"
       class="kpi-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md transition-all">
       <div>
@@ -81,7 +76,9 @@
     <div
       class="kpi-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
       <div>
-        <span class="text-xs font-semibold uppercase tracking-wider text-sky-600">Stock Total</span>
+        <span class="text-xs font-semibold uppercase tracking-wider text-sky-600">
+          {{ esAdmin() ? 'Stock Total Global' : 'Stock en Sede' }}
+        </span>
         <p class="text-2xl font-bold text-slate-800 mt-1">{{ stockGlobalTotal() }}</p>
         <span class="text-xs text-sky-600 font-medium">unidades físicas</span>
       </div>
@@ -93,15 +90,13 @@
       </div>
     </div>
 
-    <div
-      (click)="cambiarFiltroVencimiento('POR_VENCER')"
-      [class.ring-2]="filtroVencimiento() === 'POR_VENCER'"
+    <div (click)="cambiarFiltroVencimiento('POR_VENCER')" [class.ring-2]="filtroVencimiento() === 'POR_VENCER'"
       [class.ring-amber-500]="filtroVencimiento() === 'POR_VENCER'"
       class="kpi-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md transition-all">
       <div>
         <span class="text-xs font-semibold uppercase tracking-wider text-amber-600">Por Vencer (&lt; 90d)</span>
         <p class="text-2xl font-bold text-slate-800 mt-1">{{ lotesCriticosContador() }}</p>
-        <span class="text-xs text-amber-600 font-medium">atención prioritaria</span>
+        <span class="text-xs text-amber-600 font-medium">con existencias</span>
       </div>
       <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -111,15 +106,13 @@
       </div>
     </div>
 
-    <div
-      (click)="cambiarFiltroVencimiento('VENCIDO')"
-      [class.ring-2]="filtroVencimiento() === 'VENCIDO'"
+    <div (click)="cambiarFiltroVencimiento('VENCIDO')" [class.ring-2]="filtroVencimiento() === 'VENCIDO'"
       [class.ring-red-500]="filtroVencimiento() === 'VENCIDO'"
       class="kpi-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md transition-all">
       <div>
         <span class="text-xs font-semibold uppercase tracking-wider text-red-600">Lotes Vencidos</span>
         <p class="text-2xl font-bold text-slate-800 mt-1">{{ lotesVencidosContador() }}</p>
-        <span class="text-xs text-red-600 font-medium">caducados</span>
+        <span class="text-xs text-red-600 font-medium">con existencias</span>
       </div>
       <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -157,8 +150,9 @@
         }
       </div>
 
-      <!-- Filtro por Sucursal -->
+      <!-- Selector de Sucursal: Solo ADMIN puede alternar; no-admin tiene distintivo fijo de sede -->
       <div class="w-full lg:w-64">
+        @if (esAdmin()) {
         <select [ngModel]="sucursalSeleccionada()" (ngModelChange)="cambiarSucursal($event)"
           class="w-full py-2.5 px-3.5 text-sm bg-slate-50/70 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-700 transition-all">
           <option value="">Todas las sucursales</option>
@@ -166,6 +160,20 @@
           <option [value]="s.sucursalId">{{ s.nombre }}</option>
           }
         </select>
+        } @else {
+        <div
+          class="flex items-center gap-2 rounded-xl border border-sky-100 bg-sky-50/70 px-3.5 py-2.5 text-sm text-sky-900 shadow-xs">
+          <svg class="h-4 w-4 text-sky-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="truncate font-semibold text-xs text-sky-800">
+            Sede: {{ usuario()?.sucursalNombre || 'Mi Sucursal Asignada' }}
+          </span>
+        </div>
+        }
       </div>
 
       <!-- Filtro por Stock -->
@@ -196,7 +204,8 @@
           <button type="button" (click)="cambiarFiltroVencimiento('VIGENTE')"
             [class.bg-white]="filtroVencimiento() === 'VIGENTE'"
             [class.text-emerald-700]="filtroVencimiento() === 'VIGENTE'"
-            [class.shadow-sm]="filtroVencimiento() === 'VIGENTE'" [class.font-semibold]="filtroVencimiento() === 'VIGENTE'"
+            [class.shadow-sm]="filtroVencimiento() === 'VIGENTE'"
+            [class.font-semibold]="filtroVencimiento() === 'VIGENTE'"
             class="px-2.5 py-1 rounded-md text-slate-600 transition-all cursor-pointer flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             Vigentes
@@ -229,17 +238,30 @@
             </span>
           </button>
           <button type="button" (click)="cambiarFiltroVencimiento('VENCIDO')"
-            [class.bg-white]="filtroVencimiento() === 'VENCIDO'" [class.text-red-700]="filtroVencimiento() === 'VENCIDO'"
-            [class.shadow-sm]="filtroVencimiento() === 'VENCIDO'" [class.font-semibold]="filtroVencimiento() === 'VENCIDO'"
+            [class.bg-white]="filtroVencimiento() === 'VENCIDO'"
+            [class.text-red-700]="filtroVencimiento() === 'VENCIDO'"
+            [class.shadow-sm]="filtroVencimiento() === 'VENCIDO'"
+            [class.font-semibold]="filtroVencimiento() === 'VENCIDO'"
             class="px-2.5 py-1 rounded-md text-slate-600 transition-all cursor-pointer flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
             Vencidos
             <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold"
-              [class.bg-red-100]="conteoFiltros().vencidos > 0"
-              [class.text-red-800]="conteoFiltros().vencidos > 0"
+              [class.bg-red-100]="conteoFiltros().vencidos > 0" [class.text-red-800]="conteoFiltros().vencidos > 0"
               [class.bg-slate-200/80]="conteoFiltros().vencidos === 0"
               [class.text-slate-600]="conteoFiltros().vencidos === 0">
               {{ conteoFiltros().vencidos }}
+            </span>
+          </button>
+          <button type="button" (click)="cambiarFiltroVencimiento('AGOTADO')"
+            [class.bg-white]="filtroVencimiento() === 'AGOTADO'"
+            [class.text-slate-700]="filtroVencimiento() === 'AGOTADO'"
+            [class.shadow-sm]="filtroVencimiento() === 'AGOTADO'"
+            [class.font-semibold]="filtroVencimiento() === 'AGOTADO'"
+            class="px-2.5 py-1 rounded-md text-slate-600 transition-all cursor-pointer flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            Agotados
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-200/80 text-slate-700 font-bold">
+              {{ conteoFiltros().agotados }}
             </span>
           </button>
         </div>
@@ -286,8 +308,10 @@
     <!-- Estado Vacío -->
     <div class="p-12 text-center">
       @if (filtroVencimiento() === 'VENCIDO') {
-      <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center mb-3 shadow-xs">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div
+        class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center mb-3 shadow-xs">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           <polyline points="9 12 11 14 15 10"></polyline>
         </svg>
@@ -297,8 +321,10 @@
         Todos los medicamentos registrados están dentro de su período de vigencia y aptos para su dispensación.
       </p>
       } @else if (filtroVencimiento() === 'URGENTE') {
-      <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center mb-3 shadow-xs">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div
+        class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center mb-3 shadow-xs">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
@@ -307,8 +333,10 @@
         Ningún lote requiere retiro preventivo inmediato por caducidad en el corto plazo.
       </p>
       } @else if (filtroVencimiento() === 'POR_VENCER') {
-      <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center mb-3 shadow-xs">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div
+        class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center mb-3 shadow-xs">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
@@ -351,7 +379,7 @@
             <th class="px-4 py-3.5">N° de Lote</th>
             <th class="px-4 py-3.5">Semáforo Caducidad</th>
             <th class="px-4 py-3.5">Costo Unitario</th>
-            <th class="px-4 py-3.5">Stock por Sucursal</th>
+            <th class="px-4 py-3.5">{{ esAdmin() ? 'Stock por Sucursal' : 'Stock en Sede' }}</th>
             <th class="px-5 py-3.5 text-right">Trazabilidad</th>
           </tr>
         </thead>
@@ -378,7 +406,8 @@
                 {{ lote.numeroLote }}
               </span>
               @if (lote.fechaFabricacion) {
-              <span class="text-[10px] text-slate-400 block mt-0.5">Fab: {{ lote.fechaFabricacion | date:'dd/MM/yyyy' }}</span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">Fab: {{ lote.fechaFabricacion | date:'dd/MM/yyyy'
+                }}</span>
               }
             </td>
 
@@ -386,37 +415,48 @@
             <td class="px-4 py-3.5 whitespace-nowrap">
               <div>
                 @switch (lote.estadoVencimiento) {
+                @case ('AGOTADO') {
+                <span
+                  class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  {{ textoSemaforoBadge(lote) }}
+                </span>
+                }
                 @case ('VENCIDO') {
                 <span
-                  class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-700 border border-red-200">
+                  class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-700 border border-red-200 shadow-xs">
                   <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-                  VENCIDO
+                  {{ textoSemaforoBadge(lote) }}
                 </span>
                 }
                 @case ('CRITICO') {
                 <span
                   class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200">
                   <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                  Urgente (&lt; 30d)
+                  {{ textoSemaforoBadge(lote) }}
                 </span>
                 }
                 @case ('ALERTA') {
                 <span
                   class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                   <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                  Próximo (&lt; 90d)
+                  {{ textoSemaforoBadge(lote) }}
                 </span>
                 }
                 @case ('VIGENTE') {
                 <span
                   class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Vigente (&gt; 90d)
+                  {{ textoSemaforoBadge(lote) }}
                 </span>
                 }
                 }
-                <span class="text-xs text-slate-500 block mt-1">
-                  {{ lote.fechaVencimiento | date:'dd/MM/yyyy' }} ({{ textoDiasVencimiento(lote.diasParaVencer) }})
+                <span class="text-xs text-slate-400 block mt-1">
+                  @if (lote.estadoVencimiento === 'AGOTADO') {
+                  Cad: {{ lote.fechaVencimiento | date:'dd/MM/yyyy' }} · Sin existencias
+                  } @else {
+                  Caduca: {{ lote.fechaVencimiento | date:'dd/MM/yyyy' }}
+                  }
                 </span>
               </div>
             </td>
@@ -430,6 +470,7 @@
 
             <!-- Desglose de Stock por Sucursal -->
             <td class="px-4 py-3.5">
+              @if (esAdmin()) {
               <div class="flex items-center gap-2 mb-1.5">
                 <span class="text-xs font-bold text-slate-800">Total:</span>
                 <span class="text-xs font-extrabold px-2 py-0.5 rounded-md" [class.bg-emerald-100]="lote.stockTotal > 0"
@@ -456,25 +497,37 @@
               } @else {
               <span class="text-xs text-slate-400 italic">Sin existencias registradas</span>
               }
+              } @else {
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg border"
+                  [class.bg-emerald-50]="lote.stockTotal > 0" [class.border-emerald-200]="lote.stockTotal > 0"
+                  [class.text-emerald-800]="lote.stockTotal > 0" [class.bg-slate-100]="lote.stockTotal === 0"
+                  [class.border-slate-200]="lote.stockTotal === 0" [class.text-slate-500]="lote.stockTotal === 0">
+                  {{ lote.stockTotal > 0 ? (lote.stockTotal + ' unidades disponibles') : 'Sin existencias en sede' }}
+                </span>
+              </div>
+              }
             </td>
 
             <!-- Acciones / Kardex -->
             <td class="px-5 py-3.5 text-right whitespace-nowrap">
               @if (lote.tieneKardex) {
-                <a [routerLink]="['/lotes', lote.loteId]"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-700 border border-violet-200/80 text-xs font-semibold transition-all cursor-pointer shadow-xs">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                  </svg>
-                  Ver Kardex
-                </a>
+              <a [routerLink]="['/lotes', lote.loteId]"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-700 border border-violet-200/80 text-xs font-semibold transition-all cursor-pointer shadow-xs">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                Ver Kardex
+              </a>
               } @else {
-                <span class="inline-flex items-center text-xs text-slate-400 italic px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200/60" title="Este lote aún no registra movimientos de Kardex">
-                  Sin Kardex
-                </span>
+              <span
+                class="inline-flex items-center text-xs text-slate-400 italic px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200/60"
+                title="Este lote aún no registra movimientos de Kardex">
+                Sin Kardex
+              </span>
               }
             </td>
           </tr>
@@ -522,20 +575,14 @@
 <!-- Modales de Entrada y Salida -->
 @if (modalAbierto() === 'entrada') {
 <app-modal (cerrar)="cerrarModal()" maxWidthClass="max-w-5xl">
-  <app-lote-entrada-form
-    [sucursalIdInicial]="sucursalSeleccionada() ? +sucursalSeleccionada() : undefined"
-    (guardado)="onEntradaGuardada()"
-    (cancelado)="cerrarModal()"
-  />
+  <app-lote-entrada-form [sucursalIdInicial]="sucursalSeleccionada() ? +sucursalSeleccionada() : undefined"
+    (guardado)="onEntradaGuardada()" (cancelado)="cerrarModal()" />
 </app-modal>
 }
 
 @if (modalAbierto() === 'salida') {
 <app-modal (cerrar)="cerrarModal()" maxWidthClass="max-w-2xl">
-  <app-lote-salida-form
-    [sucursalIdInicial]="sucursalSeleccionada() ? +sucursalSeleccionada() : undefined"
-    (guardado)="onSalidaGuardada()"
-    (cancelado)="cerrarModal()"
-  />
+  <app-lote-salida-form [sucursalIdInicial]="sucursalSeleccionada() ? +sucursalSeleccionada() : undefined"
+    (guardado)="onSalidaGuardada()" (cancelado)="cerrarModal()" />
 </app-modal>
 }

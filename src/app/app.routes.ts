@@ -74,7 +74,7 @@ export const routes: Routes = [
       },
       {
         path: 'planillas',
-        canActivate: [roleGuard('ADMIN')],
+        canActivate: [roleGuard('ADMIN', 'GERENTE')],
         loadComponent: () =>
           import('./features/planillas/planillas-list/planillas-list').then((m) => m.PlanillasList),
       },
@@ -95,6 +95,14 @@ export const routes: Routes = [
         canActivate: [roleGuard('ADMIN')],
         loadComponent: () =>
           import('./features/usuarios/usuarios-list/usuarios-list').then((m) => m.UsuariosList),
+      },
+      {
+        path: 'reportes',
+        canActivate: [roleGuard('ADMIN', 'GERENTE', 'FARMACEUTICO')],
+        loadComponent: () =>
+          import('./features/reportes/reportes-dashboard/reportes-dashboard').then(
+            (m) => m.ReportesDashboard,
+          ),
       },
     ],
   },

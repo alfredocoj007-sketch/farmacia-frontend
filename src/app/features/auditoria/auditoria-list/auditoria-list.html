@@ -1,14 +1,13 @@
 <div class="space-y-6">
-  <!-- Encabezado de Página -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div class="auditoria-vista-principal space-y-6" [class.no-print]="eventoSeleccionado() !== null">
+    <!-- Encabezado de Página -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 no-print">
     <div>
       <div class="flex items-center gap-2.5">
         <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Auditoría & Seguridad
         </h1>
-        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-900 text-white shadow-xs">
-          Oracle XE 21c
-        </span>
+
       </div>
       <p class="text-xs sm:text-sm text-slate-500 mt-1">
         Bitácora inmutable de eventos forenses, trazabilidad de transacciones críticas y matriz de roles.
@@ -17,15 +16,10 @@
 
     <!-- Pestañas Principales de Navegación -->
     <div class="flex items-center gap-2 p-1 bg-slate-200/80 rounded-2xl w-fit">
-      <button
-        type="button"
-        (click)="cambiarTab('bitacora')"
+      <button type="button" (click)="cambiarTab('bitacora')"
         class="px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
-        [class.bg-white]="tabActiva() === 'bitacora'"
-        [class.text-slate-900]="tabActiva() === 'bitacora'"
-        [class.shadow-xs]="tabActiva() === 'bitacora'"
-        [class.text-slate-600]="tabActiva() !== 'bitacora'"
-      >
+        [class.bg-white]="tabActiva() === 'bitacora'" [class.text-slate-900]="tabActiva() === 'bitacora'"
+        [class.shadow-xs]="tabActiva() === 'bitacora'" [class.text-slate-600]="tabActiva() !== 'bitacora'">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
@@ -35,15 +29,10 @@
         Bitácora Forense
       </button>
 
-      <button
-        type="button"
-        (click)="cambiarTab('seguridad')"
+      <button type="button" (click)="cambiarTab('seguridad')"
         class="px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
-        [class.bg-white]="tabActiva() === 'seguridad'"
-        [class.text-slate-900]="tabActiva() === 'seguridad'"
-        [class.shadow-xs]="tabActiva() === 'seguridad'"
-        [class.text-slate-600]="tabActiva() !== 'seguridad'"
-      >
+        [class.bg-white]="tabActiva() === 'seguridad'" [class.text-slate-900]="tabActiva() === 'seguridad'"
+        [class.shadow-xs]="tabActiva() === 'seguridad'" [class.text-slate-600]="tabActiva() !== 'seguridad'">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
@@ -53,7 +42,7 @@
   </div>
 
   <!-- Bento Grid de 4 KPIs Ejecutivos de Seguridad -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
     <!-- KPI 1: Eventos Hoy -->
     <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-xs flex items-center justify-between">
       <div class="space-y-1">
@@ -157,489 +146,450 @@
 
   <!-- PESTAÑA 1: BITÁCORA FORENSE -->
   @if (tabActiva() === 'bitacora') {
-    <div class="space-y-4">
-      <!-- Barra de Filtros y Herramientas -->
-      <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-xs space-y-4">
-        <!-- Fila Superior de Filtros -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-          <!-- Búsqueda Libre -->
-          <div class="lg:col-span-2 relative">
-            <input
-              type="text"
-              [ngModel]="busqueda()"
-              (ngModelChange)="busqueda.set($event)"
-              (keyup.enter)="aplicarFiltros()"
-              placeholder="Buscar por descripción, IP, usuario o tabla..."
-              class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
-            />
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-2.5 text-slate-400">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </div>
-
-          <!-- Filtro por Módulo -->
-          <div>
-            <select
-              [ngModel]="moduloSeleccionado()"
-              (ngModelChange)="moduloSeleccionado.set($event); aplicarFiltros()"
-              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-700"
-            >
-              <option value="">Todos los Módulos</option>
-              <option value="AUTH">Autenticación (AUTH)</option>
-              <option value="INVENTARIO">Inventario & Lotes</option>
-              <option value="CAJAS">Cajas & Arqueos</option>
-              <option value="TRANSFERENCIAS">Transferencias</option>
-              <option value="PEDIDOS">Call Center & Pedidos</option>
-              <option value="PLANILLAS">Planillas & Salarios</option>
-              <option value="ACTIVOS_FIJOS">Activos Fijos</option>
-            </select>
-          </div>
-
-          <!-- Filtro por Operación -->
-          <div>
-            <select
-              [ngModel]="operacionSeleccionada()"
-              (ngModelChange)="operacionSeleccionada.set($event); aplicarFiltros()"
-              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-700"
-            >
-              <option value="">Todas las Operaciones</option>
-              <option value="LOGIN">LOGIN (Inicio Sesión)</option>
-              <option value="INSERT">INSERT (Creación)</option>
-              <option value="UPDATE">UPDATE (Modificación)</option>
-              <option value="DELETE">DELETE (Eliminación)</option>
-              <option value="ARQUEO">ARQUEO (Corte Caja)</option>
-              <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-              <option value="AJUSTE">AJUSTE (Inventario)</option>
-              <option value="EXCEPCION_MANUAL">EXCEPCIÓN FEFO</option>
-              <option value="AJUSTE_SALARIO">AJUSTE SALARIO</option>
-            </select>
-          </div>
-
-          <!-- Filtro por Severidad -->
-          <div>
-            <select
-              [ngModel]="severidadSeleccionada()"
-              (ngModelChange)="severidadSeleccionada.set($event); aplicarFiltros()"
-              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-700"
-            >
-              <option value="">Cualquier Severidad</option>
-              <option value="critica">🔴 Crítica / Vigilancia</option>
-              <option value="operativa">🟡 Operativa / Normal</option>
-              <option value="informativa">🟢 Informativa / Logins</option>
-            </select>
-          </div>
+  <div class="space-y-4">
+    <!-- Barra de Filtros y Herramientas -->
+    <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-xs space-y-4 no-print">
+      <!-- Fila Superior de Filtros -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <!-- Búsqueda Libre -->
+        <div class="lg:col-span-2 relative">
+          <input type="text" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)"
+            (keyup.enter)="aplicarFiltros()" placeholder="Buscar por descripción, IP, usuario o tabla..."
+            class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none" />
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="absolute left-3 top-2.5 text-slate-400">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
         </div>
 
-        <!-- Fila Inferior: Rango de Fechas, Alternador de Vista y Botones -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
-          <!-- Rango de Fechas -->
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-slate-400 font-bold uppercase text-[10px]">Período:</span>
-            <input
-              type="date"
-              [ngModel]="fechaInicio()"
-              (ngModelChange)="fechaInicio.set($event); aplicarFiltros()"
-              class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-            />
-            <span class="text-slate-400">a</span>
-            <input
-              type="date"
-              [ngModel]="fechaFin()"
-              (ngModelChange)="fechaFin.set($event); aplicarFiltros()"
-              class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-            />
-            <button
-              type="button"
-              (click)="limpiarFiltros()"
-              class="text-slate-500 hover:text-slate-800 font-bold ml-2 underline cursor-pointer"
-            >
-              Limpiar
-            </button>
-          </div>
+        <!-- Filtro por Módulo -->
+        <div>
+          <select [ngModel]="moduloSeleccionado()" (ngModelChange)="moduloSeleccionado.set($event); aplicarFiltros()"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-700">
+            <option value="">Todos los Módulos</option>
+            <option value="AUTH">Autenticación (AUTH)</option>
+            <option value="INVENTARIO">Inventario & Lotes</option>
+            <option value="TRANSFERENCIAS">Transferencias</option>
+            <option value="CAJAS">Cajas & Arqueos</option>
+            <option value="VENTAS_POS">Ventas POS</option>
+            <option value="PEDIDOS">Call Center & Pedidos</option>
+            <option value="PLANILLAS">Planillas & Salarios</option>
+            <option value="ACTIVOS_FIJOS">Activos Fijos</option>
+            <option value="USUARIOS">Usuarios & Seguridad</option>
+            <option value="SUCURSALES">Sucursales</option>
+          </select>
+        </div>
 
-          <!-- Alternador de Vista y Botón Imprimir -->
-          <div class="flex items-center gap-3">
-            <div class="flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-200">
-              <button
-                type="button"
-                (click)="cambiarVista('tabla')"
-                class="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
-                [class.bg-white]="vistaActiva() === 'tabla'"
-                [class.text-slate-800]="vistaActiva() === 'tabla'"
-                [class.shadow-xs]="vistaActiva() === 'tabla'"
-                [class.text-slate-500]="vistaActiva() !== 'tabla'"
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"></path>
-                </svg>
-                Tabla
-              </button>
-              <button
-                type="button"
-                (click)="cambiarVista('timeline')"
-                class="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
-                [class.bg-white]="vistaActiva() === 'timeline'"
-                [class.text-slate-800]="vistaActiva() === 'timeline'"
-                [class.shadow-xs]="vistaActiva() === 'timeline'"
-                [class.text-slate-500]="vistaActiva() !== 'timeline'"
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="12" y1="20" x2="12" y2="4"></line>
-                  <circle cx="12" cy="7" r="3"></circle>
-                  <circle cx="12" cy="17" r="3"></circle>
-                </svg>
-                Línea de Tiempo
-              </button>
-            </div>
+        <!-- Filtro por Operación -->
+        <div>
+          <select [ngModel]="operacionSeleccionada()"
+            (ngModelChange)="operacionSeleccionada.set($event); aplicarFiltros()"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-700">
+            <option value="">Todas las Operaciones</option>
+            <option value="LOGIN">LOGIN (Inicio Sesión)</option>
+            <option value="LOGIN_FALLIDO">LOGIN FALLIDO (Alerta)</option>
+            <option value="INSERT">INSERT (Creación / Agregar)</option>
+            <option value="UPDATE">UPDATE (Modificación / Actualizar)</option>
+            <option value="DELETE">DELETE (Eliminación / Baja)</option>
+            <option value="TRANSFERENCIA">TRANSFERENCIA (Traslados)</option>
+            <option value="CANCELADA">CANCELADA (Rechazo Traslado)</option>
+            <option value="ARQUEO">ARQUEO (Corte Caja)</option>
+            <option value="ARQUEO_FALTANTE">ARQUEO FALTANTE (Descuadre)</option>
+            <option value="AJUSTE">AJUSTE (Inventario)</option>
+            <option value="EXCEPCION_MANUAL">EXCEPCIÓN FEFO</option>
+            <option value="AJUSTE_SALARIO">AJUSTE SALARIO</option>
+          </select>
+        </div>
 
-            <button
-              type="button"
-              (click)="imprimirBitacora()"
-              class="px-3.5 py-1.5 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-1.5 hover:bg-slate-800 transition-colors cursor-pointer shadow-xs"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                <rect x="6" y="14" width="12" height="8"></rect>
-              </svg>
-              Imprimir Reporte
-            </button>
-          </div>
+        <!-- Filtro por Severidad -->
+        <div>
+          <select [ngModel]="severidadSeleccionada()"
+            (ngModelChange)="severidadSeleccionada.set($event); aplicarFiltros()"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-700">
+            <option value="">Cualquier Severidad</option>
+            <option value="critica">🔴 Crítica / Vigilancia</option>
+            <option value="operativa">🟡 Operativa / Normal</option>
+            <option value="informativa">🟢 Informativa / Logins</option>
+          </select>
         </div>
       </div>
 
-      <!-- VISTA 1: TABLA FORENSE DE AUDITORÍA -->
-      @if (vistaActiva() === 'tabla') {
-        <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200/80 uppercase text-[10px] tracking-wider">
-                <tr>
-                  <th class="py-3 px-4">Folio</th>
-                  <th class="py-3 px-4">Fecha & Hora</th>
-                  <th class="py-3 px-4">Módulo</th>
-                  <th class="py-3 px-4">Operación</th>
-                  <th class="py-3 px-4">Tabla / Reg.</th>
-                  <th class="py-3 px-4">Usuario / IP</th>
-                  <th class="py-3 px-4">Descripción Forense</th>
-                  <th class="py-3 px-4 text-center">Ficha</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 font-medium">
-                @for (ev of eventos(); track ev.auditoriaId) {
-                  <tr class="hover:bg-slate-50/80 transition-colors">
-                    <td class="py-3 px-4 font-mono font-bold text-slate-900">
-                      #{{ ev.auditoriaId }}
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap text-slate-600">
-                      <span class="block font-bold text-slate-800">
-                        {{ ev.fechaEvento | date:'dd/MM/yyyy' }}
-                      </span>
-                      <span class="text-[11px] font-mono text-slate-400">
-                        {{ ev.fechaEvento | date:'HH:mm:ss' }}
-                      </span>
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                      <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold bg-slate-100 text-slate-700">
-                        {{ ev.modulo || 'SISTEMA' }}
-                      </span>
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                      <span
-                        class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
-                        [class.bg-rose-100]="esCritico(ev.operacion)"
-                        [class.text-rose-800]="esCritico(ev.operacion)"
-                        [class.bg-amber-100]="ev.operacion === 'AJUSTE' || ev.operacion === 'EXCEPCION_MANUAL'"
-                        [class.text-amber-800]="ev.operacion === 'AJUSTE' || ev.operacion === 'EXCEPCION_MANUAL'"
-                        [class.bg-emerald-100]="esInformativo(ev.operacion)"
-                        [class.text-emerald-800]="esInformativo(ev.operacion)"
-                        [class.bg-sky-100]="esOperativo(ev.operacion) && !esCritico(ev.operacion)"
-                        [class.text-sky-800]="esOperativo(ev.operacion) && !esCritico(ev.operacion)"
-                      >
-                        {{ ev.operacion }}
-                      </span>
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                      <span class="font-mono text-[11px] text-slate-800 font-bold block">
-                        {{ ev.tablaAfectada }}
-                      </span>
-                      <span class="text-[10px] text-slate-400 font-mono">
-                        {{ ev.registroId ? '#' + ev.registroId : '—' }}
-                      </span>
-                    </td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                      <span class="font-bold text-slate-800 block">
-                        {{ ev.clientIdentifier || ev.usuarioBd || 'Anónimo' }}
-                      </span>
-                      <span class="font-mono text-[10px] text-slate-400">
-                        {{ ev.ipCliente || '127.0.0.1' }}
-                      </span>
-                    </td>
-                    <td class="py-3 px-4 max-w-xs sm:max-w-md truncate text-slate-700" title="{{ ev.descripcion }}">
-                      {{ ev.descripcion || 'Sin descripción.' }}
-                    </td>
-                    <td class="py-3 px-4 text-center">
-                      <button
-                        type="button"
-                        (click)="abrirDetalle(ev)"
-                        title="Ver Ficha Forense"
-                        class="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-900 hover:text-white transition-colors cursor-pointer"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <circle cx="11" cy="11" r="8"></circle>
-                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-                } @empty {
-                  <tr>
-                    <td colspan="8" class="py-12 text-center text-slate-400">
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto mb-2 opacity-50">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                      </svg>
-                      No se encontraron registros de auditoría que coincidan con los filtros.
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+      <!-- Fila Inferior: Rango de Fechas, Alternador de Vista y Botones -->
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
+        <!-- Rango de Fechas -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-slate-400 font-bold uppercase text-[10px]">Período:</span>
+          <input type="date" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event); aplicarFiltros()"
+            class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs" />
+          <span class="text-slate-400">a</span>
+          <input type="date" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event); aplicarFiltros()"
+            class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs" />
+          <button type="button" (click)="limpiarFiltros()"
+            class="text-slate-500 hover:text-slate-800 font-bold ml-2 underline cursor-pointer">
+            Limpiar
+          </button>
+        </div>
+
+        <!-- Alternador de Vista y Botón Imprimir -->
+        <div class="flex items-center gap-3">
+          <div class="flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-200">
+            <button type="button" (click)="cambiarVista('tabla')"
+              class="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+              [class.bg-white]="vistaActiva() === 'tabla'" [class.text-slate-800]="vistaActiva() === 'tabla'"
+              [class.shadow-xs]="vistaActiva() === 'tabla'" [class.text-slate-500]="vistaActiva() !== 'tabla'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"></path>
+              </svg>
+              Tabla
+            </button>
+            <button type="button" (click)="cambiarVista('timeline')"
+              class="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+              [class.bg-white]="vistaActiva() === 'timeline'" [class.text-slate-800]="vistaActiva() === 'timeline'"
+              [class.shadow-xs]="vistaActiva() === 'timeline'" [class.text-slate-500]="vistaActiva() !== 'timeline'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <circle cx="12" cy="7" r="3"></circle>
+                <circle cx="12" cy="17" r="3"></circle>
+              </svg>
+              Línea de Tiempo
+            </button>
           </div>
 
-          <!-- Paginación -->
-          <div class="flex items-center justify-between p-4 border-t border-slate-100 text-xs font-semibold text-slate-500">
-            <span>
-              Mostrando página {{ page() }} de {{ totalPages() }} (Total {{ total() }} eventos)
-            </span>
-            <div class="flex items-center gap-2">
-              <button
-                type="button"
-                [disabled]="page() <= 1"
-                (click)="cambiarPagina(page() - 1)"
-                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              >
-                Anterior
-              </button>
-              <button
-                type="button"
-                [disabled]="page() >= totalPages()"
-                (click)="cambiarPagina(page() + 1)"
-                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              >
-                Siguiente
-              </button>
+          <button type="button" (click)="imprimirBitacora()"
+            class="px-3.5 py-1.5 bg-slate-800 text-white rounded-xl font-bold flex items-center gap-1.5 hover:bg-slate-700 transition-colors cursor-pointer shadow-xs">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Imprimir Reporte
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 1: TABLA FORENSE DE AUDITORÍA -->
+    @if (vistaActiva() === 'tabla') {
+    <!-- ENCABEZADO EXCLUSIVO DE IMPRESIÓN (SOLO ENCABEZADO, LOGO Y TABLA) -->
+    <div class="hidden print:flex items-center justify-between border-b-2 border-slate-900 pb-3 mb-4">
+      <div class="flex items-center gap-3">
+        <img src="assets/images/logo-prosalud.png" alt="Farmacia ProSalud" class="h-12 w-auto object-contain" />
+        <div>
+          <h1 class="text-lg font-black text-slate-900 uppercase tracking-tight">FARMACIA PROSALUD</h1>
+          <p class="text-xs text-slate-700 font-bold">Reporte General de Bitácora & Auditoría Forense</p>
+        </div>
+      </div>
+      <div class="text-right text-xs text-slate-600">
+        <p class="font-bold text-slate-900">Emisión: {{ fechaReporte | date:'dd/MM/yyyy, hh:mm:ss a' }}</p>
+        <p class="text-[11px] text-slate-500">Total de Registros: {{ total() }}</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead
+            class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200/80 uppercase text-[10px] tracking-wider">
+            <tr>
+              <th class="py-3 px-4">Folio</th>
+              <th class="py-3 px-4">Fecha & Hora</th>
+              <th class="py-3 px-4">Módulo</th>
+              <th class="py-3 px-4">Operación</th>
+              <th class="py-3 px-4">Tabla / Reg.</th>
+              <th class="py-3 px-4">Usuario / IP</th>
+              <th class="py-3 px-4">Descripción Forense</th>
+              <th class="py-3 px-4 text-center no-print">Ficha</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-medium">
+            @for (ev of eventos(); track ev.auditoriaId) {
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="py-3 px-4 font-mono font-bold text-slate-900">
+                #{{ ev.auditoriaId }}
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap text-slate-600">
+                <span class="block font-bold text-slate-800">
+                  {{ ev.fechaEvento | date:'dd/MM/yyyy' }}
+                </span>
+                <span class="text-[11px] font-mono text-slate-500">
+                  {{ ev.fechaEvento | date:'hh:mm:ss a' }}
+                </span>
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap">
+                <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold bg-slate-100 text-slate-700">
+                  {{ ev.modulo || 'SISTEMA' }}
+                </span>
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+                  [class.bg-rose-100]="esCritico(ev.operacion)" [class.text-rose-800]="esCritico(ev.operacion)"
+                  [class.bg-amber-100]="ev.operacion === 'AJUSTE' || ev.operacion === 'EXCEPCION_MANUAL' || ev.operacion === 'CANCELADA'"
+                  [class.text-amber-800]="ev.operacion === 'AJUSTE' || ev.operacion === 'EXCEPCION_MANUAL' || ev.operacion === 'CANCELADA'"
+                  [class.bg-emerald-100]="esInformativo(ev.operacion) || ev.operacion === 'INSERT'"
+                  [class.text-emerald-800]="esInformativo(ev.operacion) || ev.operacion === 'INSERT'"
+                  [class.bg-sky-100]="esOperativo(ev.operacion) && !esCritico(ev.operacion) && ev.operacion !== 'INSERT' && ev.operacion !== 'CANCELADA'"
+                  [class.text-sky-800]="esOperativo(ev.operacion) && !esCritico(ev.operacion) && ev.operacion !== 'INSERT' && ev.operacion !== 'CANCELADA'">
+                  {{ ev.operacion }}
+                </span>
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap">
+                <span class="font-mono text-[11px] text-slate-800 font-bold block">
+                  {{ ev.tablaAfectada }}
+                </span>
+                <span class="text-[10px] text-slate-400 font-mono">
+                  {{ ev.registroId ? '#' + ev.registroId : '—' }}
+                </span>
+              </td>
+              <td class="py-3 px-4 whitespace-nowrap">
+                <span class="font-bold text-slate-800 block">
+                  {{ ev.clientIdentifier || ev.usuarioBd || 'Anónimo' }}
+                </span>
+                <span class="font-mono text-[10px] text-slate-400">
+                  {{ ev.ipCliente || '127.0.0.1' }}
+                </span>
+              </td>
+              <td class="py-3 px-4 max-w-xs sm:max-w-md truncate text-slate-700" title="{{ ev.descripcion }}">
+                {{ ev.descripcion || 'Sin descripción.' }}
+              </td>
+              <td class="py-3 px-4 text-center no-print">
+                <button type="button" (click)="abrirDetalle(ev)" title="Ver Ficha Forense"
+                  class="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="8" class="py-12 text-center text-slate-400">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                  class="mx-auto mb-2 opacity-50">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                No se encontraron registros de auditoría que coincidan con los filtros.
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="flex items-center justify-between p-4 border-t border-slate-100 text-xs font-semibold text-slate-500 no-print">
+        <span>
+          Mostrando página {{ page() }} de {{ totalPages() }} (Total {{ total() }} eventos)
+        </span>
+        <div class="flex items-center gap-2">
+          <button type="button" [disabled]="page() <= 1" (click)="cambiarPagina(page() - 1)"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+            Anterior
+          </button>
+          <button type="button" [disabled]="page() >= totalPages()" (click)="cambiarPagina(page() + 1)"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+            Siguiente
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- VISTA 2: LÍNEA DE TIEMPO (TIMELINE INTERACTIVO) -->
+    @if (vistaActiva() === 'timeline') {
+    <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs no-print">
+      <div class="relative border-l-2 border-slate-200 ml-4 pl-6 space-y-8">
+        @for (ev of eventos(); track ev.auditoriaId) {
+        <div class="relative group">
+          <!-- Marcador de Nodo en Timeline -->
+          <div
+            class="absolute -left-[33px] top-1 w-5 h-5 rounded-full border-4 border-white shadow-xs flex items-center justify-center"
+            [class.bg-rose-500]="esCritico(ev.operacion)"
+            [class.bg-amber-500]="ev.operacion === 'AJUSTE' || ev.operacion === 'EXCEPCION_MANUAL'"
+            [class.bg-emerald-500]="esInformativo(ev.operacion)"
+            [class.bg-sky-500]="esOperativo(ev.operacion) && !esCritico(ev.operacion)"></div>
+
+          <!-- Tarjeta del Evento -->
+          <div (click)="abrirDetalle(ev)"
+            class="p-4 rounded-2xl border border-slate-100 hover:border-slate-300 hover:shadow-md transition-all cursor-pointer bg-slate-50/50 hover:bg-white">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-bold text-slate-900">#{{ ev.auditoriaId }}</span>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-200 text-slate-800">
+                  {{ ev.modulo || 'SISTEMA' }}
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase"
+                  [class.bg-rose-100]="esCritico(ev.operacion)" [class.text-rose-800]="esCritico(ev.operacion)"
+                  [class.bg-emerald-100]="esInformativo(ev.operacion)"
+                  [class.text-emerald-800]="esInformativo(ev.operacion)"
+                  [class.bg-sky-100]="esOperativo(ev.operacion) && !esCritico(ev.operacion)"
+                  [class.text-sky-800]="esOperativo(ev.operacion) && !esCritico(ev.operacion)">
+                  {{ ev.operacion }}
+                </span>
+              </div>
+
+              <div class="text-right text-xs text-slate-500 font-medium">
+                {{ ev.fechaEvento | date:'dd/MM/yyyy, hh:mm:ss a' }}
+              </div>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed">
+              {{ ev.descripcion || 'Sin descripción.' }}
+            </p>
+
+            <div
+              class="flex items-center gap-4 mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500 font-mono">
+              <span>Tabla: <strong>{{ ev.tablaAfectada }}</strong></span>
+              <span>Usuario: <strong>{{ ev.clientIdentifier || ev.usuarioBd || 'N/A' }}</strong></span>
+              <span>IP: <strong>{{ ev.ipCliente || 'Local' }}</strong></span>
             </div>
           </div>
         </div>
-      }
-
-      <!-- VISTA 2: LÍNEA DE TIEMPO (TIMELINE INTERACTIVO) -->
-      @if (vistaActiva() === 'timeline') {
-        <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs">
-          <div class="relative border-l-2 border-slate-200 ml-4 pl-6 space-y-8">
-            @for (ev of eventos(); track ev.auditoriaId) {
-              <div class="relative group">
-                <!-- Marcador de Nodo en Timeline -->
-                <div
-                  class="absolute -left-[33px] top-1 w-5 h-5 rounded-full border-4 border-white shadow-xs flex items-center justify-center"
-                  [class.bg-rose-500]="esCritico(ev.operacion)"
-                  [class.bg-amber-500]="ev.operacion === 'AJUSTE' || ev.operacion === 'EXCEPCION_MANUAL'"
-                  [class.bg-emerald-500]="esInformativo(ev.operacion)"
-                  [class.bg-sky-500]="esOperativo(ev.operacion) && !esCritico(ev.operacion)"
-                ></div>
-
-                <!-- Tarjeta del Evento -->
-                <div
-                  (click)="abrirDetalle(ev)"
-                  class="p-4 rounded-2xl border border-slate-100 hover:border-slate-300 hover:shadow-md transition-all cursor-pointer bg-slate-50/50 hover:bg-white"
-                >
-                  <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <div class="flex items-center gap-2">
-                      <span class="font-mono text-xs font-bold text-slate-900">#{{ ev.auditoriaId }}</span>
-                      <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-200 text-slate-800">
-                        {{ ev.modulo || 'SISTEMA' }}
-                      </span>
-                      <span
-                        class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase"
-                        [class.bg-rose-100]="esCritico(ev.operacion)"
-                        [class.text-rose-800]="esCritico(ev.operacion)"
-                        [class.bg-emerald-100]="esInformativo(ev.operacion)"
-                        [class.text-emerald-800]="esInformativo(ev.operacion)"
-                        [class.bg-sky-100]="esOperativo(ev.operacion) && !esCritico(ev.operacion)"
-                        [class.text-sky-800]="esOperativo(ev.operacion) && !esCritico(ev.operacion)"
-                      >
-                        {{ ev.operacion }}
-                      </span>
-                    </div>
-
-                    <div class="text-right text-xs text-slate-400">
-                      {{ ev.fechaEvento | date:'dd/MM/yyyy HH:mm:ss' }}
-                    </div>
-                  </div>
-
-                  <p class="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed">
-                    {{ ev.descripcion || 'Sin descripción.' }}
-                  </p>
-
-                  <div class="flex items-center gap-4 mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500 font-mono">
-                    <span>Tabla: <strong>{{ ev.tablaAfectada }}</strong></span>
-                    <span>Usuario: <strong>{{ ev.clientIdentifier || ev.usuarioBd || 'N/A' }}</strong></span>
-                    <span>IP: <strong>{{ ev.ipCliente || 'Local' }}</strong></span>
-                  </div>
-                </div>
-              </div>
-            } @empty {
-              <div class="py-8 text-center text-slate-400">
-                No hay eventos para mostrar en la línea de tiempo.
-              </div>
-            }
-          </div>
+        } @empty {
+        <div class="py-8 text-center text-slate-400">
+          No hay eventos para mostrar en la línea de tiempo.
         </div>
-      }
+        }
+      </div>
     </div>
+    }
+  </div>
   }
 
   <!-- PESTAÑA 2: SEGURIDAD, ROLES & CREDENCIALES -->
   @if (tabActiva() === 'seguridad') {
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Columna 1: Matriz de Roles -->
-      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs space-y-4">
-        <div>
-          <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
-            Roles de Seguridad (ROL)
-          </h2>
-          <p class="text-xs text-slate-500 mt-0.5">
-            Perfiles de autorización del sistema farmacéutico.
-          </p>
-        </div>
-
-        <div class="space-y-3">
-          @for (rol of roles(); track rol.rolId) {
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
-              <div class="flex items-center justify-between">
-                <span class="font-extrabold text-xs text-slate-900">{{ rol.nombre }}</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800">
-                  {{ rol.totalUsuarios }} usuarios
-                </span>
-              </div>
-              <p class="text-[11px] text-slate-500 leading-snug">
-                {{ rol.descripcion || 'Sin descripción de privilegios.' }}
-              </p>
-              <div class="pt-1 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">
-                <span>● Estado: {{ rol.estado }}</span>
-              </div>
-            </div>
-          } @empty {
-            <div class="text-xs text-slate-400 py-4 text-center">Cargando roles...</div>
-          }
-        </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
+    <!-- Columna 1: Matriz de Roles -->
+    <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs space-y-4">
+      <div>
+        <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
+          Roles de Seguridad (ROL)
+        </h2>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Perfiles de autorización del sistema farmacéutico.
+        </p>
       </div>
 
-      <!-- Columna 2 y 3: Directorio de Credenciales -->
-      <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs space-y-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
-              Cuentas & Accesos Auditados (CREDENCIAL)
-            </h2>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Trazabilidad de inicio de sesión y colaboradores asociados.
-            </p>
+      <div class="space-y-3">
+        @for (rol of roles(); track rol.rolId) {
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-xs text-slate-900">{{ rol.nombre }}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800">
+              {{ rol.totalUsuarios }} usuarios
+            </span>
           </div>
-          <span class="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">
-            {{ credenciales().length }} Cuentas Registradas
-          </span>
+          <p class="text-[11px] text-slate-500 leading-snug">
+            {{ rol.descripcion || 'Sin descripción de privilegios.' }}
+          </p>
+          <div class="pt-1 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">
+            <span>● Estado: {{ rol.estado }}</span>
+          </div>
         </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 uppercase text-[10px]">
-              <tr>
-                <th class="py-2.5 px-3">Usuario</th>
-                <th class="py-2.5 px-3">Rol</th>
-                <th class="py-2.5 px-3">Colaborador / Puesto</th>
-                <th class="py-2.5 px-3">Sucursal Asignada</th>
-                <th class="py-2.5 px-3">Último Acceso</th>
-                <th class="py-2.5 px-3 text-center">Estado</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-              @for (cred of credenciales(); track cred.credencialId) {
-                <tr class="hover:bg-slate-50/70 transition-colors">
-                  <td class="py-3 px-3">
-                    <div class="flex items-center gap-2">
-                      <div class="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-[11px]">
-                        {{ cred.username.slice(0, 1).toUpperCase() }}
-                      </div>
-                      <span class="font-bold text-slate-900 font-mono">{{ cred.username }}</span>
-                    </div>
-                  </td>
-                  <td class="py-3 px-3">
-                    <span
-                      class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase"
-                      [class.bg-sky-100]="cred.rol === 'ADMINISTRADOR' || cred.rol === 'ADMIN'"
-                      [class.text-sky-800]="cred.rol === 'ADMINISTRADOR' || cred.rol === 'ADMIN'"
-                      [class.bg-teal-100]="cred.rol.includes('FARMAC')"
-                      [class.text-teal-800]="cred.rol.includes('FARMAC')"
-                      [class.bg-slate-100]="cred.rol !== 'ADMIN' && !cred.rol.includes('FARMAC')"
-                      [class.text-slate-700]="cred.rol !== 'ADMIN' && !cred.rol.includes('FARMAC')"
-                    >
-                      {{ cred.rol }}
-                    </span>
-                  </td>
-                  <td class="py-3 px-3">
-                    @if (cred.empleado) {
-                      <span class="font-bold text-slate-800 block">{{ cred.empleado.nombreCompleto }}</span>
-                      <span class="text-[10px] text-slate-400">{{ cred.empleado.puesto }}</span>
-                    } @else {
-                      <span class="text-slate-400 italic">Cuenta de Sistema</span>
-                    }
-                  </td>
-                  <td class="py-3 px-3 text-slate-600">
-                    {{ cred.empleado?.sucursal || 'Central / Matriz' }}
-                  </td>
-                  <td class="py-3 px-3 whitespace-nowrap">
-                    @if (cred.ultimoLogin) {
-                      <span class="font-bold text-slate-800 block">
-                        {{ cred.ultimoLogin | date:'dd/MM/yyyy' }}
-                      </span>
-                      <span class="text-[10px] font-mono text-slate-400">
-                        {{ cred.ultimoLogin | date:'HH:mm:ss' }}
-                      </span>
-                    } @else {
-                      <span class="text-slate-400 italic">Nunca</span>
-                    }
-                  </td>
-                  <td class="py-3 px-3 text-center">
-                    <span
-                      class="px-2 py-0.5 rounded-full text-[10px] font-bold"
-                      [class.bg-emerald-100]="cred.estado === 'ACTIVO'"
-                      [class.text-emerald-800]="cred.estado === 'ACTIVO'"
-                      [class.bg-slate-100]="cred.estado !== 'ACTIVO'"
-                      [class.text-slate-600]="cred.estado !== 'ACTIVO'"
-                    >
-                      {{ cred.estado }}
-                    </span>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        } @empty {
+        <div class="text-xs text-slate-400 py-4 text-center">Cargando roles...</div>
+        }
       </div>
     </div>
+
+    <!-- Columna 2 y 3: Directorio de Credenciales -->
+    <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
+            Cuentas & Accesos Auditados (CREDENCIAL)
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Trazabilidad de inicio de sesión y colaboradores asociados.
+          </p>
+        </div>
+        <span class="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">
+          {{ credenciales().length }} Cuentas Registradas
+        </span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 uppercase text-[10px]">
+            <tr>
+              <th class="py-2.5 px-3">Usuario</th>
+              <th class="py-2.5 px-3">Rol</th>
+              <th class="py-2.5 px-3">Colaborador / Puesto</th>
+              <th class="py-2.5 px-3">Sucursal Asignada</th>
+              <th class="py-2.5 px-3">Último Acceso</th>
+              <th class="py-2.5 px-3 text-center">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (cred of credenciales(); track cred.credencialId) {
+            <tr class="hover:bg-slate-50/70 transition-colors">
+              <td class="py-3 px-3">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-[11px]">
+                    {{ cred.username.slice(0, 1).toUpperCase() }}
+                  </div>
+                  <span class="font-bold text-slate-900 font-mono">{{ cred.username }}</span>
+                </div>
+              </td>
+              <td class="py-3 px-3">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase"
+                  [class.bg-sky-100]="cred.rol === 'ADMINISTRADOR' || cred.rol === 'ADMIN'"
+                  [class.text-sky-800]="cred.rol === 'ADMINISTRADOR' || cred.rol === 'ADMIN'"
+                  [class.bg-teal-100]="cred.rol.includes('FARMAC')" [class.text-teal-800]="cred.rol.includes('FARMAC')"
+                  [class.bg-slate-100]="cred.rol !== 'ADMIN' && !cred.rol.includes('FARMAC')"
+                  [class.text-slate-700]="cred.rol !== 'ADMIN' && !cred.rol.includes('FARMAC')">
+                  {{ cred.rol }}
+                </span>
+              </td>
+              <td class="py-3 px-3">
+                @if (cred.empleado) {
+                <span class="font-bold text-slate-800 block">{{ cred.empleado.nombreCompleto }}</span>
+                <span class="text-[10px] text-slate-400">{{ cred.empleado.puesto }}</span>
+                } @else {
+                <span class="text-slate-400 italic">Cuenta de Sistema</span>
+                }
+              </td>
+              <td class="py-3 px-3 text-slate-600">
+                {{ cred.empleado?.sucursal || 'Central / Matriz' }}
+              </td>
+              <td class="py-3 px-3 whitespace-nowrap">
+                @if (cred.ultimoLogin) {
+                <span class="font-bold text-slate-800 block">
+                  {{ cred.ultimoLogin | date:'dd/MM/yyyy' }}
+                </span>
+                <span class="text-[10px] font-mono text-slate-500">
+                  {{ cred.ultimoLogin | date:'hh:mm:ss a' }}
+                </span>
+                } @else {
+                <span class="text-slate-400 italic">Nunca</span>
+                }
+              </td>
+              <td class="py-3 px-3 text-center">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                  [class.bg-emerald-100]="cred.estado === 'ACTIVO'" [class.text-emerald-800]="cred.estado === 'ACTIVO'"
+                  [class.bg-slate-100]="cred.estado !== 'ACTIVO'" [class.text-slate-600]="cred.estado !== 'ACTIVO'">
+                  {{ cred.estado }}
+                </span>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   }
+  </div>
 
   <!-- MODAL DE DETALLE FORENSE -->
   @if (eventoSeleccionado()) {
-    <app-modal (cerrar)="cerrarDetalle()" maxWidth="max-w-3xl">
-      <app-auditoria-detalle-modal
-        [evento]="eventoSeleccionado()!"
-        (cerrar)="cerrarDetalle()"
-      />
-    </app-modal>
+  <app-modal (cerrar)="cerrarDetalle()" maxWidth="max-w-3xl">
+    <app-auditoria-detalle-modal [evento]="eventoSeleccionado()!" (cerrar)="cerrarDetalle()" />
+  </app-modal>
   }
 </div>

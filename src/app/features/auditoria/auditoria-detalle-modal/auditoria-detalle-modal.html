@@ -1,8 +1,9 @@
-<div class="p-6 sm:p-7 space-y-6">
+<!-- VISTA EN PANTALLA -->
+<div class="constancia-pantalla p-6 sm:p-7 space-y-6">
   <!-- Cabecera del Detalle -->
   <div class="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-sm shadow-md">
+      <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 flex items-center justify-center font-bold text-sm shadow-xs">
         #{{ evento().auditoriaId }}
       </div>
       <div>
@@ -14,8 +15,8 @@
             class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
             [class.bg-rose-100]="evento().operacion === 'DELETE' || evento().operacion === 'LOGIN_FALLIDO' || evento().operacion === 'ARQUEO_FALTANTE'"
             [class.text-rose-800]="evento().operacion === 'DELETE' || evento().operacion === 'LOGIN_FALLIDO' || evento().operacion === 'ARQUEO_FALTANTE'"
-            [class.bg-amber-100]="evento().operacion === 'AJUSTE' || evento().operacion === 'EXCEPCION_MANUAL' || evento().operacion === 'AJUSTE_SALARIO'"
-            [class.text-amber-800]="evento().operacion === 'AJUSTE' || evento().operacion === 'EXCEPCION_MANUAL' || evento().operacion === 'AJUSTE_SALARIO'"
+            [class.bg-amber-100]="evento().operacion === 'AJUSTE' || evento().operacion === 'EXCEPCION_MANUAL' || evento().operacion === 'AJUSTE_SALARIO' || evento().operacion === 'CANCELADA'"
+            [class.text-amber-800]="evento().operacion === 'AJUSTE' || evento().operacion === 'EXCEPCION_MANUAL' || evento().operacion === 'AJUSTE_SALARIO' || evento().operacion === 'CANCELADA'"
             [class.bg-emerald-100]="evento().operacion === 'LOGIN' || evento().operacion === 'INSERT'"
             [class.text-emerald-800]="evento().operacion === 'LOGIN' || evento().operacion === 'INSERT'"
             [class.bg-sky-100]="evento().operacion === 'UPDATE' || evento().operacion === 'TRANSFERENCIA' || evento().operacion === 'ARQUEO'"
@@ -24,8 +25,8 @@
             {{ evento().operacion }}
           </span>
         </div>
-        <p class="text-xs text-slate-500 mt-0.5">
-          Registrado el {{ evento().fechaEvento | date:'dd/MM/yyyy HH:mm:ss.sss' }}
+        <p class="text-xs text-slate-500 mt-0.5 font-medium">
+          Registrado el {{ evento().fechaEvento | date:'dd/MM/yyyy, hh:mm:ss a' }}
         </p>
       </div>
     </div>
@@ -77,10 +78,10 @@
     </div>
   </div>
 
-  <!-- Descripción Forense Completa -->
-  <div class="p-4 bg-slate-900 text-slate-100 rounded-2xl shadow-inner space-y-2">
-    <div class="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-2">
-      <span class="font-bold flex items-center gap-1.5 text-slate-300">
+  <!-- Descripción Forense Completa (Fondo Gris Claro) -->
+  <div class="p-4 bg-slate-100 border border-slate-200/90 text-slate-800 rounded-2xl space-y-2">
+    <div class="flex items-center justify-between text-xs text-slate-500 border-b border-slate-200 pb-2">
+      <span class="font-bold flex items-center gap-1.5 text-slate-700">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
@@ -92,7 +93,7 @@
       </span>
       <span class="font-mono text-[11px] text-slate-500">ID-AUD-{{ evento().auditoriaId }}</span>
     </div>
-    <p class="text-xs sm:text-sm font-mono leading-relaxed text-emerald-300 break-words whitespace-pre-wrap">
+    <p class="text-xs sm:text-sm font-mono leading-relaxed text-slate-800 break-words whitespace-pre-wrap">
       {{ evento().descripcion || 'Sin descripción complementaria disponible.' }}
     </p>
   </div>
@@ -113,7 +114,7 @@
     <button
       type="button"
       (click)="imprimirFicha()"
-      class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+      class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -125,9 +126,88 @@
     <button
       type="button"
       (click)="cerrar.emit()"
-      class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer"
+      class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 transition-colors cursor-pointer"
     >
       Cerrar
     </button>
   </div>
+</div>
+
+<!-- FORMATO EXCLUSIVO DE IMPRESIÓN (SOLO ENCABEZADO, LOGO Y TABLA) -->
+<div class="constancia-impresion">
+  <!-- ENCABEZADO Y LOGO INSTITUCIONAL -->
+  <div class="flex items-center justify-between border-b-2 border-slate-900 pb-4 mb-4">
+    <div class="flex items-center gap-4">
+      <img src="assets/images/logo-prosalud.png" alt="Farmacia ProSalud" class="h-16 w-auto object-contain" />
+      <div>
+        <h1 class="text-xl font-black text-slate-900 uppercase tracking-tight leading-none mb-1">
+          FARMACIA PROSALUD
+        </h1>
+        <p class="text-xs font-bold text-slate-700">
+          Constancia Oficial de Auditoría & Trazabilidad Forense
+        </p>
+        <p class="text-[10px] text-slate-500">
+          Sistema Integral de Gestión Farmacéutica · Sede Central
+        </p>
+      </div>
+    </div>
+    <div class="text-right">
+      <div class="inline-block border-2 border-slate-900 px-3 py-1 font-mono font-black text-sm text-slate-900">
+        CONSTANCIA #{{ evento().auditoriaId }}
+      </div>
+      <p class="text-[10px] text-slate-600 mt-1.5 font-medium">
+        <strong>Emisión:</strong> {{ fechaImpresion | date:'dd/MM/yyyy, hh:mm:ss a' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- TABLA DE CONSTANCIA -->
+  <table class="w-full text-xs border-collapse">
+    <tbody>
+      <tr>
+        <th class="w-1/3 text-left">Folio de Auditoría</th>
+        <td class="font-mono font-bold">#{{ evento().auditoriaId }}</td>
+      </tr>
+      <tr>
+        <th class="text-left">Fecha y Hora del Evento</th>
+        <td class="font-bold">{{ evento().fechaEvento | date:'dd/MM/yyyy, hh:mm:ss a' }} (Hora Oficial de Guatemala)</td>
+      </tr>
+      <tr>
+        <th class="text-left">Módulo del Sistema</th>
+        <td class="font-bold uppercase">{{ evento().modulo || 'SISTEMA' }}</td>
+      </tr>
+      <tr>
+        <th class="text-left">Tipo de Operación</th>
+        <td class="font-extrabold uppercase">{{ evento().operacion }}</td>
+      </tr>
+      <tr>
+        <th class="text-left">Entidad / Tabla Afectada</th>
+        <td class="font-mono">{{ evento().tablaAfectada }}</td>
+      </tr>
+      <tr>
+        <th class="text-left">ID Registro Afectado</th>
+        <td class="font-mono">{{ evento().registroId !== null ? '#' + evento().registroId : 'N/A' }}</td>
+      </tr>
+      <tr>
+        <th class="text-left">Usuario Identificado (Operador)</th>
+        <td class="font-bold">{{ evento().clientIdentifier || 'Desconocido' }}</td>
+      </tr>
+      <tr>
+        <th class="text-left">Usuario Base de Datos</th>
+        <td class="font-mono">{{ evento().usuarioBd || 'N/A' }}</td>
+      </tr>
+      <tr>
+        <th class="text-left">Terminal y Red de Origen</th>
+        <td class="font-mono">IP: {{ evento().ipCliente || 'Local / Interna' }} &nbsp;·&nbsp; Host: {{ evento().host || 'Desconocido' }}</td>
+      </tr>
+      <tr>
+        <th class="text-left align-top">Descripción Completa del Movimiento</th>
+        <td class="font-mono text-[11px] leading-relaxed whitespace-pre-wrap">{{ evento().descripcion || 'Sin descripción complementaria disponible.' }}</td>
+      </tr>
+      <tr>
+        <th class="text-left">Certificación de Integridad</th>
+        <td class="text-slate-700 italic">Registro inmutable sellado con timestamp criptográfico en la base de datos Oracle XE. Documento oficial de trazabilidad.</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

@@ -39,15 +39,19 @@ export class TransferenciaDetalleModal {
     return !!(userSuc && Number(userSuc) === Number(this.transferencia?.sucursalOrigen?.sucursalId));
   });
 
-  // ¿Puede recibir en destino? ADMIN o personal de la farmacia destino
+  // ¿Puede recibir en destino? Únicamente la farmacia destino (el origen jamás puede auto-recibirse)
   protected readonly puedeRecibir = computed(() => {
-    if (this.esAdmin()) return true;
     const userSuc = this.sucursalAsignadaId();
+    // Si la sucursal del usuario es el origen, no puede recibir lo que ella misma despachó
+    if (userSuc && Number(userSuc) === Number(this.transferencia?.sucursalOrigen?.sucursalId)) {
+      return false;
+    }
     return !!(userSuc && Number(userSuc) === Number(this.transferencia?.sucursalDestino?.sucursalId));
   });
 
   protected readonly procesando = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly verificacionFisicaConfirmada = signal(false);
 
   // Modal in-app de confirmación para cancelar transferencia
   protected readonly modalCancelarVisible = signal(false);
@@ -83,11 +87,16 @@ export class TransferenciaDetalleModal {
   }
 
   protected async confirmarRecepcion(): Promise<void> {
+    if (!this.verificacionFisicaConfirmada()) {
+      return;
+    }
+
+    const destino = this.transferencia?.sucursalDestino?.nombre ?? 'tu sucursal';
     const confirmado = await this.confirmService.confirm({
-      title: '¿Confirmar Recepción en Farmacia Receptora?',
+      title: '¿Confirmar Recepción e Ingreso a Stock?',
       message:
-        '¿Confirmas la recepción física de la mercadería en la sucursal solicitante? El inventario será ingresado atómicamente a su stock local.',
-      confirmText: 'Sí, Recibir e Ingresar Stock',
+        `¿Confirmas que ya contaste e inspeccionaste físicamente los medicamentos en ${destino}? Esta acción sumará de forma inmediata las unidades al inventario local de tu farmacia y estarán disponibles para la venta.`,
+      confirmText: 'Sí, Ingresar al Inventario',
       cancelText: 'Cancelar',
       tipo: 'primary',
     });
@@ -99,6 +108,7 @@ export class TransferenciaDetalleModal {
     this.transferenciasService.recibir(this.transferencia.transferenciaId, {}).subscribe({
       next: () => {
         this.procesando.set(false);
+        this.verificacionFisicaConfirmada.set(false);
         this.actualizado.emit();
       },
       error: (err) => {
@@ -155,11 +165,13 @@ export class TransferenciaDetalleModal {
     const d = new Date(fechaStr);
     if (isNaN(d.getTime())) return String(fechaStr);
     return d.toLocaleString('es-GT', {
+      timeZone: 'America/Guatemala',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: true,
     });
   }
 

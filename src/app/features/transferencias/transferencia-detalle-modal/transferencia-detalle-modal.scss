@@ -1,31 +1,56 @@
 // Estilos específicos de TransferenciaDetalleModal
 
 @media print {
+  @page {
+    size: letter portrait;
+    margin: 18mm 15mm 18mm 15mm;
+  }
+
   .no-print,
   .no-print * {
     display: none !important;
   }
 
-  // Ocultar cualquier botón nativo de cerrar del modal
   :host {
-    display: block;
-    width: 100%;
+    display: block !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .guia-print-container {
+    padding: 2mm 1mm !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   table {
     width: 100% !important;
     border-collapse: collapse !important;
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
   }
 
   th,
   td {
-    border: 1px solid #94a3b8 !important;
-    padding: 6px 8px !important;
-    color: black !important;
+    border: 1px solid #475569 !important;
+    padding: 7px 10px !important;
+    color: #000000 !important;
   }
 
   th {
     background-color: #f1f5f9 !important;
     font-weight: bold !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .firmas-impresion {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-top: 25mm !important;
+    padding-top: 5mm !important;
   }
 }

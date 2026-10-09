@@ -1,6 +1,6 @@
-<div class="p-6 sm:p-7 space-y-6 print:p-0 print:space-y-4">
+<div class="p-6 sm:p-7 space-y-6 print:p-2 print:space-y-4 guia-print-container">
   <!-- Encabezado de la Guía -->
-  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-slate-200 pb-4 pr-10 print:pr-0 print:border-b-2 print:border-black">
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-slate-200 pb-4 pr-10 print:pr-0 print:pt-1 print:border-b-2 print:border-black">
     <div>
       <div class="flex items-center gap-2.5 flex-wrap">
         <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight print:text-xl print:text-black">
@@ -9,8 +9,18 @@
         <span class="font-mono text-sm font-extrabold px-2.5 py-0.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 print:bg-white print:border-black print:text-black">
           #TRF-{{ transferencia.transferenciaId }}
         </span>
-        <span class="text-xs px-2.5 py-0.5 rounded-full font-bold border print:border-black print:text-black print:bg-white" [class]="badgeEstadoClass()">
-          ● {{ transferencia.estado }}
+        <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full font-bold border print:border-black print:text-black print:bg-white" [class]="badgeEstadoClass()">
+          @if (transferencia.estado === 'EN_TRANSITO') {
+            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+          } @else {
+            ●
+          }
+          {{ transferencia.estado }}
         </span>
       </div>
       <p class="text-xs text-slate-500 mt-1 print:text-black font-medium">
@@ -72,7 +82,14 @@
             class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
             [class]="transferencia.estado === 'EN_TRANSITO' ? 'bg-sky-500 text-white shadow-xs animate-pulse' : (transferencia.estado === 'RECIBIDA' ? 'bg-emerald-500 text-white' : 'bg-slate-300 text-slate-600')"
           >
-            @if (transferencia.estado === 'RECIBIDA') { ✓ } @else { 2 }
+            @if (transferencia.estado === 'RECIBIDA') { ✓ } @else if (transferencia.estado === 'EN_TRANSITO') {
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+            } @else { 2 }
           </div>
           <div class="min-w-0">
             <h5 class="text-xs font-bold text-slate-800 leading-snug">Paso 2: En Tránsito (Ruta)</h5>
@@ -206,7 +223,7 @@
   </div>
 
   <!-- Bloque de Firmas para la Guía Física (Solo al Imprimir) -->
-  <div class="hidden print:grid grid-cols-2 gap-12 pt-16 mt-6">
+  <div class="hidden print:grid grid-cols-2 gap-12 firmas-impresion">
     <div class="text-center space-y-1">
       <div class="border-t border-black w-4/5 mx-auto pt-2"></div>
       <p class="text-xs font-bold text-black">Entregado por (Despacho Origen)</p>
@@ -224,6 +241,49 @@
     <div class="no-print p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
       <span class="font-bold text-slate-600 block mb-0.5">Historial de Observaciones:</span>
       <p class="text-slate-700 italic">{{ transferencia.observacion }}</p>
+    </div>
+  }
+
+  <!-- Alerta de Transferencia Cancelada / Rechazada con Reintegro a Central -->
+  @if (transferencia.estado === 'CANCELADA') {
+    <div class="no-print p-4 rounded-2xl bg-gradient-to-r from-rose-50 to-red-50/50 border border-rose-200 text-rose-950 flex items-start gap-3.5 shadow-2xs">
+      <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 mt-0.5">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+      </div>
+      <div class="space-y-1 flex-1">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h4 class="text-sm font-bold text-rose-950">
+            Transferencia Cancelada / Rechazada por Discrepancia
+          </h4>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-200/90 text-rose-900">
+            Reversión de Inventario Aplicada
+          </span>
+        </div>
+        <p class="text-xs text-rose-800 leading-relaxed">
+          Las unidades despachadas <strong>han sido reintegradas automáticamente al stock de {{ transferencia.sucursalOrigen.nombre }}</strong> en el Kardex. La mercadería física retorna a la central y no forma parte del inventario de destino.
+        </p>
+      </div>
+    </div>
+  }
+
+  <!-- Verificación Física Obligatoria antes de Recibir Stock -->
+  @if (transferencia.estado === 'EN_TRANSITO' && puedeRecibir()) {
+    <div class="no-print p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50/40 border border-amber-200/90 text-amber-950 flex items-start gap-3 shadow-xs">
+      <input
+        type="checkbox"
+        id="checkVerificacionFisica"
+        [checked]="verificacionFisicaConfirmada()"
+        (change)="verificacionFisicaConfirmada.set($any($event.target).checked)"
+        class="mt-0.5 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-amber-300 cursor-pointer shrink-0"
+      />
+      <label for="checkVerificacionFisica" class="text-xs leading-relaxed cursor-pointer select-none">
+        <span class="font-bold block text-amber-900 mb-0.5">Control de Seguridad: Inspección Física Requerida</span>
+        He recibido, contado e inspeccionado físicamente los medicamentos entregados en esta sucursal. Confirmo que las cantidades, productos y lotes recibidos coinciden con la guía antes de ingresarlos al inventario.
+      </label>
     </div>
   }
 
@@ -276,14 +336,20 @@
           </span>
         }
       } @else if (transferencia.estado === 'EN_TRANSITO') {
-        @if (esAdmin()) {
+        @if (esAdmin() || puedeRecibir()) {
           <button
             type="button"
             (click)="abrirModalCancelar()"
             [disabled]="procesando()"
-            class="px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200 rounded-xl cursor-pointer"
+            class="px-3 py-2 text-xs font-semibold text-rose-700 hover:text-rose-800 hover:bg-rose-50 border border-rose-200 rounded-xl cursor-pointer inline-flex items-center gap-1.5"
+            title="Rechazar el cargamento si la mercadería física no coincide o viene averiada"
           >
-            Cancelar Transferencia
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            Rechazar por Discrepancia
           </button>
         }
 
@@ -291,19 +357,20 @@
           <button
             type="button"
             (click)="confirmarRecepcion()"
-            [disabled]="procesando()"
-            class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-xs transition-colors cursor-pointer inline-flex items-center gap-1.5"
+            [disabled]="procesando() || !verificacionFisicaConfirmada()"
+            class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5"
+            [title]="!verificacionFisicaConfirmada() ? 'Debes marcar la casilla de verificación física arriba antes de recibir' : 'Confirmar e ingresar al inventario'"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            Recibir Stock en {{ transferencia.sucursalDestino.nombre }}
+            Confirmar Recepción y Sumar al Stock
           </button>
         } @else {
           <span class="text-xs font-semibold text-sky-800 bg-sky-50 px-3 py-1.5 rounded-xl border border-sky-200 inline-flex items-center gap-1.5">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-pulse">
               <rect x="1" y="3" width="15" height="13"></rect>
-              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon>
             </svg>
             En ruta. Recepción asignada al personal de {{ transferencia.sucursalDestino.nombre }}.
           </span>
@@ -333,11 +400,17 @@
             </svg>
           </div>
           <div>
-            <h4 class="text-sm font-bold text-slate-900">¿Confirmar Cancelación de Transferencia?</h4>
+            <h4 class="text-sm font-bold text-slate-900">
+              @if (transferencia.estado === 'EN_TRANSITO') {
+                ¿Rechazar Cargamento por Discrepancia?
+              } @else {
+                ¿Confirmar Cancelación de Transferencia?
+              }
+            </h4>
             <p class="text-xs text-slate-500 mt-0.5">
               Esta acción anulará la orden #TRF-{{ transferencia.transferenciaId }}
               @if (transferencia.estado === 'EN_TRANSITO') {
-                y reintegrará las existencias a {{ transferencia.sucursalOrigen.nombre }}.
+                y reintegrará automáticamente las existencias al inventario de {{ transferencia.sucursalOrigen.nombre }}.
               } @else {
                 de traslado de medicamentos.
               }
@@ -347,13 +420,13 @@
 
         <div class="space-y-1.5">
           <label class="block text-xs font-semibold text-slate-700">
-            Motivo o justificación de cancelación: <span class="text-red-500">*</span>
+            Reporte de Discrepancia o Justificación: <span class="text-red-500">*</span>
           </label>
           <textarea
             [ngModel]="motivoCancelacion()"
             (ngModelChange)="motivoCancelacion.set($event)"
             rows="3"
-            placeholder="Ej: Solicitud duplicada, cambio de sucursal destino, falta de transporte..."
+            placeholder="Describe detalladamente la causa (ej: El lote físico LOT-100 no coincide con la guía, cajas averiadas durante el flete, faltante de unidades)..."
             class="w-full p-2.5 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-red-500 text-slate-800 resize-none"
           ></textarea>
           @if (errorCancelar()) {
@@ -377,9 +450,9 @@
             class="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl shadow-xs transition-colors cursor-pointer inline-flex items-center gap-1.5"
           >
             @if (procesando()) {
-              <span>Cancelando…</span>
+              <span>Procesando…</span>
             } @else {
-              <span>Sí, Confirmar Cancelación</span>
+              <span>Confirmar Rechazo y Retorno</span>
             }
           </button>
         </div>

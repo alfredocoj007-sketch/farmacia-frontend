@@ -130,7 +130,18 @@ export class UsuariosList implements OnInit {
     this.cargarUsuarios();
   }
 
+  protected esUsuarioProtegido(usuario: UsuarioItem): boolean {
+    return usuario.username?.trim().toLowerCase() === 'admin';
+  }
+
   protected async cambiarEstadoUsuario(usuario: UsuarioItem): Promise<void> {
+    if (this.esUsuarioProtegido(usuario)) {
+      this.toastService.warning(
+        'El usuario Administrador Principal (admin) está protegido y no puede ser desactivado.',
+      );
+      return;
+    }
+
     const nuevoEstado = usuario.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
     const esDesactivar = nuevoEstado === 'INACTIVO';
 

@@ -23,6 +23,7 @@ export class LotesService {
 
   findAll(query: QueryLotes = {}): Observable<LotesPaginados> {
     let params = new HttpParams();
+    if (query.sucursalId) params = params.set('sucursalId', query.sucursalId);
     if (query.productoId) params = params.set('productoId', query.productoId);
     if (query.page) params = params.set('page', query.page);
     if (query.limit) params = params.set('limit', query.limit);

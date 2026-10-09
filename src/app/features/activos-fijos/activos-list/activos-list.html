@@ -3,34 +3,28 @@
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
       <div class="flex items-center space-x-2">
-        <span class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
-          Gobierno Corporativo & Auditoría
-        </span>
-        <span class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-700/10">
-          Bolsa de Valores Q40M
-        </span>
+
+
       </div>
       <h1 class="text-2xl font-bold tracking-tight text-slate-900 mt-1">Activos Fijos e Infraestructura</h1>
       <p class="text-sm text-slate-500">
-        Control patrimonial de equipamiento para sucursales (Malls, Stands de Gasolinera), cálculo de depreciación lineal y traslados.
+        Control patrimonial de equipamiento para sucursales, cálculo de depreciación
+        lineal y traslados.
       </p>
     </div>
 
     <div class="flex items-center space-x-3">
-      <button
-        (click)="cargarDatosIniciales()"
-        class="inline-flex items-center space-x-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition"
-      >
+      <button (click)="cargarDatosIniciales()"
+        class="inline-flex items-center space-x-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition">
         <svg class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
         <span>Refrescar</span>
       </button>
 
-      <button
-        (click)="abrirAlta()"
-        class="inline-flex items-center space-x-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition"
-      >
+      <button (click)="abrirAlta()"
+        class="inline-flex items-center space-x-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition">
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
@@ -47,7 +41,8 @@
         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Inversión Patrimonial</span>
         <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </div>
       </div>
@@ -67,7 +62,8 @@
         <span class="text-xs font-bold uppercase tracking-wider text-emerald-800">Valor Neto en Libros</span>
         <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
       </div>
@@ -107,14 +103,16 @@
         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Disponibilidad de Equipos</span>
         <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
         </div>
       </div>
       <div class="mt-2">
         <div class="text-2xl font-bold text-slate-900">
           {{ estadisticas()?.totalOperativos || 0 }}
-          <span class="text-sm font-normal text-slate-500">/ {{ estadisticas()?.totalActivos || activos().length }} activos</span>
+          <span class="text-sm font-normal text-slate-500">/ {{ estadisticas()?.totalActivos || activos().length }}
+            activos</span>
         </div>
         <p class="text-xs text-slate-500 mt-1">
           {{ estadisticas()?.totalMantenimiento || 0 }} en calibración / mantenimiento
@@ -130,57 +128,60 @@
       <div class="md:col-span-4 relative">
         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-        <input
-          type="text"
-          [ngModel]="busqueda()"
-          (ngModelChange)="busqueda.set($event); onFiltroChange()"
+        <input type="text" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event); onFiltroChange()"
           placeholder="Buscar por código, serie, marca, modelo..."
-          class="w-full rounded-xl border border-slate-200 pl-9 pr-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none"
-        />
+          class="w-full rounded-xl border border-slate-200 pl-9 pr-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none" />
       </div>
 
       <!-- Filtro Sucursal -->
       <div class="md:col-span-3">
-        <select
-          [ngModel]="filtroSucursalId()"
-          (ngModelChange)="filtroSucursalId.set($event); onFiltroChange()"
-          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none bg-white"
-        >
+        @if (esAdmin()) {
+        <select [ngModel]="filtroSucursalId()" (ngModelChange)="filtroSucursalId.set($event); onFiltroChange()"
+          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none bg-white">
           <option [ngValue]="null">Todas las Sucursales y Stands</option>
           @for (suc of sucursales(); track suc.sucursalId) {
-            <option [ngValue]="suc.sucursalId">
-              {{ suc.nombre }} ({{ suc.tipoSucursal || 'SUCURSAL' }})
-            </option>
+          <option [ngValue]="suc.sucursalId">
+            {{ suc.nombre }} ({{ suc.tipoSucursal || 'SUCURSAL' }})
+          </option>
           }
         </select>
+        } @else {
+        <div
+          class="flex items-center space-x-2 rounded-xl border border-indigo-100 bg-indigo-50/60 px-3 py-2 text-sm text-indigo-900 shadow-xs">
+          <svg class="h-4 w-4 text-indigo-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="truncate font-semibold text-xs text-indigo-800">
+            Sede: {{ usuarioActual()?.sucursalNombre || 'Mi Sucursal Asignada' }}
+          </span>
+        </div>
+        }
       </div>
 
       <!-- Filtro Categoría -->
       <div class="md:col-span-3">
-        <select
-          [ngModel]="filtroCategoriaId()"
-          (ngModelChange)="filtroCategoriaId.set($event); onFiltroChange()"
-          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none bg-white"
-        >
+        <select [ngModel]="filtroCategoriaId()" (ngModelChange)="filtroCategoriaId.set($event); onFiltroChange()"
+          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none bg-white">
           <option [ngValue]="null">Todas las Categorías</option>
           @for (cat of categorias(); track cat.categoriaActivoId) {
-            <option [ngValue]="cat.categoriaActivoId">
-              {{ cat.nombre }}
-            </option>
+          <option [ngValue]="cat.categoriaActivoId">
+            {{ cat.nombre }}
+          </option>
           }
         </select>
       </div>
 
       <!-- Filtro Estado -->
       <div class="md:col-span-2 flex items-center space-x-2">
-        <select
-          [ngModel]="filtroEstado()"
-          (ngModelChange)="filtroEstado.set($event); onFiltroChange()"
-          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none bg-white"
-        >
+        <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event); onFiltroChange()"
+          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none bg-white">
           <option [ngValue]="null">Todos los Estados</option>
           <option value="ACTIVO">Operativo</option>
           <option value="EN_MANTENIMIENTO">Mantenimiento</option>
@@ -188,15 +189,12 @@
         </select>
 
         @if (filtroSucursalId() || filtroCategoriaId() || filtroEstado() || busqueda()) {
-          <button
-            (click)="limpiarFiltros()"
-            title="Limpiar filtros"
-            class="rounded-xl border border-slate-200 p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
-          >
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+        <button (click)="limpiarFiltros()" title="Limpiar filtros"
+          class="rounded-xl border border-slate-200 p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
         }
       </div>
     </div>
@@ -205,282 +203,247 @@
   <!-- Tabla de Activos Fijos -->
   <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
     @if (cargando()) {
-      <div class="flex flex-col items-center justify-center py-16 space-y-3">
-        <div class="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
-        <p class="text-sm font-medium text-slate-500">Cargando inventario de activos fijos...</p>
-      </div>
+    <div class="flex flex-col items-center justify-center py-16 space-y-3">
+      <div class="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <p class="text-sm font-medium text-slate-500">Cargando inventario de activos fijos...</p>
+    </div>
     } @else if (error()) {
-      <div class="p-8 text-center">
-        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <h3 class="mt-2 text-sm font-semibold text-slate-900">{{ error() }}</h3>
-        <button
-          (click)="cargarActivos()"
-          class="mt-4 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition"
-        >
-          Reintentar
-        </button>
+    <div class="p-8 text-center">
+      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
       </div>
+      <h3 class="mt-2 text-sm font-semibold text-slate-900">{{ error() }}</h3>
+      <button (click)="cargarActivos()"
+        class="mt-4 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition">
+        Reintentar
+      </button>
+    </div>
     } @else if (activos().length === 0) {
-      <div class="p-12 text-center">
-        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-          </svg>
+    <div class="p-12 text-center">
+      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+      </div>
+      <h3 class="mt-3 text-sm font-bold text-slate-900">No se encontraron activos fijos</h3>
+      <p class="mt-1 text-xs text-slate-500">Pruebe ajustando los filtros de búsqueda o incorpore un nuevo activo
+        patrimonial.</p>
+      <button (click)="abrirAlta()"
+        class="mt-4 inline-flex items-center space-x-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700 transition">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Dar de alta activo</span>
+      </button>
+    </div>
+    } @else {
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm text-slate-600">
+        <thead
+          class="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+          <tr>
+            <th scope="col" class="px-5 py-3.5">Código & Categoría</th>
+            <th scope="col" class="px-5 py-3.5">Equipo / Especificación</th>
+            <th scope="col" class="px-5 py-3.5">Ubicación / Sucursal</th>
+            <th scope="col" class="px-5 py-3.5 text-right">Inversión (Q)</th>
+            <th scope="col" class="px-5 py-3.5 text-right">Valor Libros (Q)</th>
+            <th scope="col" class="px-5 py-3.5">Depreciación Lineal</th>
+            <th scope="col" class="px-5 py-3.5 text-center">Estado</th>
+            <th scope="col" class="px-5 py-3.5 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (item of activosPaginados(); track item.activoId) {
+          <tr class="hover:bg-slate-50/80 transition group">
+            <!-- Código & Categoría -->
+            <td class="px-5 py-4">
+              <span
+                class="inline-block font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                {{ item.codigoActivo }}
+              </span>
+              <div class="text-[11px] font-medium text-slate-500 mt-1 line-clamp-1">
+                {{ item.categoria?.nombre }}
+              </div>
+            </td>
+
+            <!-- Equipo / Descripción -->
+            <td class="px-5 py-4 max-w-xs">
+              <div class="font-semibold text-slate-900 group-hover:text-indigo-600 transition">
+                {{ item.descripcion }}
+              </div>
+              <div class="text-[11px] text-slate-400 mt-0.5">
+                @if (item.marca || item.modelo) {
+                <span>{{ item.marca }} {{ item.modelo }}</span>
+                }
+                @if (item.numeroSerie) {
+                <span class="ml-2 font-mono">S/N: {{ item.numeroSerie }}</span>
+                }
+              </div>
+            </td>
+
+            <!-- Sucursal / Stand -->
+            <td class="px-5 py-4">
+              <div class="font-medium text-slate-800">
+                {{ item.sucursal?.nombre || 'Sin asignar' }}
+              </div>
+              <span
+                class="inline-block mt-0.5 text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                {{ item.sucursal?.tipoSucursal || 'SUCURSAL' }}
+              </span>
+            </td>
+
+            <!-- Inversión Original -->
+            <td class="px-5 py-4 text-right font-medium text-slate-700 whitespace-nowrap">
+              Q {{ item.valorAdquisicion | number: '1.2-2' }}
+              <div class="text-[10px] text-slate-400">
+                {{ item.fechaAdquisicion | date: 'dd/MM/yyyy' }}
+              </div>
+            </td>
+
+            <!-- Valor en Libros -->
+            <td class="px-5 py-4 text-right whitespace-nowrap">
+              <div class="font-bold text-emerald-600">
+                Q {{ item.valorLibros | number: '1.2-2' }}
+              </div>
+              <div class="text-[10px] text-rose-500">
+                - Q {{ item.depreciacionAcumulada | number: '1.2-2' }}
+              </div>
+            </td>
+
+            <!-- Progreso de Depreciación -->
+            <td class="px-5 py-4 min-w-[150px]">
+              <div class="flex items-center justify-between text-[11px] font-medium mb-1">
+                <span class="text-slate-600">{{ item.porcentajeDepreciado }}%</span>
+                <span class="text-slate-400">{{ item.mesesUso }}m / {{ item.categoria?.vidaUtilMeses }}m</span>
+              </div>
+              <div class="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full" [class.bg-emerald-500]="item.porcentajeDepreciado < 50"
+                  [class.bg-amber-500]="item.porcentajeDepreciado >= 50 && item.porcentajeDepreciado < 85"
+                  [class.bg-rose-500]="item.porcentajeDepreciado >= 85" [style.width.%]="item.porcentajeDepreciado">
+                </div>
+              </div>
+            </td>
+
+            <!-- Estado -->
+            <td class="px-5 py-4 text-center whitespace-nowrap">
+              <span class="inline-flex items-center space-x-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                [class.bg-emerald-50]="item.estado === 'ACTIVO'" [class.text-emerald-700]="item.estado === 'ACTIVO'"
+                [class.ring-1]="item.estado === 'ACTIVO'" [class.ring-emerald-600/20]="item.estado === 'ACTIVO'"
+                [class.bg-amber-50]="item.estado === 'EN_MANTENIMIENTO'"
+                [class.text-amber-700]="item.estado === 'EN_MANTENIMIENTO'"
+                [class.ring-amber-600/20]="item.estado === 'EN_MANTENIMIENTO'"
+                [class.bg-rose-50]="item.estado === 'DE_BAJA'" [class.text-rose-700]="item.estado === 'DE_BAJA'"
+                [class.ring-rose-600/20]="item.estado === 'DE_BAJA'">
+                <span class="h-1.5 w-1.5 rounded-full" [class.bg-emerald-500]="item.estado === 'ACTIVO'"
+                  [class.bg-amber-500]="item.estado === 'EN_MANTENIMIENTO'"
+                  [class.bg-rose-500]="item.estado === 'DE_BAJA'"></span>
+                <span>{{ item.estado }}</span>
+              </span>
+            </td>
+
+            <!-- Acciones -->
+            <td class="px-5 py-4 text-right whitespace-nowrap">
+              <div class="flex items-center justify-end space-x-1">
+                <!-- Ficha y Trazabilidad -->
+                <button (click)="abrirDetalle(item.activoId)" title="Ver Ficha Técnica y Auditoría"
+                  class="rounded-lg p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+
+                <!-- Traslado entre sucursales -->
+                <button (click)="abrirTraslado(item)" [disabled]="item.estado === 'DE_BAJA'"
+                  title="Trasladar de Sucursal / Stand"
+                  class="rounded-lg p-1.5 text-slate-400 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-30 disabled:hover:bg-transparent transition">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                </button>
+
+                <!-- Mantenimiento / Estado -->
+                <button (click)="abrirMantenimiento(item)" title="Gestionar Mantenimiento o Baja"
+                  class="rounded-lg p-1.5 text-slate-400 hover:bg-amber-50 hover:text-amber-600 transition">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Barra de Paginación -->
+    <div
+      class="px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <span>
+        Mostrando página <strong class="text-slate-700 font-semibold">{{ page() }}</strong> de <strong
+          class="text-slate-700 font-semibold">{{ totalPaginas() }}</strong> ({{ activos().length }} activos
+        patrimoniales)
+      </span>
+      <div class="flex items-center gap-1.5">
+        <button (click)="cambiarPagina(-1)" [disabled]="page() <= 1"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+          ← Anterior
+        </button>
+        <div class="hidden sm:flex items-center gap-1">
+          @for (p of listaPaginas(); track p) {
+          <button (click)="irAPagina(p)" [class.bg-indigo-600]="p === page()" [class.text-white]="p === page()"
+            [class.font-semibold]="p === page()" [class.shadow-sm]="p === page()"
+            [class.border-indigo-600]="p === page()"
+            class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+            {{ p }}
+          </button>
+          }
         </div>
-        <h3 class="mt-3 text-sm font-bold text-slate-900">No se encontraron activos fijos</h3>
-        <p class="mt-1 text-xs text-slate-500">Pruebe ajustando los filtros de búsqueda o incorpore un nuevo activo patrimonial.</p>
-        <button
-          (click)="abrirAlta()"
-          class="mt-4 inline-flex items-center space-x-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700 transition"
-        >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          <span>Dar de alta activo</span>
+        <button (click)="cambiarPagina(1)" [disabled]="page() >= totalPaginas()"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+          Siguiente →
         </button>
       </div>
-    } @else {
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-600">
-          <thead class="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200">
-            <tr>
-              <th scope="col" class="px-5 py-3.5">Código & Categoría</th>
-              <th scope="col" class="px-5 py-3.5">Equipo / Especificación</th>
-              <th scope="col" class="px-5 py-3.5">Ubicación / Sucursal</th>
-              <th scope="col" class="px-5 py-3.5 text-right">Inversión (Q)</th>
-              <th scope="col" class="px-5 py-3.5 text-right">Valor Libros (Q)</th>
-              <th scope="col" class="px-5 py-3.5">Depreciación Lineal</th>
-              <th scope="col" class="px-5 py-3.5 text-center">Estado</th>
-              <th scope="col" class="px-5 py-3.5 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            @for (item of activosPaginados(); track item.activoId) {
-              <tr class="hover:bg-slate-50/80 transition group">
-                <!-- Código & Categoría -->
-                <td class="px-5 py-4">
-                  <span class="inline-block font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-                    {{ item.codigoActivo }}
-                  </span>
-                  <div class="text-[11px] font-medium text-slate-500 mt-1 line-clamp-1">
-                    {{ item.categoria?.nombre }}
-                  </div>
-                </td>
-
-                <!-- Equipo / Descripción -->
-                <td class="px-5 py-4 max-w-xs">
-                  <div class="font-semibold text-slate-900 group-hover:text-indigo-600 transition">
-                    {{ item.descripcion }}
-                  </div>
-                  <div class="text-[11px] text-slate-400 mt-0.5">
-                    @if (item.marca || item.modelo) {
-                      <span>{{ item.marca }} {{ item.modelo }}</span>
-                    }
-                    @if (item.numeroSerie) {
-                      <span class="ml-2 font-mono">S/N: {{ item.numeroSerie }}</span>
-                    }
-                  </div>
-                </td>
-
-                <!-- Sucursal / Stand -->
-                <td class="px-5 py-4">
-                  <div class="font-medium text-slate-800">
-                    {{ item.sucursal?.nombre || 'Sin asignar' }}
-                  </div>
-                  <span class="inline-block mt-0.5 text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600">
-                    {{ item.sucursal?.tipoSucursal || 'SUCURSAL' }}
-                  </span>
-                </td>
-
-                <!-- Inversión Original -->
-                <td class="px-5 py-4 text-right font-medium text-slate-700 whitespace-nowrap">
-                  Q {{ item.valorAdquisicion | number: '1.2-2' }}
-                  <div class="text-[10px] text-slate-400">
-                    {{ item.fechaAdquisicion | date: 'dd/MM/yyyy' }}
-                  </div>
-                </td>
-
-                <!-- Valor en Libros -->
-                <td class="px-5 py-4 text-right whitespace-nowrap">
-                  <div class="font-bold text-emerald-600">
-                    Q {{ item.valorLibros | number: '1.2-2' }}
-                  </div>
-                  <div class="text-[10px] text-rose-500">
-                    - Q {{ item.depreciacionAcumulada | number: '1.2-2' }}
-                  </div>
-                </td>
-
-                <!-- Progreso de Depreciación -->
-                <td class="px-5 py-4 min-w-[150px]">
-                  <div class="flex items-center justify-between text-[11px] font-medium mb-1">
-                    <span class="text-slate-600">{{ item.porcentajeDepreciado }}%</span>
-                    <span class="text-slate-400">{{ item.mesesUso }}m / {{ item.categoria?.vidaUtilMeses }}m</span>
-                  </div>
-                  <div class="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-                    <div
-                      class="h-full rounded-full"
-                      [class.bg-emerald-500]="item.porcentajeDepreciado < 50"
-                      [class.bg-amber-500]="item.porcentajeDepreciado >= 50 && item.porcentajeDepreciado < 85"
-                      [class.bg-rose-500]="item.porcentajeDepreciado >= 85"
-                      [style.width.%]="item.porcentajeDepreciado"
-                    ></div>
-                  </div>
-                </td>
-
-                <!-- Estado -->
-                <td class="px-5 py-4 text-center whitespace-nowrap">
-                  <span
-                    class="inline-flex items-center space-x-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                    [class.bg-emerald-50]="item.estado === 'ACTIVO'"
-                    [class.text-emerald-700]="item.estado === 'ACTIVO'"
-                    [class.ring-1]="item.estado === 'ACTIVO'"
-                    [class.ring-emerald-600/20]="item.estado === 'ACTIVO'"
-                    [class.bg-amber-50]="item.estado === 'EN_MANTENIMIENTO'"
-                    [class.text-amber-700]="item.estado === 'EN_MANTENIMIENTO'"
-                    [class.ring-amber-600/20]="item.estado === 'EN_MANTENIMIENTO'"
-                    [class.bg-rose-50]="item.estado === 'DE_BAJA'"
-                    [class.text-rose-700]="item.estado === 'DE_BAJA'"
-                    [class.ring-rose-600/20]="item.estado === 'DE_BAJA'"
-                  >
-                    <span
-                      class="h-1.5 w-1.5 rounded-full"
-                      [class.bg-emerald-500]="item.estado === 'ACTIVO'"
-                      [class.bg-amber-500]="item.estado === 'EN_MANTENIMIENTO'"
-                      [class.bg-rose-500]="item.estado === 'DE_BAJA'"
-                    ></span>
-                    <span>{{ item.estado }}</span>
-                  </span>
-                </td>
-
-                <!-- Acciones -->
-                <td class="px-5 py-4 text-right whitespace-nowrap">
-                  <div class="flex items-center justify-end space-x-1">
-                    <!-- Ficha y Trazabilidad -->
-                    <button
-                      (click)="abrirDetalle(item.activoId)"
-                      title="Ver Ficha Técnica y Auditoría"
-                      class="rounded-lg p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition"
-                    >
-                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </button>
-
-                    <!-- Traslado entre sucursales -->
-                    <button
-                      (click)="abrirTraslado(item)"
-                      [disabled]="item.estado === 'DE_BAJA'"
-                      title="Trasladar de Sucursal / Stand"
-                      class="rounded-lg p-1.5 text-slate-400 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-30 disabled:hover:bg-transparent transition"
-                    >
-                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                      </svg>
-                    </button>
-
-                    <!-- Mantenimiento / Estado -->
-                    <button
-                      (click)="abrirMantenimiento(item)"
-                      title="Gestionar Mantenimiento o Baja"
-                      class="rounded-lg p-1.5 text-slate-400 hover:bg-amber-50 hover:text-amber-600 transition"
-                    >
-                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Barra de Paginación -->
-      <div class="px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-        <span>
-          Mostrando página <strong class="text-slate-700 font-semibold">{{ page() }}</strong> de <strong class="text-slate-700 font-semibold">{{ totalPaginas() }}</strong> ({{ activos().length }} activos patrimoniales)
-        </span>
-        <div class="flex items-center gap-1.5">
-          <button
-            (click)="cambiarPagina(-1)"
-            [disabled]="page() <= 1"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
-          >
-            ← Anterior
-          </button>
-          <div class="hidden sm:flex items-center gap-1">
-            @for (p of listaPaginas(); track p) {
-              <button
-                (click)="irAPagina(p)"
-                [class.bg-indigo-600]="p === page()"
-                [class.text-white]="p === page()"
-                [class.font-semibold]="p === page()"
-                [class.shadow-sm]="p === page()"
-                [class.border-indigo-600]="p === page()"
-                class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs"
-              >
-                {{ p }}
-              </button>
-            }
-          </div>
-          <button
-            (click)="cambiarPagina(1)"
-            [disabled]="page() >= totalPaginas()"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
-          >
-            Siguiente →
-          </button>
-        </div>
-      </div>
+    </div>
     }
   </div>
 
   <!-- Modales -->
   @if (modalAltaAbierto()) {
-    <app-modal maxWidthClass="max-w-2xl" (cerrar)="cerrarAlta()">
-      <app-activo-form-modal
-        [categorias]="categorias()"
-        [sucursales]="sucursales()"
-        (guardado)="onAltaGuardada()"
-        (cancelar)="cerrarAlta()"
-      ></app-activo-form-modal>
-    </app-modal>
+  <app-modal maxWidthClass="max-w-2xl" (cerrar)="cerrarAlta()">
+    <app-activo-form-modal [categorias]="categorias()" [sucursales]="sucursales()" (guardado)="onAltaGuardada()"
+      (cancelar)="cerrarAlta()"></app-activo-form-modal>
+  </app-modal>
   }
 
   @if (activoParaTraslado()) {
-    <app-modal maxWidthClass="max-w-xl" (cerrar)="cerrarTraslado()">
-      <app-activo-traslado-modal
-        [activo]="activoParaTraslado()!"
-        [sucursales]="sucursales()"
-        (trasladado)="onTrasladoCompletado()"
-        (cancelar)="cerrarTraslado()"
-      ></app-activo-traslado-modal>
-    </app-modal>
+  <app-modal maxWidthClass="max-w-xl" (cerrar)="cerrarTraslado()">
+    <app-activo-traslado-modal [activo]="activoParaTraslado()!" [sucursales]="sucursales()"
+      (trasladado)="onTrasladoCompletado()" (cancelar)="cerrarTraslado()"></app-activo-traslado-modal>
+  </app-modal>
   }
 
   @if (activoParaMantenimiento()) {
-    <app-modal maxWidthClass="max-w-lg" (cerrar)="cerrarMantenimiento()">
-      <app-activo-mantenimiento-modal
-        [activo]="activoParaMantenimiento()!"
-        (guardado)="onMantenimientoGuardado()"
-        (cancelar)="cerrarMantenimiento()"
-      ></app-activo-mantenimiento-modal>
-    </app-modal>
+  <app-modal maxWidthClass="max-w-lg" (cerrar)="cerrarMantenimiento()">
+    <app-activo-mantenimiento-modal [activo]="activoParaMantenimiento()!" (guardado)="onMantenimientoGuardado()"
+      (cancelar)="cerrarMantenimiento()"></app-activo-mantenimiento-modal>
+  </app-modal>
   }
 
   @if (activoParaDetalle()) {
-    <app-modal maxWidthClass="max-w-3xl" (cerrar)="cerrarDetalle()">
-      <app-activo-detalle-modal
-        [activoId]="activoParaDetalle()!"
-        (cerrar)="cerrarDetalle()"
-      ></app-activo-detalle-modal>
-    </app-modal>
+  <app-modal maxWidthClass="max-w-3xl" (cerrar)="cerrarDetalle()">
+    <app-activo-detalle-modal [activoId]="activoParaDetalle()!" (cerrar)="cerrarDetalle()"></app-activo-detalle-modal>
+  </app-modal>
   }
 </div>

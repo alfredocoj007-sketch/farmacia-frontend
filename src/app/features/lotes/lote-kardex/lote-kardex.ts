@@ -18,6 +18,7 @@ export class LoteKardex implements OnInit {
   private readonly router = inject(Router);
 
   protected readonly usuario = this.authService.currentUser;
+  protected readonly esAdmin = computed(() => this.usuario()?.rol === 'ADMIN');
   protected readonly lote = signal<Lote | null>(null);
   protected readonly lotesDelProducto = signal<Lote[]>([]);
   protected readonly movimientos = signal<MovimientoInventario[]>([]);
@@ -69,35 +70,6 @@ export class LoteKardex implements OnInit {
     return Number(inv?.cantidadDisponible ?? 0);
   });
 
-  protected readonly estadoFefo = computed(() => {
-    const dias = this.diasParaVencer();
-    if (dias === null) {
-      return { texto: 'Sin fecha', clase: 'bg-slate-100 text-slate-600 border-slate-200' };
-    }
-    if (dias < 0) {
-      return {
-        texto: `VENCIDO (${Math.abs(dias)}d)`,
-        clase: 'bg-red-50 text-red-700 border-red-200 font-bold animate-pulse',
-      };
-    }
-    if (dias <= 30) {
-      return {
-        texto: `URGENTE (${dias}d)`,
-        clase: 'bg-amber-50 text-amber-700 border-amber-200 font-bold',
-      };
-    }
-    if (dias <= 90) {
-      return {
-        texto: `PRÓXIMO (${dias}d)`,
-        clase: 'bg-yellow-50 text-yellow-800 border-yellow-200 font-medium',
-      };
-    }
-    return {
-      texto: `VIGENTE (${dias}d)`,
-      clase: 'bg-emerald-50 text-emerald-700 border-emerald-200 font-medium',
-    };
-  });
-
   // Stock físico total
   protected readonly stockTotal = computed(() =>
     (this.lote()?.inventarios ?? []).reduce(
@@ -105,6 +77,56 @@ export class LoteKardex implements OnInit {
       0,
     ),
   );
+
+  protected readonly estadoFefo = computed(() => {
+    const stock = this.stockTotal();
+    if (stock === 0) {
+      return {
+        texto: 'AGOTADO (0 stock)',
+        clase: 'bg-slate-100 text-slate-500 border-slate-200 font-medium',
+      };
+    }
+
+    const dias = this.diasParaVencer();
+    if (dias === null) {
+      return { texto: 'Sin fecha', clase: 'bg-slate-100 text-slate-600 border-slate-200' };
+    }
+    if (dias < 0) {
+      const abs = Math.abs(dias);
+      return {
+        texto: abs === 1 ? 'Venció ayer' : `Venció hace ${abs} días`,
+        clase: 'bg-red-100 text-red-700 border-red-200 font-bold animate-pulse',
+      };
+    }
+    if (dias === 0) {
+      return {
+        texto: '¡Vence hoy!',
+        clase: 'bg-red-100 text-red-700 border-red-200 font-bold animate-pulse',
+      };
+    }
+    if (dias === 1) {
+      return {
+        texto: 'Vence mañana',
+        clase: 'bg-red-50 text-red-700 border-red-200 font-bold',
+      };
+    }
+    if (dias <= 30) {
+      return {
+        texto: `Vence en ${dias} días`,
+        clase: 'bg-red-50 text-red-700 border-red-200 font-bold',
+      };
+    }
+    if (dias <= 90) {
+      return {
+        texto: `Vence en ${dias} días`,
+        clase: 'bg-amber-50 text-amber-800 border-amber-200 font-medium',
+      };
+    }
+    return {
+      texto: `Vence en ${dias} días`,
+      clase: 'bg-emerald-50 text-emerald-700 border-emerald-200 font-medium',
+    };
+  });
 
   // Valorización a costo (Capital invertido en bodega)
   protected readonly valorInventarioCosto = computed(() => {
@@ -209,6 +231,9 @@ export class LoteKardex implements OnInit {
   });
 
   ngOnInit(): void {
+    if (!this.esAdmin() && this.usuario()?.sucursalId) {
+      this.filtroSucursalId.set(this.usuario()!.sucursalId!);
+    }
     this.actualizarFechaImpresion();
     this.route.paramMap.subscribe((params) => {
       const loteIdStr = params.get('id');
@@ -222,13 +247,14 @@ export class LoteKardex implements OnInit {
     const ahora = new Date();
     this.fechaImpresion.set(
       ahora.toLocaleString('es-GT', {
+        timeZone: 'America/Guatemala',
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        hour12: false,
+        hour12: true,
       }),
     );
   }
@@ -300,13 +326,14 @@ export class LoteKardex implements OnInit {
     const d = new Date(fechaStr);
     if (isNaN(d.getTime())) return String(fechaStr);
     return d.toLocaleString('es-GT', {
+      timeZone: 'America/Guatemala',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-      hour12: false,
+      hour12: true,
     });
   }
 

@@ -24,7 +24,10 @@ export class EmpleadoModal implements OnInit {
   protected readonly sucursales = signal<Sucursal[]>([]);
   protected readonly procesando = signal(false);
   protected readonly error = signal<string | null>(null);
-  protected readonly fechaMinima = new Date().toISOString().substring(0, 10);
+  protected readonly fechaMinima = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  })();
 
   protected nombre = '';
   protected apellido = '';

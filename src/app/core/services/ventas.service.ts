@@ -7,6 +7,7 @@ import {
   MetodoPagoSimple,
   ProductoPosItem,
   SesionCajaInfo,
+  StockRedRespuesta,
   VentaListadoItem,
   VentaRespuesta,
 } from '../models/venta.models';
@@ -55,5 +56,9 @@ export class VentasService {
 
   listarMetodosPago(): Observable<MetodoPagoSimple[]> {
     return this.http.get<MetodoPagoSimple[]>(`${this.apiUrl}/metodos-pago`);
+  }
+
+  obtenerStockRed(productoId: number): Observable<StockRedRespuesta> {
+    return this.http.get<StockRedRespuesta>(`${this.apiUrl}/stock-red/${productoId}`);
   }
 }

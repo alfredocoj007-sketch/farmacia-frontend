@@ -27,13 +27,6 @@ export class Login {
     this.mostrarPassword.update((val) => !val);
   }
 
-  protected llenarCredenciales(usuario: string, clave: string): void {
-    this.form.patchValue({
-      username: usuario,
-      password: clave,
-    });
-    this.error.set(null);
-  }
 
   protected onSubmit(): void {
     if (this.form.invalid) {

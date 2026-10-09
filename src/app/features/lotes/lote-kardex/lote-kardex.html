@@ -440,15 +440,27 @@
           }
         </div>
 
-        <!-- Filtro por Sucursal (si hay más de una) -->
-        @if (sucursalesDisponibles().length > 1) {
-        <select (change)="cambiarFiltroSucursal($event)"
-          class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-700 bg-slate-50/50 focus:bg-white focus:outline-none cursor-pointer">
-          <option value="">Todas las Sucursales</option>
-          @for (suc of sucursalesDisponibles(); track suc.id) {
-          <option [value]="suc.id">{{ suc.nombre }}</option>
+        <!-- Filtro por Sucursal -->
+        @if (esAdmin()) {
+          @if (sucursalesDisponibles().length > 1) {
+            <select (change)="cambiarFiltroSucursal($event)"
+              class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-700 bg-slate-50/50 focus:bg-white focus:outline-none cursor-pointer">
+              <option value="">Todas las Sucursales</option>
+              @for (suc of sucursalesDisponibles(); track suc.id) {
+              <option [value]="suc.id">{{ suc.nombre }}</option>
+              }
+            </select>
           }
-        </select>
+        } @else {
+          <div class="flex items-center gap-1.5 rounded-xl border border-violet-100 bg-violet-50/60 px-2.5 py-1 text-xs text-violet-900 shadow-xs">
+            <svg class="h-3.5 w-3.5 text-violet-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="truncate font-semibold text-violet-800">
+              Sede: {{ usuario()?.sucursalNombre || 'Mi Sucursal Asignada' }}
+            </span>
+          </div>
         }
 
         <!-- Píldoras de Tipo de Movimiento -->

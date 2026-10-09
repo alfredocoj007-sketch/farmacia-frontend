@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth.service';
 import { ActivosFijosService } from '../../../core/services/activos-fijos.service';
 import { SucursalesService } from '../../../core/services/sucursales.service';
 import {
@@ -33,9 +34,13 @@ import { ActivoDetalleModal } from '../activo-detalle-modal/activo-detalle-modal
   styleUrl: './activos-list.scss',
 })
 export class ActivosList implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly activosService = inject(ActivosFijosService);
   private readonly sucursalesService = inject(SucursalesService);
   private readonly toastService = inject(ToastService);
+
+  protected readonly usuarioActual = this.authService.currentUser;
+  protected readonly esAdmin = computed(() => this.usuarioActual()?.rol === 'ADMIN');
 
   protected readonly activos = signal<ActivoFijo[]>([]);
   protected readonly categorias = signal<CategoriaActivo[]>([]);
@@ -110,6 +115,11 @@ export class ActivosList implements OnInit {
   protected cargarDatosIniciales(): void {
     this.cargando.set(true);
 
+    // Si no es administrador y tiene sucursal asignada, pre-fijamos el filtro
+    if (!this.esAdmin() && this.usuarioActual()?.sucursalId) {
+      this.filtroSucursalId.set(this.usuarioActual()!.sucursalId!);
+    }
+
     // Cargar categorías y sucursales
     this.activosService.listarCategorias().subscribe({
       next: (cats) => this.categorias.set(cats),
@@ -124,7 +134,11 @@ export class ActivosList implements OnInit {
   }
 
   protected cargarEstadisticas(): void {
-    this.activosService.obtenerEstadisticas().subscribe({
+    const sucId = this.esAdmin()
+      ? (this.filtroSucursalId() ?? undefined)
+      : (this.usuarioActual()?.sucursalId ?? undefined);
+
+    this.activosService.obtenerEstadisticas(sucId).subscribe({
       next: (stats) => this.estadisticas.set(stats),
     });
   }
@@ -161,14 +175,20 @@ export class ActivosList implements OnInit {
   }
 
   protected onFiltroChange(): void {
+    this.cargarEstadisticas();
     this.cargarActivos();
   }
 
   protected limpiarFiltros(): void {
-    this.filtroSucursalId.set(null);
+    if (this.esAdmin()) {
+      this.filtroSucursalId.set(null);
+    } else if (this.usuarioActual()?.sucursalId) {
+      this.filtroSucursalId.set(this.usuarioActual()!.sucursalId!);
+    }
     this.filtroCategoriaId.set(null);
     this.filtroEstado.set(null);
     this.busqueda.set('');
+    this.cargarEstadisticas();
     this.cargarActivos();
   }
 

@@ -11,6 +11,12 @@ export interface SesionActivaResumen {
   totalEgresos: number;
   fechaApertura: string;
   cajeroNombre: string;
+  ultimoMovimiento?: {
+    fecha: string;
+    descripcion: string;
+    monto: number;
+    tipo: 'INGRESO' | 'EGRESO';
+  } | null;
 }
 
 export interface Caja {
@@ -46,6 +52,7 @@ export interface SesionActivaDetalle {
   desglose: {
     ingresosEfectivo: number;
     ingresosTarjeta: number;
+    ingresosTransferencia?: number;
     ingresosOtros: number;
     egresosEfectivo: number;
   };

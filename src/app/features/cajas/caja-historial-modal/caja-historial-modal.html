@@ -61,15 +61,34 @@
             <tr class="hover:bg-slate-50/70 transition-colors">
               <td class="px-3.5 py-2.5">
                 <span class="font-bold font-mono text-slate-800">#TUR-{{ s.sesionCajaId }}</span>
-                <span class="text-[10px] text-slate-400 block mt-0.5">
-                  {{ s.fechaApertura | date: 'dd/MM/yy HH:mm' }}
-                </span>
+                <div class="space-y-0.5 text-[11px] mt-1">
+                  <div class="flex items-center gap-1 font-mono text-slate-700">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 font-sans">Apertura:</span>
+                    <span>{{ s.fechaApertura | date: 'dd/MM/yy, hh:mm a' }}</span>
+                  </div>
+                  <div class="flex items-center gap-1 font-mono">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 font-sans">Cierre:</span>
+                    @if (s.fechaCierre) {
+                      <span class="text-slate-700">{{ s.fechaCierre | date: 'dd/MM/yy, hh:mm a' }}</span>
+                    } @else {
+                      <span class="text-emerald-600 font-bold text-[10px] font-sans">● En curso</span>
+                    }
+                  </div>
+                </div>
               </td>
               <td class="px-3.5 py-2.5">
-                <span class="font-semibold text-slate-700 block">{{ s.cajeroApertura }}</span>
-                @if (s.cajeroCierre && s.cajeroCierre !== s.cajeroApertura) {
-                  <span class="text-[10px] text-slate-400 block">Cierre: {{ s.cajeroCierre }}</span>
-                }
+                <div class="space-y-0.5 text-xs">
+                  <div class="flex items-center gap-1 text-slate-800">
+                    <span class="text-[9px] uppercase font-bold text-slate-400">Abrió:</span>
+                    <span class="font-semibold">{{ s.cajeroApertura }}</span>
+                  </div>
+                  @if (s.cajeroCierre) {
+                    <div class="flex items-center gap-1 text-slate-600 text-[11px]">
+                      <span class="text-[9px] uppercase font-bold text-slate-400">Cerró:</span>
+                      <span>{{ s.cajeroCierre }}</span>
+                    </div>
+                  }
+                </div>
               </td>
               <td class="px-3.5 py-2.5 text-right font-mono text-slate-700">
                 Q {{ s.saldoInicial.toFixed(2) }}
@@ -113,6 +132,11 @@
                   >
                     {{ s.diferencia === 0 ? 'CUADRADA' : (s.diferencia !== null && s.diferencia < 0 ? 'FALTANTE' : 'SOBRANTE') }}
                   </span>
+                  @if (s.observacionCierre) {
+                    <span class="text-[10px] text-slate-500 italic block mt-1 max-w-[150px] truncate" [title]="s.observacionCierre">
+                      "{{ s.observacionCierre }}"
+                    </span>
+                  }
                 }
               </td>
             </tr>

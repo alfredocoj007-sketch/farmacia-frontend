@@ -29,6 +29,61 @@
       </button>
     </div>
 
+    <!-- Banner Informativo para la Farmacia Receptora: Envíos Aprobados en Camino -->
+    @if (esSucursalReceptora() && totalEnTransitoHaciaMiSede() > 0) {
+    <div
+      class="p-4 rounded-2xl bg-gradient-to-r from-sky-50 via-indigo-50/40 to-sky-50 border border-sky-200/90 text-sky-900 flex items-start gap-3.5 shadow-xs">
+      <div class="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="3" width="15" height="13"></rect>
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+          <circle cx="5.5" cy="18.5" r="2.5"></circle>
+          <circle cx="18.5" cy="18.5" r="2.5"></circle>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <h4 class="text-sm font-bold text-sky-950">
+            ¡Tienes {{ totalEnTransitoHaciaMiSede() }} pedido(s) aprobado(s) y en camino desde Bodega Central!
+          </h4>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-sky-600 text-white animate-pulse">
+            En Ruta
+          </span>
+        </div>
+        <p class="text-xs text-sky-800 mt-1 leading-relaxed">
+          Bodega Central autorizó el despacho de tu solicitud. Cuando el vehículo o mensajero arribe con la mercadería a tu sede, localiza el envío en la tabla y presiona el botón <span class="font-bold text-emerald-800 bg-emerald-100 border border-emerald-200/80 px-1.5 py-0.5 rounded">Revisar y Recibir</span> para cotejar físicamente la guía e ingresarla a tus existencias.
+        </p>
+      </div>
+    </div>
+    }
+
+    <!-- Banner Informativo para Bodega Central / Administrador: Solicitudes Pendientes de Atender -->
+    @if ((esAdmin() || esBodegaCentral()) && solicitudesPendientesDespacho() > 0) {
+    <div
+      class="p-4 rounded-2xl bg-gradient-to-r from-amber-50 via-orange-50/30 to-amber-50 border border-amber-200/90 text-amber-900 flex items-start gap-3.5 shadow-xs">
+      <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <h4 class="text-sm font-bold text-amber-950">
+            Tienes {{ solicitudesPendientesDespacho() }} solicitud(es) de reposición por autorizar y despachar
+          </h4>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-600 text-white animate-pulse">
+            Pendiente Central
+          </span>
+        </div>
+        <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+          Las farmacias de la red han solicitado reabastecimiento de medicamentos. Abre cada solicitud en la tabla para preparar el paquete y autorizar el despacho a ruta.
+        </p>
+      </div>
+    </div>
+    }
+
+
     <!-- Métricas Rápidas (KPIs) ordenadas por el flujo de 3 pasos -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       <!-- Paso 1: Solicitadas -->
@@ -109,8 +164,14 @@
           <button type="button" (click)="cambiarFiltroEstado('EN_TRANSITO')"
             [class.bg-white]="filtroEstado() === 'EN_TRANSITO'" [class.text-sky-700]="filtroEstado() === 'EN_TRANSITO'"
             [class.shadow-xs]="filtroEstado() === 'EN_TRANSITO'" [class.font-bold]="filtroEstado() === 'EN_TRANSITO'"
-            class="px-3 py-1.5 rounded-lg text-slate-600 transition-all cursor-pointer whitespace-nowrap">
-            ✈ En Tránsito ({{ totalEnTransito() }})
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-600 transition-all cursor-pointer whitespace-nowrap">
+            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            <span>En Tránsito ({{ totalEnTransito() }})</span>
           </button>
 
           <button type="button" (click)="cambiarFiltroEstado('SOLICITADA')"
@@ -131,7 +192,7 @@
             [class.bg-white]="filtroEstado() === 'CANCELADA'" [class.text-red-700]="filtroEstado() === 'CANCELADA'"
             [class.shadow-xs]="filtroEstado() === 'CANCELADA'" [class.font-bold]="filtroEstado() === 'CANCELADA'"
             class="px-3 py-1.5 rounded-lg text-slate-600 transition-all cursor-pointer whitespace-nowrap">
-            ✕ Canceladas
+            ✕ Canceladas ({{ totalCanceladas() }})
           </button>
         </div>
 
@@ -238,8 +299,14 @@
                 @case ('EN_TRANSITO') {
                 <div class="flex flex-col gap-1 items-start">
                   <span
-                    class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold animate-pulse">
-                    ✈ EN TRÁNSITO
+                    class="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold animate-pulse">
+                    <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="1" y="3" width="15" height="13"></rect>
+                      <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+                      <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                      <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                    </svg>
+                    <span>EN TRÁNSITO</span>
                   </span>
                   @if (esDestinoMiSucursal(t)) {
                     <span class="inline-flex items-center gap-1 text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 tracking-wide">
@@ -255,23 +322,29 @@
                 </span>
                 }
                 @case ('CANCELADA') {
-                <span
-                  class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 font-bold">
-                  ✕ CANCELADA
-                </span>
+                <div class="flex flex-col items-start gap-1">
+                  <span
+                    class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold">
+                    ✕ CANCELADA
+                  </span>
+                  <span class="inline-flex items-center gap-1 text-[9px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded">
+                    ↺ Retorno a Central
+                  </span>
+                </div>
                 }
                 }
               </td>
 
               <!-- Acciones -->
               <td class="px-4 py-3.5 text-right whitespace-nowrap">
-                @if (t.estado === 'EN_TRANSITO' && (esAdmin() || esDestinoMiSucursal(t))) {
+                @if (t.estado === 'EN_TRANSITO' && esDestinoMiSucursal(t)) {
                   <button type="button" (click)="verDetalle(t)"
-                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors cursor-pointer">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-xl shadow-xs transition-colors cursor-pointer"
+                    title="Cotejar guía física y registrar recepción">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Recibir Stock
+                    Revisar y Recibir
                   </button>
                 } @else {
                   <button type="button" (click)="verDetalle(t)"
