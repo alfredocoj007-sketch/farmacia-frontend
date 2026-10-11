@@ -17,15 +17,20 @@
           </div>
         </a>
 
-        <!-- Indicador de Red Farmacéutica -->
+        <!-- Indicador de Sucursal Asignada / Ubicación en Tiempo Real -->
         <div
-          class="hidden lg:flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-slate-50 border border-slate-200/80 text-[11px] font-medium text-slate-600">
+          class="hidden lg:flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-50 border border-slate-200/80 text-[11px] font-medium text-slate-700 shadow-2xs"
+          [title]="'Sucursal conectada: ' + sucursalUbicacionTexto()">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span class="font-semibold text-slate-700">Red Farmacias:</span>
-          <span class="text-slate-500">Bodega Matriz · Centros Comerciales · Stands Gasolinera</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            class="text-emerald-600">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="font-bold text-slate-800">{{ sucursalUbicacionTexto() }}</span>
         </div>
 
         <!-- Reloj Oficial en Tiempo Real (UTC-6) -->
@@ -74,7 +79,7 @@
           </div>
           }
 
-          <button (click)="cerrarSesion()" title="Cerrar sesión segura"
+          <button (click)="confirmarCerrarSesion()" title="Cerrar sesión segura"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-red-600 hover:bg-red-50/70 border border-transparent transition-all cursor-pointer">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -214,13 +219,27 @@
             @if (puedeVerCallCenter()) {
             <a routerLink="/call-center" routerLinkActive="bg-amber-50 text-amber-800 font-bold"
               (click)="cerrarMenuMovil()"
-              class="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path
-                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                </path>
-              </svg>
-              Call Center & Envíos
+              class="flex items-center justify-between px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors">
+              <div class="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                  </path>
+                </svg>
+                <span>Call Center & Envíos</span>
+              </div>
+              @if (badgeCallCenter() > 0) {
+              <div class="flex items-center gap-1.5">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                </span>
+                <span class="px-1.5 py-0.5 text-[10px] font-black rounded-full bg-amber-500 text-white shadow-xs">
+                  {{ badgeCallCenter() }}
+                </span>
+              </div>
+              }
             </a>
             }
 
@@ -286,7 +305,7 @@
             }
 
             <div class="pt-1 border-t border-slate-100">
-              <button (click)="cerrarSesion()"
+              <button (click)="confirmarCerrarSesion()"
                 class="flex items-center gap-2 w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -302,175 +321,377 @@
       </div>
     </div>
 
-    <!-- Nivel 2: Barra de Módulos Operativos (Tabs Ejecutivos con Espacio Completo) -->
-    <div
-      class="hidden md:block bg-slate-50/75 px-4 sm:px-8 py-1.5 overflow-x-auto no-scrollbar border-t border-slate-100/80">
-      <div class="max-w-7xl mx-auto flex items-center gap-1.5 text-xs font-semibold">
-        <a routerLink="/dashboard" routerLinkActive="bg-white text-sky-700 font-bold border-slate-200/90 shadow-xs"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-          Dashboard
-        </a>
+    <!-- Nivel 2: Barra de Módulos Operativos (Organizado con Botón Desplegable en 3 Columnas) -->
+    <div class="hidden md:block bg-slate-50/75 px-4 sm:px-8 py-1.5 border-t border-slate-100/80 relative"
+      #menuModulosRef>
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 text-xs font-semibold">
+        <div class="flex items-center gap-2">
+          <!-- 1. Acceso Directo Dashboard -->
+          <a routerLink="/dashboard" routerLinkActive="bg-white text-sky-700 font-bold border-slate-200/90 shadow-xs"
+            [routerLinkActiveOptions]="{ exact: true }" (click)="cerrarMenuModulos()"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Dashboard</span>
+          </a>
 
-        <a routerLink="/productos" routerLinkActive="bg-white text-sky-700 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
-            <path d="m8.5 8.5 7 7"></path>
-          </svg>
-          Catálogo Productos
-        </a>
+          <!-- 2. Botón Principal: Módulos del Sistema (Abre el panel de 3 columnas) -->
+          <button type="button" (click)="alternarMenuModulos()" [class.bg-white]="menuModulosAbierto()"
+            [class.border-slate-300]="menuModulosAbierto()" [class.text-slate-900]="menuModulosAbierto()"
+            [class.shadow-xs]="menuModulosAbierto()"
+            class="relative inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-white/80 border border-slate-200/80 bg-white/40 transition-all whitespace-nowrap shrink-0 cursor-pointer font-bold">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="text-sky-600">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+            <span>Módulos del Sistema</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              [class.rotate-180]="menuModulosAbierto()" class="text-slate-400 transition-transform duration-200">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
 
-        @if (puedeVerLotes()) {
-        <a routerLink="/lotes" routerLinkActive="bg-white text-violet-700 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path
-              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
-            </path>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-            <line x1="12" y1="22.08" x2="12" y2="12"></line>
-          </svg>
-          Lotes & Inventario
-        </a>
-        }
+            @if (badgeTransferencias() > 0 || badgeCallCenter() > 0) {
+            <span class="relative flex h-2 w-2 ml-0.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
+            }
+          </button>
 
-        @if (puedeVerTransferencias()) {
-        <a routerLink="/transferencias"
-          routerLinkActive="bg-white text-indigo-700 font-bold border-slate-200/90 shadow-xs"
-          class="relative inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M16 3h5v5"></path>
-            <path d="M4 20L21 3"></path>
-            <path d="M21 16v5h-5"></path>
-            <path d="M15 15l6 6"></path>
-            <path d="M4 4l5 5"></path>
-          </svg>
-          <span>Transferencias</span>
-          @if (badgeTransferencias() > 0) {
-          <span
-            class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black rounded-full text-white shadow-xs transition-transform transform scale-100"
-            [class]="tipoBadgeTransferencias() === 'DESPACHO' ? 'bg-amber-500 shadow-amber-500/30 ring-2 ring-amber-100 animate-pulse' : 'bg-sky-500 shadow-sky-500/30 ring-2 ring-sky-100 animate-pulse'"
-            [title]="tooltipBadgeTransferencias()">
-            {{ badgeTransferencias() > 99 ? '99+' : badgeTransferencias() }}
-          </span>
+          <!-- Divisor vertical -->
+          <div class="h-4 w-px bg-slate-200 mx-1"></div>
+
+          <!-- Accesos rápidos habituales a un solo clic -->
+          @if (puedeVerVentas()) {
+          <a routerLink="/ventas" routerLinkActive="bg-white text-emerald-800 font-bold border-slate-200/90 shadow-xs"
+            (click)="cerrarMenuModulos()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer text-xs">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+              <path d="M3 6h18"></path>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span>Ventas</span>
+          </a>
           }
-        </a>
-        }
 
-        @if (puedeVerCajas()) {
-        <a routerLink="/cajas" routerLinkActive="bg-white text-emerald-800 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-            <path d="M7 15h0M2 9.5h20"></path>
-          </svg>
-          Cajas & Arqueos
-        </a>
-        }
+          @if (puedeVerCajas()) {
+          <a routerLink="/cajas" routerLinkActive="bg-white text-emerald-800 font-bold border-slate-200/90 shadow-xs"
+            (click)="cerrarMenuModulos()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer text-xs">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M7 15h0M2 9.5h20"></path>
+            </svg>
+            <span>Cajas</span>
+          </a>
+          }
 
-        @if (puedeVerVentas()) {
-        <a routerLink="/ventas" routerLinkActive="bg-white text-emerald-800 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-            <path d="M3 6h18"></path>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-          </svg>
-          Ventas
-        </a>
-        }
+          @if (puedeVerCallCenter()) {
+          <a routerLink="/call-center"
+            routerLinkActive="bg-white text-amber-800 font-bold border-slate-200/90 shadow-xs"
+            (click)="cerrarMenuModulos()"
+            class="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer text-xs">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+              </path>
+            </svg>
+            <span>Call Center</span>
+            @if (badgeCallCenter() > 0) {
+            <span
+              class="inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-black rounded-full bg-amber-500 text-white shadow-xs">
+              {{ badgeCallCenter() }}
+            </span>
+            }
+          </a>
+          }
 
-        @if (puedeVerActivos()) {
-        <a routerLink="/activos-fijos"
-          routerLinkActive="bg-white text-indigo-800 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path
-              d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-            </path>
-          </svg>
-          Activos Fijos
-        </a>
-        }
+          @if (puedeVerTransferencias()) {
+          <a routerLink="/transferencias"
+            routerLinkActive="bg-white text-indigo-700 font-bold border-slate-200/90 shadow-xs"
+            (click)="cerrarMenuModulos()"
+            class="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer text-xs">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 3h5v5"></path>
+              <path d="M4 20L21 3"></path>
+              <path d="M21 16v5h-5"></path>
+              <path d="M15 15l6 6"></path>
+              <path d="M4 4l5 5"></path>
+            </svg>
+            <span>Transferencias</span>
+            @if (badgeTransferencias() > 0) {
+            <span
+              class="inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-black rounded-full text-white shadow-xs"
+              [class]="tipoBadgeTransferencias() === 'DESPACHO' ? 'bg-amber-500' : 'bg-sky-500'">
+              {{ badgeTransferencias() }}
+            </span>
+            }
+          </a>
+          }
+        </div>
 
-        @if (puedeVerCallCenter()) {
-        <a routerLink="/call-center" routerLinkActive="bg-white text-amber-800 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path
-              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-            </path>
-          </svg>
-          Call Center & Envíos
-        </a>
-        }
 
-        @if (puedeVerPlanillas()) {
-        <a routerLink="/planillas" routerLinkActive="bg-white text-teal-800 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-            <line x1="12" y1="8" x2="12" y2="16"></line>
-            <line x1="8" y1="12" x2="16" y2="12"></line>
-          </svg>
-          Planillas & Personal
-        </a>
-        }
-
-        @if (puedeVerAuditoria()) {
-        <a routerLink="/auditoria" routerLinkActive="bg-white text-slate-900 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-          Auditoría & Seguridad
-        </a>
-        }
-
-        @if (puedeVerSucursales()) {
-        <a routerLink="/sucursales" routerLinkActive="bg-white text-emerald-800 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path
-              d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4">
-            </path>
-          </svg>
-          Red de Sucursales
-        </a>
-        }
-
-        @if (puedeVerUsuarios()) {
-        <a routerLink="/usuarios" routerLinkActive="bg-white text-indigo-800 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-          Usuarios & Roles
-        </a>
-        }
-
-        @if (puedeVerReportes()) {
-        <a routerLink="/reportes" routerLinkActive="bg-white text-sky-800 font-bold border-slate-200/90 shadow-xs"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent transition-all whitespace-nowrap shrink-0 cursor-pointer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-          </svg>
-          Reportes Generales
-        </a>
-        }
       </div>
+
+      <!-- =============================================================== -->
+      <!-- PANEL DESPLEGABLE: LAS 3 COLUMNAS ORGANIZADAS DE MÓDULOS        -->
+      <!-- =============================================================== -->
+      @if (menuModulosAbierto()) {
+      <div
+        class="absolute left-4 sm:left-8 top-full mt-2 z-50 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-2xl p-5 w-[850px] max-w-[calc(100vw-3rem)] animate-modalScaleUp">
+
+        <!-- Encabezado del Panel -->
+        <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <div
+              class="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center border border-sky-100">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-black text-slate-900 leading-tight">Módulos del Sistema</h2>
+              <p class="text-[11px] text-slate-400">Selecciona el módulo al que deseas acceder</p>
+            </div>
+          </div>
+          <button type="button" (click)="cerrarMenuModulos()" title="Cerrar (Esc)"
+            class="w-7 h-7 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Cuadrícula de 3 Columnas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <!-- COLUMNA 1: VENTAS & CAJAS -->
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 px-1 mb-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">VENTAS & CAJAS</span>
+            </div>
+
+            @if (puedeVerVentas()) {
+            <a routerLink="/ventas" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-emerald-50 text-emerald-800 font-bold border-emerald-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-emerald-600">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                <path d="M3 6h18"></path>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              <span>Ventas</span>
+            </a>
+            }
+
+            @if (puedeVerCajas()) {
+            <a routerLink="/cajas" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-emerald-50 text-emerald-800 font-bold border-emerald-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-emerald-600">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <path d="M7 15h0M2 9.5h20"></path>
+              </svg>
+              <span>Cajas & Arqueos</span>
+            </a>
+            }
+
+            @if (puedeVerCallCenter()) {
+            <a routerLink="/call-center" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-amber-50 text-amber-800 font-bold border-amber-200/90 shadow-2xs"
+              class="flex items-center justify-between w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <div class="flex items-center gap-2.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  class="text-amber-600">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                  </path>
+                </svg>
+                <span>Call Center & Envíos</span>
+              </div>
+              @if (badgeCallCenter() > 0) {
+              <div class="flex items-center gap-1.5">
+                <span class="relative flex h-2 w-2">
+                  <span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                <span class="px-1.5 py-0.5 text-[10px] font-black rounded-full bg-amber-500 text-white shadow-xs">
+                  {{ badgeCallCenter() }}
+                </span>
+              </div>
+              }
+            </a>
+            }
+          </div>
+
+          <!-- COLUMNA 2: INVENTARIOS -->
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 px-1 mb-2">
+              <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">INVENTARIOS</span>
+            </div>
+
+            <a routerLink="/productos" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-sky-50 text-sky-700 font-bold border-sky-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-sky-600">
+                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
+                <path d="m8.5 8.5 7 7"></path>
+              </svg>
+              <span>Catálogo Productos</span>
+            </a>
+
+            @if (puedeVerLotes()) {
+            <a routerLink="/lotes" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-violet-50 text-violet-700 font-bold border-violet-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-violet-600">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                </path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+              <span>Lotes & Inventario</span>
+            </a>
+            }
+
+            @if (puedeVerTransferencias()) {
+            <a routerLink="/transferencias" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-indigo-50 text-indigo-700 font-bold border-indigo-200/90 shadow-2xs"
+              class="flex items-center justify-between w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <div class="flex items-center gap-2.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  class="text-indigo-600">
+                  <path d="M16 3h5v5"></path>
+                  <path d="M4 20L21 3"></path>
+                  <path d="M21 16v5h-5"></path>
+                  <path d="M15 15l6 6"></path>
+                  <path d="M4 4l5 5"></path>
+                </svg>
+                <span>Transferencias</span>
+              </div>
+              @if (badgeTransferencias() > 0) {
+              <span class="px-1.5 py-0.5 text-[10px] font-black rounded-full text-white shadow-xs"
+                [class]="tipoBadgeTransferencias() === 'DESPACHO' ? 'bg-amber-500' : 'bg-sky-500'">
+                {{ badgeTransferencias() }}
+              </span>
+              }
+            </a>
+            }
+
+            @if (puedeVerActivos()) {
+            <a routerLink="/activos-fijos" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-indigo-50 text-indigo-800 font-bold border-indigo-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-indigo-600">
+                <path
+                  d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                </path>
+              </svg>
+              <span>Activos Fijos</span>
+            </a>
+            }
+          </div>
+
+          <!-- COLUMNA 3: ADMINISTRACIÓN -->
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 px-1 mb-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">ADMINISTRACIÓN</span>
+            </div>
+
+            @if (puedeVerSucursales()) {
+            <a routerLink="/sucursales" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-emerald-50 text-emerald-800 font-bold border-emerald-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-emerald-600">
+                <path
+                  d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4">
+                </path>
+              </svg>
+              <span>Red de Sucursales</span>
+            </a>
+            }
+
+            @if (puedeVerUsuarios()) {
+            <a routerLink="/usuarios" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-indigo-50 text-indigo-800 font-bold border-indigo-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-indigo-600">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <span>Usuarios & Roles</span>
+            </a>
+            }
+
+            @if (puedeVerPlanillas()) {
+            <a routerLink="/planillas" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-teal-50 text-teal-800 font-bold border-teal-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-teal-600">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+              </svg>
+              <span>Planillas & Personal</span>
+            </a>
+            }
+
+            @if (puedeVerAuditoria()) {
+            <a routerLink="/auditoria" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-rose-50 text-rose-800 font-bold border-rose-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-rose-600">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span>Auditoría & Seguridad</span>
+            </a>
+            }
+
+            @if (puedeVerReportes()) {
+            <a routerLink="/reportes" (click)="cerrarMenuModulos()"
+              routerLinkActive="bg-sky-50 text-sky-800 font-bold border-sky-200/90 shadow-2xs"
+              class="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-transparent transition-all cursor-pointer text-xs font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-sky-600">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+              <span>Reportes Generales</span>
+            </a>
+            }
+          </div>
+        </div>
+      </div>
+      }
     </div>
   </header>
 

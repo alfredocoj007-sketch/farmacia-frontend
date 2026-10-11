@@ -79,6 +79,41 @@ export class UsuariosList implements OnInit {
     });
   });
 
+  // Paginación (7 registros por página estrictamente)
+  protected readonly page = signal<number>(1);
+  protected readonly limit = 7;
+  protected readonly totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.usuariosFiltrados().length / this.limit)),
+  );
+  protected readonly usuariosPaginados = computed(() => {
+    const inicio = (this.page() - 1) * this.limit;
+    return this.usuariosFiltrados().slice(inicio, inicio + this.limit);
+  });
+  protected readonly listaPaginas = computed(() => {
+    const total = this.totalPaginas();
+    const actual = this.page();
+    const paginas: number[] = [];
+    const inicio = Math.max(1, actual - 2);
+    const fin = Math.min(total, actual + 2);
+    for (let i = inicio; i <= fin; i++) {
+      paginas.push(i);
+    }
+    return paginas;
+  });
+
+  protected cambiarPagina(delta: number): void {
+    const nueva = this.page() + delta;
+    if (nueva >= 1 && nueva <= this.totalPaginas()) {
+      this.page.set(nueva);
+    }
+  }
+
+  protected irAPagina(p: number): void {
+    if (p >= 1 && p <= this.totalPaginas()) {
+      this.page.set(p);
+    }
+  }
+
   ngOnInit(): void {
     this.cargarCatalogos();
     this.cargarUsuarios();

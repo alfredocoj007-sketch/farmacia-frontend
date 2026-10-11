@@ -76,6 +76,7 @@ export interface SucursalDisponibilidad {
   direccion: string;
   telefono: string | null;
   puedeEntregarCompleto: boolean;
+  tieneCajaAbierta?: boolean;
   tiempoEstimadoMinutos: string;
   items: ItemDisponibilidadSucursal[];
 }
@@ -113,6 +114,14 @@ export interface EstadisticasCallCenter {
   entregados: number;
   cancelados: number;
   montoTotal: number;
+  porDespachar?: number;
+  ultimoPedido?: {
+    pedidoId: number;
+    estado: string;
+    total: number;
+    sucursalNombre: string;
+    clienteNombre: string;
+  } | null;
 }
 
 export interface QueryPedidosParams {

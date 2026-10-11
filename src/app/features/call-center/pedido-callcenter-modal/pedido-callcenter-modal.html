@@ -29,7 +29,7 @@
   </div>
   }
 
-  <form (ngSubmit)="submit()" class="space-y-6">
+  <form (ngSubmit)="submit()" novalidate class="space-y-6">
     <!-- SECCIÓN 1: Identificación del Cliente -->
     <div class="rounded-2xl border border-slate-200/90 bg-slate-50/50 p-4 space-y-3">
       <div class="flex items-center justify-between">
@@ -100,10 +100,24 @@
             class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-800 focus:border-sky-500 outline-none" />
         </div>
         <div>
-          <label class="block font-semibold text-slate-600 mb-1">Teléfono de Contacto *</label>
-          <input type="text" [(ngModel)]="nuevoClienteForm.telefono" name="nuevoTelefono" placeholder="Ej. 5511-2233"
-            required
-            class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-800 focus:border-sky-500 outline-none" />
+          <label class="block font-semibold text-slate-600 mb-1">Teléfono de Contacto (8 dígitos exactos) *</label>
+          <div class="relative">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="8" [ngModel]="nuevoClienteForm.telefono"
+              (input)="onTelefonoInput($event)" name="nuevoTelefono" placeholder="Ej. 55112233" required
+              class="w-full rounded-lg border bg-white px-3 py-2 pr-14 text-slate-800 font-mono tracking-wider focus:border-sky-500 outline-none"
+              [class.border-red-400]="nuevoClienteForm.telefono && nuevoClienteForm.telefono.length !== 8"
+              [class.border-slate-200]="!nuevoClienteForm.telefono || nuevoClienteForm.telefono.length === 8" />
+            <span class="absolute right-2.5 top-2.5 text-[10px] font-mono font-bold"
+              [class.text-slate-400]="!nuevoClienteForm.telefono || nuevoClienteForm.telefono.length === 0"
+              [class.text-amber-500]="nuevoClienteForm.telefono && nuevoClienteForm.telefono.length > 0 && nuevoClienteForm.telefono.length < 8"
+              [class.text-emerald-600]="nuevoClienteForm.telefono && nuevoClienteForm.telefono.length === 8">
+              {{ nuevoClienteForm.telefono ? nuevoClienteForm.telefono.length : 0 }}/8
+            </span>
+          </div>
+          @if (nuevoClienteForm.telefono && nuevoClienteForm.telefono.length !== 8) {
+          <p class="text-[10px] text-red-500 mt-1 font-medium">Debe contener exactamente 8 dígitos numéricos (solo
+            números).</p>
+          }
         </div>
         <div class="sm:col-span-2">
           <label class="block font-semibold text-slate-600 mb-1">Dirección de Entrega Exacta *</label>
@@ -276,10 +290,13 @@
           </div>
 
           @for (p of medicamentosFiltrados(); track p.productoId) {
-          <div
-            class="p-2.5 rounded-xl border bg-white transition flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
-            [class.border-emerald-200]="!p.agotado && p.stockTotal > 0"
-            [class.border-slate-200]="p.agotado || p.stockTotal <= 0"
+          <div (click)="seleccionarMedicamento(p)"
+            class="p-2.5 rounded-xl border bg-white transition flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 cursor-pointer hover:border-emerald-300 hover:shadow-2xs"
+            [class.ring-2]="productoSeleccionado()?.productoId === p.productoId"
+            [class.ring-emerald-500/30]="productoSeleccionado()?.productoId === p.productoId"
+            [class.border-emerald-500]="productoSeleccionado()?.productoId === p.productoId"
+            [class.border-emerald-200]="productoSeleccionado()?.productoId !== p.productoId && !p.agotado && p.stockTotal > 0"
+            [class.border-slate-200]="productoSeleccionado()?.productoId !== p.productoId && (p.agotado || p.stockTotal <= 0)"
             [class.opacity-60]="p.agotado || p.stockTotal <= 0" [class.bg-slate-50]="p.agotado || p.stockTotal <= 0">
             <!-- Datos del Producto -->
             <div class="min-w-0 flex-1">
@@ -295,7 +312,7 @@
                   } @else {
                   <span
                     class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    Stock: {{ p.stockTotal }} uds
+                    Stock Total: {{ p.stockTotal }} uds
                   </span>
                   }
 
@@ -347,7 +364,7 @@
                 Agotado
                 </button>
                 } @else {
-                <button type="button" (click)="agregarMedicamentoDirecto(p, cantidadAgregar())"
+                <button type="button" (click)="$event.stopPropagation(); agregarMedicamentoDirecto(p, cantidadAgregar())"
                   class="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] py-1.5 px-3 transition cursor-pointer shadow-2xs flex items-center gap-1">
                   <span>+ Agregar</span>
                   <span class="font-mono text-[10px] opacity-80">(x{{ cantidadAgregar() }})</span>
@@ -438,13 +455,28 @@
           </tfoot>
         </table>
       </div>
+
+      @if (tieneMedicamentosConReceta()) {
+      <div
+        class="mt-2.5 rounded-xl border border-amber-300 bg-amber-50 p-3 flex items-start space-x-2.5 text-xs text-amber-900 shadow-2xs">
+        <span class="text-amber-600 text-base font-bold shrink-0">📋</span>
+        <div>
+          <span class="font-bold block">Aviso Regulatorio: La orden contiene medicamentos bajo prescripción
+            médica</span>
+          <span class="text-[11px] text-amber-800">
+            Informe al cliente por teléfono que debe <strong>entregar la receta médica física original al
+              repartidor</strong> al momento de la entrega para que se le pueda despachar el producto.
+          </span>
+        </div>
+      </div>
+      }
       }
     </div>
 
     <!-- SECCIÓN 3: Consulta en Tiempo Real de Disponibilidad por Farmacia -->
-    <div class="rounded-2xl border border-blue-200/80 bg-blue-50/40 p-4 space-y-3">
-      <div class="flex items-center justify-between">
-        <div>
+    <div class="rounded-2xl border border-blue-200/80 bg-blue-50/40 p-4 space-y-3.5">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div class="space-y-0.5">
           <span class="text-xs font-bold uppercase tracking-wider text-blue-900 flex items-center space-x-1.5">
             <svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -452,66 +484,135 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span>3. Decisión de Farmacia de Despacho (Evitar Entregas Tardías)</span>
+            <span>Decisión de Farmacia de Despacho</span>
           </span>
-          <p class="text-[11px] text-blue-700/80 mt-0.5">
-            El sistema evalúa el stock multisede para indicar al cliente en la llamada qué farmacia entregará a tiempo
-          </p>
+
+          @if (medicamentoEvaluadoInfo(); as med) {
+          <div class="text-[11px] text-blue-800 font-medium flex items-center gap-1.5 pt-0.5 flex-wrap">
+            <span>Sucursales donde está disponible:</span>
+            <span class="font-bold text-blue-950 bg-white px-2 py-0.5 rounded-md border border-blue-200 shadow-2xs">
+              {{ med.nombre }} ({{ med.cantidad }} uds)
+            </span>
+          </div>
+          }
         </div>
 
-        @if (consultandoStock()) {
-        <div class="flex items-center space-x-1 text-xs text-blue-600 font-semibold">
-          <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-            </path>
-          </svg>
-          <span>Consultando...</span>
+        <div class="flex items-center gap-3">
+          @if (consultandoStock()) {
+          <div class="flex items-center space-x-1 text-xs text-blue-600 font-semibold">
+            <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+              </path>
+            </svg>
+            <span>Consultando existencias...</span>
+          </div>
+          }
+
+          @if (sucursalesDisponibles().length > 0) {
+          <label class="flex items-center gap-1.5 text-[11px] text-blue-900 font-semibold cursor-pointer select-none">
+            <input type="checkbox" [checked]="soloSucursalesConStock()" (change)="alternarSoloConStockSucursal()"
+              class="rounded border-blue-300 text-blue-600 focus:ring-blue-500" />
+            <span>Solo donde está disponible</span>
+          </label>
+          }
         </div>
-        }
       </div>
 
-      @if (sucursalesDisponibles().length === 0) {
-      <div class="rounded-xl border border-dashed border-blue-200 p-4 text-center text-xs text-blue-600">
-        Agregue medicamentos a la orden para evaluar qué farmacias y stands tienen existencias completas para despacho.
+      @if (!medicamentoEvaluadoInfo()) {
+      <div class="rounded-xl border border-dashed border-blue-200 bg-white/70 p-5 text-center text-xs text-blue-600 space-y-1">
+        <p class="font-bold">Elige un medicamento del catálogo o agrégalo a la orden</p>
+        <p class="text-[11px] text-slate-500">
+          Al elegir o agregar un medicamento, aquí se mostrarán de inmediato las sucursales donde está disponible y cuántas unidades tiene cada una.
+        </p>
+      </div>
+      } @else if (sucursalesFiltradas().length === 0) {
+      <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-center text-xs text-amber-800 space-y-1.5">
+        <p class="font-bold text-sm">⚠ Medicamento no disponible en las sucursales</p>
+        <p class="text-[11px] text-amber-700">
+          No hay sucursales con existencias disponibles de este producto actualmente.
+        </p>
+        @if (soloSucursalesConStock()) {
+        <button type="button" (click)="soloSucursalesConStock.set(false)"
+          class="text-xs text-blue-700 hover:underline font-bold cursor-pointer">
+          Ver todas las sucursales de la red
+        </button>
+        }
       </div>
       } @else {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        @for (suc of sucursalesDisponibles(); track suc.sucursalId) {
-        <label
-          class="flex flex-col justify-between p-3.5 rounded-xl border-2 cursor-pointer transition relative bg-white"
+        @for (suc of sucursalesFiltradas(); track suc.sucursalId) {
+        <label (click)="seleccionarSucursal(suc)"
+          class="flex flex-col justify-between p-3.5 rounded-xl border-2 transition relative bg-white hover:border-blue-400"
+          [class.cursor-pointer]="suc.tieneCajaAbierta !== false"
+          [class.cursor-not-allowed]="suc.tieneCajaAbierta === false"
+          [class.opacity-60]="suc.tieneCajaAbierta === false" [class.bg-slate-50]="suc.tieneCajaAbierta === false"
           [class.border-blue-600]="sucursalPreparacionId === suc.sucursalId"
           [class.ring-2]="sucursalPreparacionId === suc.sucursalId"
           [class.ring-blue-500/20]="sucursalPreparacionId === suc.sucursalId"
           [class.border-slate-200]="sucursalPreparacionId !== suc.sucursalId">
           <input type="radio" name="sucursalPreparacionId" [value]="suc.sucursalId" [(ngModel)]="sucursalPreparacionId"
-            class="sr-only" />
+            [disabled]="suc.tieneCajaAbierta === false" class="sr-only" />
 
-          <div>
-            <div class="flex items-center justify-between mb-1">
+          <div class="space-y-2.5">
+            <!-- Encabezado de la Sucursal -->
+            <div class="flex items-center justify-between gap-2 flex-wrap">
               <span class="font-bold text-xs text-slate-900">{{ suc.nombre }}</span>
-              @if (suc.puedeEntregarCompleto) {
-              <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                ✓ Stock Completo
-              </span>
-              } @else {
-              <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
-                Stock Parcial
-              </span>
+              <div class="flex items-center gap-1">
+                @if (suc.tieneCajaAbierta === false) {
+                <span class="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-800">
+                  ⚠ Caja Cerrada
+                </span>
+                } @else if (suc.tieneCajaAbierta === true) {
+                <span
+                  class="rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 px-2 py-0.5 text-[10px] font-bold">
+                  🟢 Caja Abierta
+                </span>
+                }
+              </div>
+            </div>
+
+            <!-- Existencias del medicamento en esta sucursal -->
+            @if (suc.items && suc.items.length > 0) {
+            <div class="space-y-1.5 pt-1 border-t border-slate-100">
+              @for (it of suc.items; track it.productoId) {
+              <div class="flex items-center justify-between text-xs bg-slate-50 p-2 rounded-lg border border-slate-100">
+                <span class="text-slate-700 truncate mr-2 font-medium text-[11px]">{{ it.nombre }}</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  @if (it.stockDisponibleEnSucursal > 0) {
+                  <span class="px-2 py-0.5 rounded font-mono font-black text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    {{ it.stockDisponibleEnSucursal }} disponibles
+                  </span>
+                  @if (it.stockDisponibleEnSucursal >= it.cantidadSolicitada) {
+                  <span class="text-[10px] font-bold text-emerald-600">✓ Cumple</span>
+                  } @else {
+                  <span class="text-[10px] font-bold text-amber-600">Parcial</span>
+                  }
+                  } @else {
+                  <span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-rose-100 text-rose-700">
+                    0 disponibles
+                  </span>
+                  }
+                </div>
+              </div>
+              }
+            </div>
+            }
+
+            <!-- Dirección y Tiempo Estimado -->
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-50">
+              <span class="line-clamp-1">📍 {{ suc.direccion }}</span>
+              @if (suc.tiempoEstimadoMinutos) {
+              <span class="font-medium text-blue-700 shrink-0 ml-2">⏱ {{ suc.tiempoEstimadoMinutos }}</span>
               }
             </div>
 
-            <p class="text-[11px] text-slate-500 line-clamp-1">📍 {{ suc.direccion }}</p>
-          </div>
-
-          <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-            <span class="font-medium text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">
-              ⏱ {{ suc.tiempoEstimadoMinutos }}
-            </span>
-            <span class="text-slate-400 font-semibold uppercase text-[10px]">
-              {{ suc.tipoSucursal }}
-            </span>
+            @if (suc.tieneCajaAbierta === false) {
+            <p class="text-[10px] text-rose-600 font-semibold mt-1">
+              Debe abrirse un turno de caja en esta sucursal para poder coordinar despachos.
+            </p>
+            }
           </div>
         </label>
         }
@@ -522,11 +623,7 @@
     <!-- SECCIÓN 4: Forma de Pago y Tiempo Estimado -->
     <div class="rounded-2xl border border-slate-200/90 bg-white p-4 space-y-4">
       <span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center space-x-1.5">
-        <svg class="h-4 w-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>4. Condiciones de Entrega y Cobro Acordadas en la Llamada</span>
+        <span>Condiciones de Entrega y Cobro</span>
       </span>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -570,14 +667,28 @@
       </div>
     </div>
 
+    <!-- Alerta de Error en Pie de Modal -->
+    @if (error()) {
+    <div class="rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs text-red-700 flex items-start space-x-2.5 shadow-2xs">
+      <svg class="h-4 w-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div class="space-y-0.5">
+        <span class="font-bold block">No se pudo procesar el pedido</span>
+        <span class="text-[11px] text-red-600 block">{{ error() }}</span>
+      </div>
+    </div>
+    }
+
     <!-- Botones de Acción -->
     <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
       <button type="button" (click)="cancelar.emit()" [disabled]="guardando()"
-        class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition">
+        class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition cursor-pointer">
         Cancelar Llamada
       </button>
 
-      <button type="submit" [disabled]="guardando() || itemsCarrito().length === 0"
+      <button type="button" (click)="submit()" [disabled]="guardando()"
         class="inline-flex items-center space-x-2 rounded-xl bg-sky-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-sky-700 disabled:opacity-50 transition cursor-pointer">
         @if (guardando()) {
         <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">

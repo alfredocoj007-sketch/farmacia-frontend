@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PedidosService } from '../../../core/services/pedidos.service';
 import { CajasService } from '../../../core/services/cajas.service';
+import { ToastService } from '../../../shared/toast/toast.service';
 import {
   ClienteSimple,
   CreatePedidoCallCenterRequest,
@@ -27,6 +28,7 @@ export interface ItemCarrito {
 export class PedidoCallcenterModal implements OnInit {
   private readonly pedidosService = inject(PedidosService);
   private readonly cajasService = inject(CajasService);
+  private readonly toastService = inject(ToastService);
 
   @Output() pedidoCreado = new EventEmitter<void>();
   @Output() cancelar = new EventEmitter<void>();
@@ -97,6 +99,49 @@ export class PedidoCallcenterModal implements OnInit {
   // Disponibilidad por farmacia
   protected sucursalesDisponibles = signal<SucursalDisponibilidad[]>([]);
   protected sucursalPreparacionId = 0;
+  protected readonly soloSucursalesConStock = signal<boolean>(true);
+
+  // Sucursales filtradas para mostrar solo donde está disponible el medicamento
+  protected readonly sucursalesFiltradas = computed(() => {
+    const lista = this.sucursalesDisponibles();
+    if (!this.soloSucursalesConStock()) {
+      return lista;
+    }
+    return lista.filter((suc) => {
+      if (!suc.items || suc.items.length === 0) {
+        return suc.puedeEntregarCompleto;
+      }
+      return suc.items.some((i) => i.stockDisponibleEnSucursal > 0);
+    });
+  });
+
+  // Información del medicamento actualmente evaluado
+  protected readonly medicamentoEvaluadoInfo = computed(() => {
+    const carrito = this.itemsCarrito();
+    if (carrito.length === 1) {
+      return {
+        nombre: carrito[0].producto.nombre,
+        cantidad: carrito[0].cantidad,
+        esMultiple: false,
+      };
+    }
+    if (carrito.length > 1) {
+      return {
+        nombre: `${carrito.length} medicamentos en orden`,
+        cantidad: carrito.reduce((acc, i) => acc + i.cantidad, 0),
+        esMultiple: true,
+      };
+    }
+    const sel = this.productoSeleccionado();
+    if (sel) {
+      return {
+        nombre: sel.nombre,
+        cantidad: this.cantidadAgregar(),
+        esMultiple: false,
+      };
+    }
+    return null;
+  });
 
   // Condiciones de entrega
   protected metodoPagoId = 0;
@@ -168,11 +213,18 @@ export class PedidoCallcenterModal implements OnInit {
     this.error.set(null);
     this.productoSeleccionado.set(prod);
     this.cantidadAgregar.set(1);
+    this.evaluarDisponibilidadParaProducto(prod, 1);
   }
 
   protected deseleccionarMedicamento(): void {
     this.productoSeleccionado.set(null);
     this.cantidadAgregar.set(1);
+    if (this.itemsCarrito().length === 0) {
+      this.sucursalesDisponibles.set([]);
+      this.sucursalPreparacionId = 0;
+    } else {
+      this.evaluarDisponibilidadFarmacias();
+    }
   }
 
   protected ajustarCantidad(delta: number): void {
@@ -180,7 +232,15 @@ export class PedidoCallcenterModal implements OnInit {
     const nueva = this.cantidadAgregar() + delta;
     if (nueva >= 1 && nueva <= maxStock) {
       this.cantidadAgregar.set(nueva);
+      const sel = this.productoSeleccionado();
+      if (sel) {
+        this.evaluarDisponibilidadParaProducto(sel, nueva);
+      }
     }
+  }
+
+  protected alternarSoloConStockSucursal(): void {
+    this.soloSucursalesConStock.update((v) => !v);
   }
 
   /**
@@ -284,6 +344,10 @@ export class PedidoCallcenterModal implements OnInit {
     return this.itemsCarrito().reduce((sum, i) => sum + i.subtotal, 0);
   }
 
+  protected tieneMedicamentosConReceta(): boolean {
+    return this.itemsCarrito().some((i) => i.producto.requiereReceta);
+  }
+
   // Clientes
   protected buscarClientes(): void {
     if (this.busquedaCliente.trim().length < 2) {
@@ -315,6 +379,11 @@ export class PedidoCallcenterModal implements OnInit {
   // Evaluación FEFO por farmacia
   protected evaluarDisponibilidadFarmacias(): void {
     if (this.itemsCarrito().length === 0) {
+      const sel = this.productoSeleccionado();
+      if (sel) {
+        this.evaluarDisponibilidadParaProducto(sel, this.cantidadAgregar());
+        return;
+      }
       this.sucursalesDisponibles.set([]);
       this.sucursalPreparacionId = 0;
       return;
@@ -330,54 +399,152 @@ export class PedidoCallcenterModal implements OnInit {
       next: (sucursales) => {
         this.sucursalesDisponibles.set(sucursales);
         this.consultandoStock.set(false);
-
-        // Preseleccionar la primera que tenga stock completo si no hay una seleccionada
-        const primeraCompleta = sucursales.find((s) => s.puedeEntregarCompleto);
-        if (primeraCompleta && (!this.sucursalPreparacionId || !sucursales.some(s => s.sucursalId === this.sucursalPreparacionId))) {
-          this.sucursalPreparacionId = primeraCompleta.sucursalId;
-        } else if (!this.sucursalPreparacionId && sucursales.length > 0) {
-          this.sucursalPreparacionId = sucursales[0].sucursalId;
-        }
+        this.autoSeleccionarSucursalOptima(sucursales);
       },
       error: () => this.consultandoStock.set(false),
     });
   }
 
-  protected submit(): void {
-    if (!this.clienteSeleccionado && !this.modoNuevoCliente) {
-      this.error.set('Debe seleccionar un cliente existente o registrar un nuevo cliente.');
+  protected evaluarDisponibilidadParaProducto(prod: MedicamentoCallCenter, cantidad = 1): void {
+    this.consultandoStock.set(true);
+    const payload = [
+      {
+        productoId: prod.productoId,
+        cantidad: cantidad || 1,
+      },
+    ];
+
+    this.pedidosService.consultarDisponibilidad(payload).subscribe({
+      next: (sucursales) => {
+        this.sucursalesDisponibles.set(sucursales);
+        this.consultandoStock.set(false);
+        this.autoSeleccionarSucursalOptima(sucursales);
+      },
+      error: () => this.consultandoStock.set(false),
+    });
+  }
+
+  private autoSeleccionarSucursalOptima(sucursales: SucursalDisponibilidad[]): void {
+    const primeraOptima = sucursales.find((s) => s.puedeEntregarCompleto && s.tieneCajaAbierta !== false);
+    const primeraConStockYCaja = sucursales.find(
+      (s) => s.tieneCajaAbierta !== false && s.items?.some((i) => i.stockDisponibleEnSucursal > 0),
+    );
+    const primeraConStock = sucursales.find((s) => s.items?.some((i) => i.stockDisponibleEnSucursal > 0));
+
+    if (primeraOptima && (!this.sucursalPreparacionId || !sucursales.some((s) => s.sucursalId === this.sucursalPreparacionId))) {
+      this.sucursalPreparacionId = primeraOptima.sucursalId;
+    } else if (primeraConStockYCaja && (!this.sucursalPreparacionId || !sucursales.some((s) => s.sucursalId === this.sucursalPreparacionId))) {
+      this.sucursalPreparacionId = primeraConStockYCaja.sucursalId;
+    } else if (primeraConStock && (!this.sucursalPreparacionId || !sucursales.some((s) => s.sucursalId === this.sucursalPreparacionId))) {
+      this.sucursalPreparacionId = primeraConStock.sucursalId;
+    } else if (!this.sucursalPreparacionId && sucursales.length > 0) {
+      this.sucursalPreparacionId = sucursales[0].sucursalId;
+    }
+  }
+
+  protected onTelefonoInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digitos = (input.value || '').replace(/\D/g, '').slice(0, 8);
+    this.nuevoClienteForm.telefono = digitos;
+    input.value = digitos;
+  }
+
+  protected seleccionarSucursal(suc: SucursalDisponibilidad): void {
+    if (suc.tieneCajaAbierta === false) {
+      this.toastService.warning(
+        'Caja Cerrada en Sucursal',
+        `La sucursal "${suc.nombre}" tiene su caja cerrada. Debe haber un turno abierto para despachar pedidos.`,
+      );
       return;
     }
+    this.sucursalPreparacionId = suc.sucursalId;
+  }
 
-    if (this.modoNuevoCliente) {
-      if (!this.nuevoClienteForm.nombre.trim() || !this.nuevoClienteForm.telefono.trim() || !this.nuevoClienteForm.direccion.trim()) {
-        this.error.set('Nombre, teléfono y dirección son requeridos para el nuevo cliente.');
+  protected submit(): void {
+    this.error.set(null);
+
+    // 1. Validar selección o registro de cliente
+    if (!this.clienteSeleccionado && !this.modoNuevoCliente) {
+      if (this.clientesEncontrados().length === 1) {
+        this.seleccionarCliente(this.clientesEncontrados()[0]);
+      } else {
+        const msg = this.busquedaCliente.trim()
+          ? 'Por favor selecciona el cliente que apareció en la lista o activa "+ Registrar nuevo cliente".'
+          : 'Debe buscar y seleccionar un cliente existente, o activar "+ Registrar nuevo cliente".';
+        this.error.set(msg);
+        this.toastService.warning('Falta Cliente', msg);
         return;
       }
     }
 
+    if (this.modoNuevoCliente) {
+      const nom = (this.nuevoClienteForm.nombre || '').trim();
+      const tel = (this.nuevoClienteForm.telefono || '').trim();
+      const dir = (this.nuevoClienteForm.direccion || '').trim();
+
+      if (!nom || !tel || !dir) {
+        const msg = 'Nombre, teléfono y dirección son obligatorios para registrar al nuevo cliente.';
+        this.error.set(msg);
+        this.toastService.warning('Datos Incompletos', msg);
+        return;
+      }
+
+      if (!/^\d{8}$/.test(tel)) {
+        const msg = 'El teléfono del cliente debe tener exactamente 8 dígitos numéricos.';
+        this.error.set(msg);
+        this.toastService.warning('Teléfono Inválido', msg);
+        return;
+      }
+    }
+
+    // 2. Validar medicamentos en carrito
     if (this.itemsCarrito().length === 0) {
-      this.error.set('Debe agregar al menos un medicamento a la orden.');
+      const msg = 'Debe agregar al menos un medicamento a la orden antes de despachar.';
+      this.error.set(msg);
+      this.toastService.warning('Carrito Vacío', msg);
       return;
     }
 
+    // 3. Validar sucursal preparadora
     if (!this.sucursalPreparacionId) {
-      this.error.set('Debe seleccionar la farmacia que preparará y despachará el medicamento.');
+      const msg = 'Debe seleccionar la farmacia o sucursal que preparará y despachará la orden.';
+      this.error.set(msg);
+      this.toastService.warning('Seleccionar Farmacia', msg);
       return;
     }
 
+    const sucSeleccionada = this.sucursalesDisponibles().find(
+      (s) => s.sucursalId === Number(this.sucursalPreparacionId),
+    );
+    if (sucSeleccionada && sucSeleccionada.tieneCajaAbierta === false) {
+      const msg = `La sucursal "${sucSeleccionada.nombre}" tiene su caja cerrada actualmente. Se requiere un turno de caja abierto en esa sede para despachar.`;
+      this.error.set(msg);
+      this.toastService.error('Caja Cerrada', msg, 5000);
+      return;
+    }
+
+    // 4. Validar método de pago
     if (!this.metodoPagoId) {
-      this.error.set('Debe seleccionar la forma de pago acordada.');
+      const msg = 'Debe seleccionar la forma de pago acordada con el cliente.';
+      this.error.set(msg);
+      this.toastService.warning('Forma de Pago', msg);
       return;
     }
 
+    // 5. Normalizar fecha estimada de entrega
     if (!this.fechaEstimadaEntrega) {
-      this.error.set('Debe indicar la fecha u hora estimada de entrega.');
-      return;
+      this.inicializarFechaEstimada();
+    }
+
+    let fechaIso: string;
+    try {
+      const d = this.fechaEstimadaEntrega ? new Date(this.fechaEstimadaEntrega) : new Date();
+      fechaIso = isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+    } catch {
+      fechaIso = new Date().toISOString();
     }
 
     this.guardando.set(true);
-    this.error.set(null);
 
     const req: CreatePedidoCallCenterRequest = {
       clienteId: this.clienteSeleccionado?.clienteId,
@@ -385,7 +552,7 @@ export class PedidoCallcenterModal implements OnInit {
       sucursalPreparacionId: Number(this.sucursalPreparacionId),
       metodoPagoId: Number(this.metodoPagoId),
       origen: 'CALL_CENTER',
-      fechaEstimadaEntrega: new Date(this.fechaEstimadaEntrega).toISOString(),
+      fechaEstimadaEntrega: fechaIso,
       personaRecibe: this.personaRecibe.trim() || undefined,
       observacion: this.observacion.trim() || undefined,
       items: this.itemsCarrito().map((i) => ({
@@ -397,11 +564,18 @@ export class PedidoCallcenterModal implements OnInit {
     this.pedidosService.crearPedidoCallCenter(req).subscribe({
       next: () => {
         this.guardando.set(false);
+        this.toastService.success(
+          '¡Pedido Despachado!',
+          'El pedido ha sido transmitido exitosamente a la farmacia preparadora.',
+          4000,
+        );
         this.pedidoCreado.emit();
       },
       error: (err) => {
         this.guardando.set(false);
-        this.error.set(err.error?.message || 'Error al coordinar y despachar el pedido.');
+        const mensajeError = err.error?.message || 'Error al coordinar y despachar el pedido en el servidor.';
+        this.error.set(mensajeError);
+        this.toastService.error('Error al Despachar', mensajeError, 6000);
       },
     });
   }

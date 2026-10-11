@@ -63,7 +63,7 @@
             <path d="M3 6h18"></path>
             <path d="M16 10a4 4 0 0 1-8 0"></path>
           </svg>
-          Facturación POS
+          Facturación
         </a>
 
         <a routerLink="/cajas"
@@ -234,10 +234,10 @@
       </label>
       <select id="filtroSucursalAdmin" [ngModel]="sucursalFiltroAdminId()" (ngModelChange)="cambiarFiltroAdmin($event)"
         class="w-full sm:w-auto px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl shadow-2xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
-        <option [ngValue]="null">🌐 Toda la Red (Consolidado Corporativo)</option>
+        <option [ngValue]="null">Toda la Red (Consolidado Corporativo)</option>
         @for (s of sucursalesDisponibles(); track s.sucursalId) {
         <option [ngValue]="s.sucursalId">
-          📍 {{ s.nombre }} · ({{ s.tipoSucursal || 'Sucursal' }})
+          {{ s.nombre }} · ({{ s.tipoSucursal || 'Sucursal' }})
         </option>
         }
       </select>
@@ -511,27 +511,37 @@
             <path [attr.d]="pathCurvaSuave()" fill="none" stroke="url(#lineGradient)" stroke-width="3"
               stroke-linecap="round" stroke-linejoin="round" class="chart-line" />
 
-            <!-- Puntos Interiores Interactivos con Coordenadas Reales -->
+            <!-- Puntos Interiores Interactivos con Coordenadas Reales (Sin Parpadeo) -->
             @for (p of puntosGrafica(); track p.dia) {
-            <g class="cursor-pointer group" (mouseenter)="puntoHover.set(p)" (mouseleave)="puntoHover.set(null)">
+            <g class="cursor-pointer" (mouseenter)="puntoHover.set(p)" (mouseleave)="puntoHover.set(null)">
               <!-- Línea vertical punteada al hover -->
               @if (puntoHover()?.dia === p.dia) {
               <line [attr.x1]="p.x" [attr.y1]="p.y" [attr.x2]="p.x" [attr.y2]="135" stroke="#0d9488" stroke-width="1.5"
-                stroke-dasharray="3 3" />
+                stroke-dasharray="3 3" class="pointer-events-none" />
               }
 
-              <!-- Círculo exterior con resplandor -->
-              <circle [attr.cx]="p.x" [attr.cy]="p.y" r="6"
-                class="fill-white stroke-teal-600 transition-all duration-150 group-hover:scale-125"
-                stroke-width="2.5" />
+              <!-- Círculo exterior con resplandor suave -->
+              <circle [attr.cx]="p.x" [attr.cy]="p.y" [attr.r]="puntoHover()?.dia === p.dia ? 8 : 5.5"
+                class="chart-point-outer fill-white pointer-events-none"
+                [class.stroke-emerald-500]="puntoHover()?.dia === p.dia"
+                [class.stroke-teal-600]="puntoHover()?.dia !== p.dia"
+                [attr.stroke-width]="puntoHover()?.dia === p.dia ? 3 : 2.5" />
+
               <!-- Núcleo interior -->
-              <circle [attr.cx]="p.x" [attr.cy]="p.y" r="2.5" class="fill-teal-600 group-hover:fill-emerald-500" />
+              <circle [attr.cx]="p.x" [attr.cy]="p.y" [attr.r]="puntoHover()?.dia === p.dia ? 3.5 : 2.5"
+                class="chart-point-inner pointer-events-none" [class.fill-emerald-500]="puntoHover()?.dia === p.dia"
+                [class.fill-teal-600]="puntoHover()?.dia !== p.dia" />
 
               <!-- Etiqueta del Eje X -->
               <text [attr.x]="p.x" y="152" text-anchor="middle"
-                class="text-[10px] font-bold fill-slate-400 group-hover:fill-slate-800 transition-colors">
+                class="text-[10px] font-bold transition-colors pointer-events-none"
+                [class.fill-slate-900]="puntoHover()?.dia === p.dia"
+                [class.fill-slate-400]="puntoHover()?.dia !== p.dia">
                 {{ p.dia }}
               </text>
+
+              <!-- Zona de captura invisible (Hit-area) de tamaño constante que previene cualquier parpadeo -->
+              <circle [attr.cx]="p.x" [attr.cy]="p.y" r="22" fill="transparent" class="cursor-pointer" />
             </g>
             }
           </svg>
@@ -664,55 +674,120 @@
 
   <!-- Fila Secundaria: Categorías Terapéuticas y Radar FEFO -->
   <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-    <!-- Panel de Categorías Terapéuticas -->
+    <!-- Panel: Medicamentos Más Vendidos (Ranking & Demanda) -->
     <div
       class="lg:col-span-3 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+        <div
+          class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-4 mb-4">
           <div>
-            <h2 class="text-base font-bold text-slate-900">Distribución por Categoría Farmacéutica</h2>
-            <p class="text-xs text-slate-400">Medicamentos clasificados según su acción terapéutica</p>
+            <div class="flex items-center gap-2">
+              <span
+                class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 text-xs">
+
+              </span>
+              <h2 class="text-base font-bold text-slate-900">Medicamentos Más Vendidos</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Top medicamentos con mayor demanda y rotación en mostrador y Call
+              Center</p>
           </div>
-          <a routerLink="/productos" class="text-xs font-semibold text-sky-600 hover:text-sky-800 transition-colors">
-            Ver catálogo completo →
+          <a routerLink="/reportes"
+            class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+            <span>Ver reporte de ventas</span>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </a>
         </div>
 
         @if (cargandoKpis()) {
         <div class="space-y-3 py-4">
           @for (i of [1,2,3,4,5]; track i) {
-          <div class="h-7 bg-slate-100 rounded-lg animate-pulse"></div>
+          <div class="h-12 bg-slate-50 rounded-2xl animate-pulse"></div>
           }
         </div>
-        } @else if (categorias().length === 0) {
+        } @else if (medicamentosMasVendidos().length === 0) {
         <div class="py-12 text-center text-slate-400 text-xs">
-          No hay productos clasificados registrados actualmente.
+          No hay registros de ventas recientes en este período.
         </div>
         } @else {
-        <div class="space-y-3.5">
-          @for (c of categorias(); track c.nombre) {
-          <div class="group flex items-center gap-3">
-            <span
-              class="text-xs font-semibold text-slate-700 w-36 shrink-0 truncate group-hover:text-sky-600 transition-colors">
-              {{ c.nombre }}
-            </span>
-            <div class="flex-1 h-3.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/40">
-              <div
-                class="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-600 transition-all duration-700"
-                [style.width.%]="c.porcentaje"></div>
+        <div class="space-y-3">
+          @for (m of medicamentosMasVendidos(); track m.puesto) {
+          <div
+            class="group p-2.5 rounded-2xl hover:bg-slate-50/80 border border-transparent hover:border-slate-200/70 transition-all duration-200">
+            <!-- Encabezado de la barra: Puesto, Nombre, Categoría y Cantidad -->
+            <div class="flex items-center justify-between gap-3 mb-1.5">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <!-- Medalla / Puesto -->
+                @if (m.puesto === 1) {
+                <span
+                  class="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-100 text-amber-900 text-[11px] font-black shrink-0 shadow-xs border border-amber-300">
+                  1
+                </span>
+                } @else if (m.puesto === 2) {
+                <span
+                  class="flex items-center justify-center w-6 h-6 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-bold shrink-0 border border-slate-300">
+                  2
+                </span>
+                } @else if (m.puesto === 3) {
+                <span
+                  class="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-50 text-amber-800 text-[11px] font-bold shrink-0 border border-amber-200">
+                  3
+                </span>
+                } @else {
+                <span
+                  class="flex items-center justify-center w-6 h-6 rounded-lg bg-slate-50 text-slate-500 text-[11px] font-semibold shrink-0 border border-slate-200">
+                  {{ m.puesto }}
+                </span>
+                }
+
+                <div class="min-w-0">
+                  <span
+                    class="text-xs font-bold text-slate-800 truncate block group-hover:text-emerald-700 transition-colors">
+                    {{ m.nombre }}
+                  </span>
+                  @if (m.subtitulo) {
+                  <span class="text-[10px] text-slate-400 block truncate">
+                    {{ m.subtitulo }}
+                  </span>
+                  }
+                </div>
+              </div>
+
+              <!-- Métrica numérica derecha -->
+              <div class="text-right shrink-0">
+                <div class="text-xs font-black text-slate-800 font-mono">
+                  {{ m.unidades }} <span class="text-[10px] font-semibold text-slate-400">unids.</span>
+                </div>
+                @if (m.monto > 0) {
+                <div class="text-[10px] font-semibold text-emerald-600 font-mono">
+                  Q {{ m.monto | number: '1.2-2' }}
+                </div>
+                }
+              </div>
             </div>
-            <span class="text-xs font-bold text-slate-800 w-8 text-right font-mono shrink-0">
-              {{ c.cantidad }}
-            </span>
+
+            <!-- Barra de Progreso Estilizada con Gradiente y Animación -->
+            <div
+              class="w-full h-2.5 bg-slate-100/90 rounded-full overflow-hidden p-0.5 border border-slate-200/50 shadow-inner">
+              <div class="h-full rounded-full bg-gradient-to-r transition-all duration-700 ease-out shadow-xs"
+                [class]="m.colorGradiente" [style.width.%]="m.porcentaje"></div>
+            </div>
           </div>
           }
         </div>
         }
       </div>
 
-      <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-400 flex items-center justify-between">
-        <span>Catálogo sincronizado en tiempo real</span>
-        <span class="font-medium text-slate-600">{{ categorias().length }} grupos terapéuticos</span>
+      <!-- Pie de Tarjeta -->
+      <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-400 flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Actualizado con ventas mostrador y envíos</span>
+        </div>
+        <span class="font-semibold text-slate-600 font-mono">
+          {{ totalUnidadesVendidasTop() }} unidades en el ranking
+        </span>
       </div>
     </div>
 
@@ -781,7 +856,7 @@
       <div class="mt-4 pt-3 border-t border-slate-100">
         <a routerLink="/lotes"
           class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl text-center block transition-colors cursor-pointer">
-          Gestionar Lotes y Salidas FEFO
+          Gestionar Lotes y Salidas
         </a>
       </div>
     </div>

@@ -159,6 +159,7 @@ export interface TopProductoItem {
   unidadesVendidas: number;
   montoTotalGenerado: number;
   porcentajeIngresos?: number;
+  posicion?: number;
 }
 
 export interface ReporteTopProductosResponse {

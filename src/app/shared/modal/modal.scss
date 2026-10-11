@@ -43,32 +43,34 @@
 }
 
 @media print {
-  .modal-backdrop {
-    position: static !important;
-    inset: auto !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    padding: 0 !important;
-    z-index: auto !important;
-    display: block !important;
-    animation: none !important;
-  }
+  body:not(.print-iframe-active) {
+    .modal-backdrop {
+      position: static !important;
+      inset: auto !important;
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      padding: 0 !important;
+      z-index: auto !important;
+      display: block !important;
+      animation: none !important;
+    }
 
-  .modal-card {
-    box-shadow: none !important;
-    border: none !important;
-    max-height: none !important;
-    overflow: visible !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    animation: none !important;
-  }
+    .modal-card {
+      box-shadow: none !important;
+      border: none !important;
+      max-height: none !important;
+      overflow: visible !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      animation: none !important;
+    }
 
-  .modal-card > button {
-    display: none !important;
+    .modal-card > button {
+      display: none !important;
+    }
   }
 }
 

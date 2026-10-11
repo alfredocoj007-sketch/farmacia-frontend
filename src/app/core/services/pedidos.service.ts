@@ -1,6 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import {
   CambiarEstadoPedidoRequest,
@@ -18,6 +19,19 @@ import {
 export class PedidosService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/pedidos`;
+
+  readonly conteoBadge = signal<number>(0);
+  readonly estadisticasEnVivo = signal<EstadisticasCallCenter | null>(null);
+
+  actualizarNotificaciones(sucursalId?: number): Observable<EstadisticasCallCenter> {
+    return this.obtenerEstadisticas(sucursalId).pipe(
+      tap((stats) => {
+        const porDespachar = (stats.recibidos || 0) + (stats.enPreparacion || 0);
+        this.conteoBadge.set(porDespachar);
+        this.estadisticasEnVivo.set(stats);
+      }),
+    );
+  }
 
   listar(params?: QueryPedidosParams): Observable<PedidoCallCenter[]> {
     let httpParams = new HttpParams();

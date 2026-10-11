@@ -82,7 +82,7 @@
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
-          {{ vistaHistorial() ? 'Volver a Caja POS' : 'Ventas del Día' }}
+          {{ vistaHistorial() ? 'Volver a Caja' : 'Ventas del Día' }}
         </button>
       </div>
     </div>
@@ -92,8 +92,7 @@
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden space-y-4 p-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 class="text-lg font-bold text-slate-900">Historial de Facturas Emitidas Hoy</h2>
-          <p class="text-xs text-slate-500">Comprobantes autorizados por el régimen SAT en esta sede</p>
+          <h2 class="text-lg font-bold text-slate-900">Historial de ventas del día</h2>
         </div>
         <div class="w-full sm:w-72">
           <input type="text" placeholder="Buscar por cliente o factura..." [(ngModel)]="filtroHistorial"
@@ -107,13 +106,13 @@
           <thead
             class="bg-slate-50/75 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
             <tr>
-              <th class="px-4 py-3">No. Factura FEL</th>
+              <th class="px-4 py-3">No. Comprobante</th>
               <th class="px-4 py-3">Fecha / Hora</th>
               <th class="px-4 py-3">Cliente</th>
               <th class="px-4 py-3">Método Pago</th>
               <th class="px-4 py-3 text-right">Base Imp.</th>
               <th class="px-4 py-3 text-right">IVA (12%)</th>
-              <th class="px-4 py-3 text-right">Total Facturado</th>
+              <th class="px-4 py-3 text-right">Total</th>
               <th class="px-4 py-3 text-center">Acciones</th>
             </tr>
           </thead>
@@ -530,8 +529,7 @@
         <!-- Selector de Cliente FEL (Consumidor Final vs NIT) -->
         <div class="p-4 border-b border-slate-100 bg-slate-50/40 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Datos del Comprador
-              (FEL):</span>
+            <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Datos del Comprador:</span>
             <div class="flex items-center gap-1">
               <button type="button" (click)="setConsumidorFinal(true)"
                 class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all cursor-pointer"
@@ -619,7 +617,7 @@
                 <span>{{ nombreError() }}</span>
               </p>
               } @else {
-              <p class="text-[9px] text-slate-400 mt-0.5">Nombre requerido para facturación fiscal SAT.</p>
+              <p class="text-[9px] text-slate-400 mt-0.5">Nombre requerido para comprobante.</p>
               }
             </div>
           </div>
@@ -758,7 +756,7 @@
                 <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                 <path d="M7 15h0M2 9.5h20"></path>
               </svg>
-              <span>{{ cajaInfo()?.abierta ? 'Cobrar & Facturar (F2)' : 'Caja Cerrada (Requiere Turno)' }}</span>
+              <span>{{ cajaInfo()?.abierta ? 'Cobrar' : 'Caja Cerrada (Requiere Turno)' }}</span>
             </button>
           </div>
         </div>
@@ -775,7 +773,7 @@
         class="bg-white rounded-3xl shadow-2xl border border-slate-200/90 max-w-md w-full overflow-hidden p-6 space-y-5 animate-modalScaleUp">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
-            <h3 class="text-base font-extrabold text-slate-900">Cobro en Mostrador & Emisión FEL</h3>
+            <h3 class="text-base font-extrabold text-slate-900">Cobro en Mostrador</h3>
             <p class="text-xs text-slate-500">Selecciona forma de pago e ingresa el efectivo recibido</p>
           </div>
           <button (click)="cerrarModalCobro()"
@@ -874,12 +872,12 @@
             class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
             @if (procesandoVenta()) {
             <span class="animate-spin text-sm">⏳</span>
-            <span>Procesando FEL...</span>
+            <span>Procesando comprobante...</span>
             } @else {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <path d="M20 6 9 17l-5-5"></path>
             </svg>
-            <span>Confirmar y Emitir Factura</span>
+            <span>Confirmar y generar comprobante</span>
             }
           </button>
         </div>
@@ -899,7 +897,7 @@
       <div class="flex items-center justify-between no-print border-b border-slate-100 pb-2">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-          <span class="text-xs font-extrabold text-slate-800">Factura Electrónica FEL Autorizada</span>
+          <span class="text-xs font-extrabold text-slate-800">Comprobante Autorizado</span>
         </div>
         <button (click)="cerrarModalTicket()"
           class="text-slate-400 hover:text-slate-600 text-lg cursor-pointer">&times;</button>
@@ -924,7 +922,8 @@
           <p class="text-[8px] text-slate-400 break-all">
             AUTORIZACIÓN: {{ v.fel?.autorizacionDte || v.autorizacionDte || ('DTE-' + v.pedidoId + '-CERT') }}
           </p>
-          <p class="text-[9px] text-slate-500 font-medium">{{ (v.fechaVenta || v.fechaEmision) | date:'dd/MM/yyyy, hh:mm:ss a' }}</p>
+          <p class="text-[9px] text-slate-500 font-medium">{{ (v.fechaVenta || v.fechaEmision) | date:'dd/MM/yyyy,
+            hh:mm:ss a' }}</p>
         </div>
 
         <!-- Datos del Receptor -->
@@ -984,13 +983,11 @@
         <!-- Código de Validación SAT y Pie Fiscal -->
         <div class="text-center text-[9px] text-slate-400 space-y-1 pt-1">
           <p class="uppercase font-semibold">Sujeto a pagos trimestrales ISR</p>
-          <p>Certificador SAT: INFILE S.A.</p>
+          <p>Certificador: INFILE S.A.</p>
           <div
             class="pt-1.5 pb-1 flex flex-col items-center justify-center gap-0.5 border-t border-dashed border-slate-300">
             <div class="font-mono text-[9px] tracking-widest text-slate-700 font-bold">||| | |||| | ||| || |||| ||| ||||
               | ||| || ||||</div>
-            <span class="text-[8px] text-slate-400 font-mono">Consulte su DTE en portal SAT con el número de
-              autorización</span>
           </div>
           <p class="font-bold text-slate-600">¡Gracias por su compra en Farmacia ProSalud!</p>
         </div>

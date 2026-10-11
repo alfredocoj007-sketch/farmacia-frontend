@@ -1,53 +1,40 @@
 <div class="reportes-container p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
   <!-- ENCABEZADO EJECUTIVO / HERO (BLANCO LIMPIO) -->
-  <div class="header-ui no-print bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div
+    class="header-ui no-print bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div class="flex items-start sm:items-center gap-3.5">
-      <div class="w-11 h-11 rounded-2xl bg-sky-50 border border-sky-200 text-sky-700 flex items-center justify-center shrink-0">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div
+        class="w-11 h-11 rounded-2xl bg-sky-50 border border-sky-200 text-sky-700 flex items-center justify-center shrink-0">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="20" x2="18" y2="10"></line>
           <line x1="12" y1="20" x2="12" y2="4"></line>
           <line x1="6" y1="20" x2="6" y2="14"></line>
         </svg>
       </div>
       <div>
-        <div class="flex items-center gap-2 mb-0.5">
-          <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
-            Auditoría &amp; BI
-          </span>
-          <span class="text-xs text-slate-400">
-            • Generado: {{ fechaGeneracion() | date: 'dd/MM/yyyy, hh:mm a' }}
-          </span>
-        </div>
         <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
           Centro de Reportes Gerenciales
         </h1>
-        <p class="text-slate-500 text-xs mt-0.5 max-w-2xl">
-          Consolidación de ventas, auditoría de vencimiento FEFO, valuación de activos en mercadería, rotación y cuadre de cajas.
-        </p>
       </div>
     </div>
 
     <!-- ACCIONES RÁPIDAS -->
     <div class="flex items-center gap-2.5 no-print self-start md:self-auto">
-      <button
-        type="button"
-        (click)="cargarReporteActual()"
-        [disabled]="cargando()"
+      <button type="button" (click)="cargarReporteActual()" [disabled]="cargando()"
         class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200 shadow-xs hover:border-slate-300 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
-        title="Actualizar datos"
-      >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [class.animate-spin]="cargando()">
-          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        title="Actualizar datos">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" [class.animate-spin]="cargando()">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
         </svg>
         <span>Actualizar</span>
       </button>
 
-      <button
-        type="button"
-        (click)="imprimirReporte()"
-        class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200 shadow-xs hover:border-slate-300 active:scale-95 transition-all cursor-pointer"
-      >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button type="button" (click)="imprimirReporte()"
+        class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200 shadow-xs hover:border-slate-300 active:scale-95 transition-all cursor-pointer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 6 2 18 2 18 9"></polyline>
           <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
           <rect x="6" y="14" width="12" height="8"></rect>
@@ -58,7 +45,8 @@
   </div>
 
   <!-- BARRA DE FILTROS GLOBALES -->
-  <div class="filtros-ui no-print bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
+  <div
+    class="filtros-ui no-print bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
     <!-- FILTRO SUCURSAL -->
     <div class="flex items-center gap-2 min-w-[260px]">
       <span class="text-xs font-bold text-slate-500 shrink-0 flex items-center gap-1.5 uppercase tracking-wider">
@@ -68,14 +56,11 @@
         </svg>
         Sucursal:
       </span>
-      <select
-        [value]="sucursalSeleccionada() ?? ''"
-        (change)="onSucursalChange($event)"
-        class="flex-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold rounded-xl px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:outline-none cursor-pointer"
-      >
+      <select [value]="sucursalSeleccionada() ?? ''" (change)="onSucursalChange($event)"
+        class="flex-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold rounded-xl px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:outline-none cursor-pointer">
         <option value="">Todas las Sucursales (Red Global)</option>
         @for (s of sucursales(); track s.sucursalId) {
-          <option [value]="s.sucursalId">{{ s.nombre }} ({{ s.tipoSucursal }})</option>
+        <option [value]="s.sucursalId">{{ s.nombre }} ({{ s.tipoSucursal }})</option>
         }
       </select>
     </div>
@@ -85,155 +70,89 @@
       <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">
         Periodo:
       </span>
-      <button
-        type="button"
-        (click)="cambiarPeriodo('HOY')"
+      <button type="button" (click)="cambiarPeriodo('HOY')"
         [class]="periodoSeleccionado() === 'HOY' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium'"
-        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer"
-      >
+        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer">
         Hoy
       </button>
-      <button
-        type="button"
-        (click)="cambiarPeriodo('SEMANA')"
+      <button type="button" (click)="cambiarPeriodo('SEMANA')"
         [class]="periodoSeleccionado() === 'SEMANA' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium'"
-        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer"
-      >
+        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer">
         7 Días
       </button>
-      <button
-        type="button"
-        (click)="cambiarPeriodo('MES')"
+      <button type="button" (click)="cambiarPeriodo('MES')"
         [class]="periodoSeleccionado() === 'MES' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium'"
-        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer"
-      >
+        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer">
         Este Mes
       </button>
-      <button
-        type="button"
-        (click)="cambiarPeriodo('ANIO')"
+      <button type="button" (click)="cambiarPeriodo('ANIO')"
         [class]="periodoSeleccionado() === 'ANIO' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium'"
-        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer"
-      >
+        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer">
         Este Año
       </button>
-      <button
-        type="button"
-        (click)="cambiarPeriodo('HISTORICO')"
+      <button type="button" (click)="cambiarPeriodo('HISTORICO')"
         [class]="periodoSeleccionado() === 'HISTORICO' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium'"
-        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer"
-      >
+        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer">
         Histórico
       </button>
-      <button
-        type="button"
-        (click)="cambiarPeriodo('PERSONALIZADO')"
+      <button type="button" (click)="cambiarPeriodo('PERSONALIZADO')"
         [class]="periodoSeleccionado() === 'PERSONALIZADO' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium'"
-        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer"
-      >
+        class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer">
         Personalizado
       </button>
     </div>
 
     <!-- RANGOS PERSONALIZADOS -->
     @if (periodoSeleccionado() === 'PERSONALIZADO') {
-      <div class="flex items-center gap-2 flex-wrap">
-        <input
-          type="date"
-          [ngModel]="fechaInicio()"
-          (ngModelChange)="fechaInicio.set($event)"
-          class="bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-2.5 py-1.5 focus:ring-2 focus:ring-sky-500"
-        />
-        <span class="text-xs text-slate-400">a</span>
-        <input
-          type="date"
-          [ngModel]="fechaFin()"
-          (ngModelChange)="fechaFin.set($event)"
-          class="bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-2.5 py-1.5 focus:ring-2 focus:ring-sky-500"
-        />
-        <button
-          type="button"
-          (click)="cargarReporteActual()"
-          class="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold cursor-pointer shadow-xs"
-        >
-          Aplicar
-        </button>
-      </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <input type="date" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)"
+        class="bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-2.5 py-1.5 focus:ring-2 focus:ring-sky-500" />
+      <span class="text-xs text-slate-400">a</span>
+      <input type="date" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)"
+        class="bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-2.5 py-1.5 focus:ring-2 focus:ring-sky-500" />
+      <button type="button" (click)="cargarReporteActual()"
+        class="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold cursor-pointer shadow-xs">
+        Aplicar
+      </button>
+    </div>
     }
   </div>
 
   <!-- NAVEGACIÓN DE PESTAÑAS (LOS 5 REPORTES) -->
   <div class="tabs-ui no-print border-b border-slate-200 flex overflow-x-auto gap-2 pb-1">
     <!-- TAB 1: VENTAS -->
-    <button
-      type="button"
-      (click)="cambiarTab('ventas')"
+    <button type="button" (click)="cambiarTab('ventas')"
       [class]="tabActiva() === 'ventas' ? 'border-sky-600 text-sky-700 bg-sky-50/70 font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium'"
-      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer"
-    >
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"></line>
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-      </svg>
-      <span>1. Ventas e Ingresos</span>
+      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer">
+      <span>Ventas e Ingresos</span>
     </button>
 
     <!-- TAB 2: CADUCIDAD FEFO -->
-    <button
-      type="button"
-      (click)="cambiarTab('caducidad')"
+    <button type="button" (click)="cambiarTab('caducidad')"
       [class]="tabActiva() === 'caducidad' ? 'border-amber-600 text-amber-700 bg-amber-50/70 font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium'"
-      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer"
-    >
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-        <line x1="12" y1="9" x2="12" y2="13"></line>
-        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-      </svg>
-      <span>2. Riesgo de Caducidad (FEFO)</span>
+      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer">
+      <span>Riesgo de Caducidad</span>
     </button>
 
     <!-- TAB 3: VALORACION -->
-    <button
-      type="button"
-      (click)="cambiarTab('valoracion')"
+    <button type="button" (click)="cambiarTab('valoracion')"
       [class]="tabActiva() === 'valoracion' ? 'border-emerald-600 text-emerald-700 bg-emerald-50/70 font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium'"
-      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer"
-    >
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-        <line x1="12" y1="22.08" x2="12" y2="12"></line>
-      </svg>
-      <span>3. Valoración de Inventario</span>
+      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer">
+      <span>Valoración de Inventario</span>
     </button>
 
     <!-- TAB 4: TOP PRODUCTOS -->
-    <button
-      type="button"
-      (click)="cambiarTab('top')"
+    <button type="button" (click)="cambiarTab('top')"
       [class]="tabActiva() === 'top' ? 'border-indigo-600 text-indigo-700 bg-indigo-50/70 font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium'"
-      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer"
-    >
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="8" r="7"></circle>
-        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-      </svg>
-      <span>4. Top 10 Medicamentos</span>
+      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer">
+      <span>Top 10 Medicamentos</span>
     </button>
 
     <!-- TAB 5: CUADRE DE CAJAS -->
-    <button
-      type="button"
-      (click)="cambiarTab('cajas')"
+    <button type="button" (click)="cambiarTab('cajas')"
       [class]="tabActiva() === 'cajas' ? 'border-teal-600 text-teal-700 bg-teal-50/70 font-bold' : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium'"
-      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer"
-    >
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-        <path d="M7 15h0M2 9.5h20"></path>
-      </svg>
-      <span>5. Arqueos y Cuadre de Cajas</span>
+      class="flex items-center gap-2 px-4 py-3 border-b-2 text-xs sm:text-sm whitespace-nowrap rounded-t-xl transition-all cursor-pointer">
+      <span>Arqueos y Cuadre de Cajas</span>
     </button>
   </div>
 
@@ -255,12 +174,13 @@
           DOCUMENTO OFICIAL DE AUDITORÍA
         </div>
         <div class="text-slate-700 mt-0.5 font-medium">
-          Fecha y Hora: <span class="font-black text-slate-900">{{ fechaGeneracion() | date: 'dd/MM/yyyy, hh:mm:ss a' }}</span>
+          Fecha y Hora: <span class="font-black text-slate-900">{{ fechaGeneracion() | date: 'dd/MM/yyyy, hh:mm:ss a'
+            }}</span>
         </div>
         @if (usuario(); as u) {
-          <div class="text-[10px] text-slate-500 font-semibold">
-            Emitido por: {{ u.nombre }} ({{ u.rol }})
-          </div>
+        <div class="text-[10px] text-slate-500 font-semibold">
+          Emitido por: {{ u.nombre }} ({{ u.rol }})
+        </div>
         }
       </div>
     </div>
@@ -285,848 +205,1296 @@
         </span>
       </div>
     </div>
+
+    <!-- RESUMEN EJECUTIVO PARA IMPRESIÓN -->
+    <div class="mt-2 p-2 bg-white border border-slate-300 flex flex-wrap justify-between items-center text-xs">
+      @if (tabActiva() === 'ventas' && reporteVentas(); as rv) {
+      <span>Total Ventas: <strong>{{ rv.kpis.totalVentas }}</strong></span>
+      <span>Total Facturado: <strong>Q{{ rv.kpis.montoTotal | number: '1.2-2' }}</strong></span>
+      <span>IVA Débito (12%): <strong>Q{{ rv.kpis.ivaTotal | number: '1.2-2' }}</strong></span>
+      <span>Ticket Promedio: <strong>Q{{ rv.kpis.ticketPromedio | number: '1.2-2' }}</strong></span>
+      } @else if (tabActiva() === 'caducidad' && reporteCaducidad(); as rc) {
+      <span>Lotes en Riesgo: <strong>{{ rc.kpis.totalLotesRiesgo }}</strong></span>
+      <span>Lotes Vencidos: <strong class="text-rose-700">{{ rc.kpis.lotesVencidosCount }}</strong></span>
+      <span>Costo Total en Riesgo: <strong>Q{{ rc.kpis.costoTotalEnRiesgo | number: '1.2-2' }}</strong></span>
+      } @else if (tabActiva() === 'valoracion' && reporteValoracion(); as rval) {
+      <span>Inversión Total Costo: <strong>Q{{ rval.kpis.costoTotalInventario | number: '1.2-2' }}</strong></span>
+      <span>Valor Estimado PVP: <strong>Q{{ rval.kpis.valorTotalVentaPVP | number: '1.2-2' }}</strong></span>
+      <span>Margen Proyectado: <strong>{{ rval.kpis.margenGlobalPct }}% (Q{{ rval.kpis.gananciaPotencial | number:
+          '1.2-2' }})</strong></span>
+      } @else if (tabActiva() === 'top' && reporteTop(); as rt) {
+      <span>Productos Vendidos: <strong>{{ rt.kpis.totalProductosVendidos }}</strong></span>
+      <span>Unidades Despachadas: <strong>{{ rt.kpis.totalUnidadesVendidas | number }}</strong></span>
+      <span>Ingresos Top: <strong>Q{{ rt.kpis.ingresosTotalesTop | number: '1.2-2' }}</strong></span>
+      } @else if (tabActiva() === 'cajas' && reporteCajas(); as rca) {
+      <span>Turnos Auditados: <strong>{{ rca.kpis.totalSesiones }}</strong></span>
+      <span>Total Ventas Caja: <strong>Q{{ rca.kpis.montoTotalVentasCajas | number: '1.2-2' }}</strong></span>
+      <span>Diferencia Neta Arqueo: <strong>Q{{ rca.kpis.diferenciaNetaTotal | number: '1.2-2' }}</strong></span>
+      }
+    </div>
   </div>
 
   <!-- MENSAJE DE ERROR -->
   @if (error()) {
-    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between no-print">
-      <div class="flex items-center gap-2">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <span>{{ error() }}</span>
-      </div>
-      <button (click)="cargarReporteActual()" class="font-bold underline ml-2 cursor-pointer">Reintentar</button>
+  <div
+    class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between no-print">
+    <div class="flex items-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ error() }}</span>
     </div>
+    <button (click)="cargarReporteActual()" class="font-bold underline ml-2 cursor-pointer">Reintentar</button>
+  </div>
   }
 
   <!-- SPINNER DE CARGA -->
   @if (cargando()) {
-    <div class="py-16 flex flex-col items-center justify-center space-y-3 no-print">
-      <div class="w-9 h-9 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-xs font-medium text-slate-500">Compilando datos y métricas financieras...</p>
-    </div>
+  <div class="py-16 flex flex-col items-center justify-center space-y-3 no-print">
+    <div class="w-9 h-9 border-3 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
+    <p class="text-xs font-medium text-slate-500">Compilando datos y métricas financieras...</p>
+  </div>
   }
 
   @if (!cargando()) {
-    <!-- ========================================================================= -->
-    <!-- 1. REPORTE CONSOLIDADO DE VENTAS E INGRESOS -->
-    <!-- ========================================================================= -->
-    @if (tabActiva() === 'ventas' && reporteVentas()) {
-      <div class="space-y-6">
-        <!-- KPIS VENTAS (SOLO PANTALLA) -->
-        <div class="kpis-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <!-- TOTAL FACTURADO -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Facturado</span>
-            <div class="text-2xl font-black text-sky-600 mt-1">
-              Q{{ reporteVentas()!.kpis.montoTotal | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-slate-400">{{ reporteVentas()!.kpis.totalVentas }} ventas registradas</span>
-          </div>
-
-          <!-- BASE IMPONIBLE -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Base Imponible</span>
-            <div class="text-2xl font-black text-slate-800 mt-1">
-              Q{{ reporteVentas()!.kpis.baseImponible | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-slate-400">Monto neto sin tributos</span>
-          </div>
-
-          <!-- IVA RECAUDADO (12%) -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">IVA Recaudado (12%)</span>
-            <div class="text-2xl font-black text-indigo-600 mt-1">
-              Q{{ reporteVentas()!.kpis.ivaTotal | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-indigo-600/70">Débito Fiscal SAT</span>
-          </div>
-
-          <!-- TICKET PROMEDIO -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Ticket Promedio</span>
-            <div class="text-2xl font-black text-emerald-600 mt-1">
-              Q{{ reporteVentas()!.kpis.ticketPromedio | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-slate-400">Por compra realizada</span>
-          </div>
-
-          <!-- TOTAL TRANSACCIONES -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Transacciones</span>
-            <div class="text-2xl font-black text-slate-900 mt-1">
-              {{ reporteVentas()!.kpis.totalVentas }}
-            </div>
-            <span class="text-xs text-emerald-600 font-semibold">Pedidos Completados</span>
-          </div>
+  <!-- ========================================================================= -->
+  <!-- 1. REPORTE CONSOLIDADO DE VENTAS E INGRESOS -->
+  <!-- ========================================================================= -->
+  @if (tabActiva() === 'ventas' && reporteVentas()) {
+  <div class="space-y-6">
+    <!-- KPIS VENTAS (SOLO PANTALLA) -->
+    <div class="kpis-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <!-- TOTAL FACTURADO -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Facturado</span>
+        <div class="text-2xl font-black text-sky-600 mt-1">
+          Q{{ reporteVentas()!.kpis.montoTotal | number: '1.2-2' }}
         </div>
+        <span class="text-xs text-slate-400">{{ reporteVentas()!.kpis.totalVentas }} ventas registradas</span>
+      </div>
 
-        <!-- DESGLOSES (SOLO PANTALLA) -->
-        <div class="desgloses-grid grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- METODOS DE PAGO -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-600">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                <line x1="10" y1="1" x2="10" y2="23"></line>
-              </svg>
-              <span>Desglose por Método de Pago</span>
-            </h3>
-            <div class="space-y-4">
-              @for (mp of reporteVentas()!.porMetodoPago; track mp.metodoPagoId) {
-                <div>
-                  <div class="flex justify-between text-xs font-semibold mb-1">
-                    <span class="text-slate-700">{{ mp.nombre }}</span>
-                    <span class="text-slate-900 font-bold">
-                      Q{{ mp.totalRecaudado | number: '1.2-2' }} ({{ mp.porcentaje }}%)
-                    </span>
-                  </div>
-                  <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div
-                      class="h-full bg-sky-600 rounded-full transition-all duration-500"
-                      [style.width.%]="mp.porcentaje"
-                    ></div>
-                  </div>
-                  <span class="text-[11px] text-slate-400">{{ mp.cantidadTransacciones }} transacciones</span>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- RENDIMIENTO POR SUCURSAL -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-600">
-                <path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path>
-              </svg>
-              <span>Ventas por Sucursal</span>
-            </h3>
-            <div class="space-y-4">
-              @for (suc of reporteVentas()!.porSucursal; track suc.sucursalId) {
-                <div>
-                  <div class="flex justify-between text-xs font-semibold mb-1">
-                    <span class="text-slate-700">{{ suc.nombre }}</span>
-                    <span class="text-slate-900 font-bold">
-                      Q{{ suc.totalVentas | number: '1.2-2' }} ({{ suc.porcentaje }}%)
-                    </span>
-                  </div>
-                  <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div
-                      class="h-full bg-indigo-600 rounded-full transition-all duration-500"
-                      [style.width.%]="suc.porcentaje"
-                    ></div>
-                  </div>
-                  <span class="text-[11px] text-slate-400">{{ suc.cantidadVentas }} ventas</span>
-                </div>
-              }
-            </div>
-          </div>
+      <!-- BASE IMPONIBLE -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Base Imponible</span>
+        <div class="text-2xl font-black text-slate-800 mt-1">
+          Q{{ reporteVentas()!.kpis.baseImponible | number: '1.2-2' }}
         </div>
+        <span class="text-xs text-slate-400">Monto neto sin tributos</span>
+      </div>
 
-        <!-- TABLA DETALLE DE VENTAS (SE IMPRIME) -->
-        <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
-          <div class="search-filter-row p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h3 class="text-sm font-bold text-slate-800">Transacciones de Ventas Registradas</h3>
-              <p class="text-xs text-slate-400">Listado detallado de facturación del periodo seleccionado</p>
+      <!-- IVA RECAUDADO (12%) -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">IVA Recaudado (12%)</span>
+        <div class="text-2xl font-black text-indigo-600 mt-1">
+          Q{{ reporteVentas()!.kpis.ivaTotal | number: '1.2-2' }}
+        </div>
+        <span class="text-xs text-indigo-600/70">Débito Fiscal SAT</span>
+      </div>
+
+      <!-- TICKET PROMEDIO -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Ticket Promedio</span>
+        <div class="text-2xl font-black text-emerald-600 mt-1">
+          Q{{ reporteVentas()!.kpis.ticketPromedio | number: '1.2-2' }}
+        </div>
+        <span class="text-xs text-slate-400">Por compra realizada</span>
+      </div>
+
+      <!-- TOTAL TRANSACCIONES -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Transacciones</span>
+        <div class="text-2xl font-black text-slate-900 mt-1">
+          {{ reporteVentas()!.kpis.totalVentas }}
+        </div>
+        <span class="text-xs text-emerald-600 font-semibold">Pedidos Completados</span>
+      </div>
+    </div>
+
+    <!-- DESGLOSES (SOLO PANTALLA) -->
+    <div class="desgloses-grid grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- METODOS DE PAGO -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-slate-600">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="10" y1="1" x2="10" y2="23"></line>
+          </svg>
+          <span>Desglose por Método de Pago</span>
+        </h3>
+        <div class="space-y-4">
+          @for (mp of reporteVentas()!.porMetodoPago; track mp.metodoPagoId) {
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span class="text-slate-700">{{ mp.nombre }}</span>
+              <span class="text-slate-900 font-bold">
+                Q{{ mp.totalRecaudado | number: '1.2-2' }} ({{ mp.porcentaje }}%)
+              </span>
             </div>
-            <input
-              type="text"
-              placeholder="Buscar cliente, sucursal, ID..."
-              [ngModel]="busquedaDetalle()"
-              (ngModelChange)="busquedaDetalle.set($event)"
-              class="w-full sm:w-64 text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none"
-            />
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+              <div class="h-full bg-sky-600 rounded-full transition-all duration-500" [style.width.%]="mp.porcentaje">
+              </div>
+            </div>
+            <span class="text-[11px] text-slate-400">{{ mp.cantidadTransacciones }} transacciones</span>
           </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
-                <tr>
-                  <th class="p-3"># Factura</th>
-                  <th class="p-3">Fecha y Hora</th>
-                  <th class="p-3">Sucursal</th>
-                  <th class="p-3">Cliente</th>
-                  <th class="p-3">Método de Pago</th>
-                  <th class="p-3">Estado</th>
-                  <th class="p-3 text-right">Total (Q)</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                @for (v of ventasDetalleFiltradas(); track v.pedidoId) {
-                  <tr class="hover:bg-slate-50/60 transition-colors">
-                    <td class="p-3 font-semibold text-sky-700">#{{ v.pedidoId }}</td>
-                    <td class="p-3 text-slate-600">{{ v.fecha | date: 'dd/MM/yyyy, hh:mm a' }}</td>
-                    <td class="p-3 text-slate-800 font-medium">{{ v.sucursalNombre }}</td>
-                    <td class="p-3">
-                      <div class="font-medium text-slate-800">{{ v.clienteNombre }}</div>
-                      <div class="text-[10px] text-slate-400">NIT: {{ v.clienteNit }}</div>
-                    </td>
-                    <td class="p-3">
-                      <span class="px-2 py-0.5 rounded-md text-[11px] bg-slate-100 text-slate-700 border border-slate-200">
-                        {{ v.metodoPago }}
-                      </span>
-                    </td>
-                    <td class="p-3">
-                      <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        {{ v.estado }}
-                      </span>
-                    </td>
-                    <td class="p-3 text-right font-black text-slate-900">
-                      Q{{ v.total | number: '1.2-2' }}
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+          }
         </div>
       </div>
-    }
 
-    <!-- ========================================================================= -->
-    <!-- 2. REPORTE DE CADUCIDAD Y MERMAS (AUDITORÍA FEFO) -->
-    <!-- ========================================================================= -->
-    @if (tabActiva() === 'caducidad' && reporteCaducidad()) {
-      <div class="space-y-6">
-        <!-- SEMÁFORO Y KPIS DE RIESGO FINANCIERO (SOLO PANTALLA) -->
-        <div class="kpis-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <!-- COSTO TOTAL EN RIESGO -->
-          <div class="bg-white rounded-2xl p-4 border border-rose-200 shadow-xs">
-            <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Costo Total en Riesgo</span>
-            <div class="text-2xl font-black text-rose-600 mt-1">
-              Q{{ reporteCaducidad()!.kpis.costoTotalEnRiesgo | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-slate-400">Pérdida monetaria potencial</span>
-          </div>
-
-          <!-- YA VENCIDOS -->
-          <div class="bg-rose-50/70 rounded-2xl p-4 border border-rose-200">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-rose-700 uppercase">1. Vencidos</span>
-              <span class="text-xs font-black px-1.5 py-0.5 rounded bg-rose-200 text-rose-900">
-                {{ reporteCaducidad()!.kpis.lotesVencidosCount }} lotes
+      <!-- RENDIMIENTO POR SUCURSAL -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-slate-600">
+            <path
+              d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4">
+            </path>
+          </svg>
+          <span>Ventas por Sucursal</span>
+        </h3>
+        <div class="space-y-4">
+          @for (suc of reporteVentas()!.porSucursal; track suc.sucursalId) {
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span class="text-slate-700">{{ suc.nombre }}</span>
+              <span class="text-slate-900 font-bold">
+                Q{{ suc.totalVentas | number: '1.2-2' }} ({{ suc.porcentaje }}%)
               </span>
             </div>
-            <div class="text-xl font-black text-rose-700 mt-2">
-              Q{{ reporteCaducidad()!.kpis.costoVencidos | number: '1.2-2' }}
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+              <div class="h-full bg-indigo-600 rounded-full transition-all duration-500"
+                [style.width.%]="suc.porcentaje"></div>
             </div>
-            <span class="text-[11px] text-rose-600">Merma inmediata (Retirar)</span>
+            <span class="text-[11px] text-slate-400">{{ suc.cantidadVentas }} ventas</span>
           </div>
-
-          <!-- CRÍTICO <= 30 DÍAS -->
-          <div class="bg-amber-50/70 rounded-2xl p-4 border border-amber-200">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-amber-700 uppercase">2. Crítico (≤ 30d)</span>
-              <span class="text-xs font-black px-1.5 py-0.5 rounded bg-amber-200 text-amber-900">
-                {{ reporteCaducidad()!.kpis.lotes30DiasCount }} lotes
-              </span>
-            </div>
-            <div class="text-xl font-black text-amber-700 mt-2">
-              Q{{ reporteCaducidad()!.kpis.costo30Dias | number: '1.2-2' }}
-            </div>
-            <span class="text-[11px] text-amber-600">Devolución / Descuento</span>
-          </div>
-
-          <!-- ALERTA <= 60 DÍAS -->
-          <div class="bg-yellow-50/70 rounded-2xl p-4 border border-yellow-200">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-yellow-800 uppercase">3. Alerta (≤ 60d)</span>
-              <span class="text-xs font-black px-1.5 py-0.5 rounded bg-yellow-200 text-yellow-900">
-                {{ reporteCaducidad()!.kpis.lotes60DiasCount }} lotes
-              </span>
-            </div>
-            <div class="text-xl font-black text-yellow-800 mt-2">
-              Q{{ reporteCaducidad()!.kpis.costo60Dias | number: '1.2-2' }}
-            </div>
-            <span class="text-[11px] text-yellow-700">Prioridad dispensación FEFO</span>
-          </div>
-
-          <!-- PREVENCIÓN <= 90 DÍAS -->
-          <div class="bg-sky-50/70 rounded-2xl p-4 border border-sky-200">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-sky-800 uppercase">4. Prevención (≤ 90d)</span>
-              <span class="text-xs font-black px-1.5 py-0.5 rounded bg-sky-200 text-sky-900">
-                {{ reporteCaducidad()!.kpis.lotes90DiasCount }} lotes
-              </span>
-            </div>
-            <div class="text-xl font-black text-sky-800 mt-2">
-              Q{{ reporteCaducidad()!.kpis.costo90Dias | number: '1.2-2' }}
-            </div>
-            <span class="text-[11px] text-sky-700">Monitoreo activo</span>
-          </div>
-        </div>
-
-        <!-- AUDITORÍA FEFO TABLA (SE IMPRIME) -->
-        <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
-          <div class="search-filter-row p-4 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-600">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-                <span>Listado de Lotes en Riesgo (Orden FEFO: First Expired, First Out)</span>
-              </h3>
-              <p class="text-xs text-slate-400">Herramienta oficial para regentes farmacéuticos y administradores</p>
-            </div>
-
-            <div class="flex items-center gap-2 w-full md:w-auto">
-              <!-- FILTRO URGENCIA -->
-              <select
-                [value]="filtroUrgenciaFefo()"
-                (change)="filtroUrgenciaFefo.set($any($event.target).value)"
-                class="text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none cursor-pointer"
-              >
-                <option value="TODOS">Todos los niveles</option>
-                <option value="VENCIDO">Vencidos</option>
-                <option value="CRITICO">Crítico (≤ 30d)</option>
-                <option value="ALERTA">Alerta (≤ 60d)</option>
-                <option value="PREVENCION">Prevención (≤ 90d)</option>
-              </select>
-
-              <input
-                type="text"
-                placeholder="Buscar medicamento, lote..."
-                [ngModel]="busquedaDetalle()"
-                (ngModelChange)="busquedaDetalle.set($event)"
-                class="w-full sm:w-60 text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
-                <tr>
-                  <th class="p-3">Estado Urgencia</th>
-                  <th class="p-3">Medicamento / Presentación</th>
-                  <th class="p-3">Laboratorio</th>
-                  <th class="p-3">Sucursal</th>
-                  <th class="p-3">N° Lote</th>
-                  <th class="p-3">Vencimiento</th>
-                  <th class="p-3 text-right">Días</th>
-                  <th class="p-3 text-right">Stock</th>
-                  <th class="p-3 text-right">Costo Unit. (Q)</th>
-                  <th class="p-3 text-right">Costo en Riesgo (Q)</th>
-                  <th class="p-3">Acción Recomendada</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                @for (l of lotesFiltrados(); track l.loteId) {
-                  <tr class="hover:bg-slate-50/60 transition-colors">
-                    <td class="p-3">
-                      @if (l.estadoUrgencia === 'VENCIDO') {
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
-                          VENCIDO
-                        </span>
-                      } @else if (l.estadoUrgencia === 'CRITICO_30') {
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
-                          CRÍTICO ≤30D
-                        </span>
-                      } @else if (l.estadoUrgencia === 'ALERTA_60') {
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-yellow-100 text-yellow-800 border border-yellow-200">
-                          ALERTA ≤60D
-                        </span>
-                      } @else {
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-sky-100 text-sky-800 border border-sky-200">
-                          PREVENCIÓN ≤90D
-                        </span>
-                      }
-                    </td>
-                    <td class="p-3 font-semibold text-slate-800">
-                      {{ l.productoNombre }}
-                    </td>
-                    <td class="p-3 text-slate-500">{{ l.laboratorioNombre }}</td>
-                    <td class="p-3 text-slate-600 font-medium">{{ l.sucursalNombre }}</td>
-                    <td class="p-3 font-mono text-slate-700">{{ l.numeroLote }}</td>
-                    <td class="p-3 font-medium text-slate-700">
-                      {{ l.fechaVencimiento | date: 'dd/MM/yyyy' }}
-                    </td>
-                    <td class="p-3 text-right font-black" [class.text-rose-600]="l.diasRestantes <= 0" [class.text-amber-600]="l.diasRestantes > 0 && l.diasRestantes <= 30">
-                      {{ l.diasRestantes }} d
-                    </td>
-                    <td class="p-3 text-right font-bold text-slate-800">
-                      {{ l.stockActual }} un.
-                    </td>
-                    <td class="p-3 text-right text-slate-600">
-                      Q{{ l.precioCosto | number: '1.2-2' }}
-                    </td>
-                    <td class="p-3 text-right font-black text-rose-600">
-                      Q{{ l.costoRiesgo | number: '1.2-2' }}
-                    </td>
-                    <td class="p-3">
-                      <span class="text-[11px] text-slate-600 italic">
-                        {{ l.accionRecomendada }}
-                      </span>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+          }
         </div>
       </div>
-    }
+    </div>
 
-    <!-- ========================================================================= -->
-    <!-- 3. REPORTE DE VALORACIÓN GLOBAL DE INVENTARIO -->
-    <!-- ========================================================================= -->
-    @if (tabActiva() === 'valoracion' && reporteValoracion()) {
-      <div class="space-y-6">
-        <!-- KPIS VALORACION (SOLO PANTALLA) -->
-        <div class="kpis-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- INVERSIÓN TOTAL A COSTO -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Inversión Total en Costo (Q)</span>
-            <div class="text-2xl sm:text-3xl font-black text-sky-600 mt-1">
-              Q{{ reporteValoracion()!.kpis.costoTotalInventario | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-slate-400">Costo de adquisición de mercadería</span>
-          </div>
-
-          <!-- VALOR TOTAL ESTIMADO PVP -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Valor Estimado de Venta PVP (Q)</span>
-            <div class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">
-              Q{{ reporteValoracion()!.kpis.valorTotalVentaPVP | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-slate-400">Retorno proyectado al público</span>
-          </div>
-
-          <!-- MARGEN DE GANANCIA PROYECTADA -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Ganancia Bruta Potencial</span>
-            <div class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">
-              Q{{ reporteValoracion()!.kpis.gananciaPotencial | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-emerald-600 font-semibold">Margen comercial: {{ reporteValoracion()!.kpis.margenGlobalPct }}%</span>
-          </div>
-
-          <!-- TOTAL STOCK UNIDADES -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Stock Físico Consolidado</span>
-            <div class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
-              {{ reporteValoracion()!.kpis.stockTotalUnidades | number }}
-            </div>
-            <span class="text-xs text-slate-400">{{ reporteValoracion()!.kpis.totalItems }} productos en catálogo</span>
-          </div>
+    <!-- TABLA DETALLE DE VENTAS (SE IMPRIME) -->
+    <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+      <div
+        class="search-filter-row p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h3 class="text-sm font-bold text-slate-800">Transacciones de Ventas Registradas</h3>
+          <p class="text-xs text-slate-400">Listado detallado de facturación del periodo seleccionado</p>
         </div>
-
-        <!-- DESGLOSE SUCURSAL Y CATEGORIAS (SOLO PANTALLA) -->
-        <div class="desgloses-grid grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- VALORACION POR SUCURSAL -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-600">
-                <path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path>
-              </svg>
-              <span>Inversión por Sucursal</span>
-            </h3>
-            <div class="space-y-4">
-              @for (suc of reporteValoracion()!.porSucursal; track suc.sucursalId) {
-                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
-                  <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-slate-800 text-sm">{{ suc.nombre }}</span>
-                    <span class="text-xs font-bold text-emerald-700">Margen: {{ suc.margenPct }}%</span>
-                  </div>
-                  <div class="grid grid-cols-3 gap-2 text-xs text-slate-600 mt-2">
-                    <div>
-                      <span class="text-[10px] uppercase text-slate-400 font-bold block">Costo</span>
-                      <span class="font-bold text-slate-900">Q{{ suc.costoTotal | number: '1.2-2' }}</span>
-                    </div>
-                    <div>
-                      <span class="text-[10px] uppercase text-slate-400 font-bold block">PVP Venta</span>
-                      <span class="font-bold text-indigo-700">Q{{ suc.valorVentaTotal | number: '1.2-2' }}</span>
-                    </div>
-                    <div>
-                      <span class="text-[10px] uppercase text-slate-400 font-bold block">Stock</span>
-                      <span class="font-semibold text-slate-700">{{ suc.stockTotal }} un.</span>
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- VALORACION POR CATEGORIA -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-600">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                <line x1="7" y1="7" x2="7.01" y2="7"></line>
-              </svg>
-              <span>Inversión por Categoría de Medicamentos</span>
-            </h3>
-            <div class="space-y-3">
-              @for (cat of reporteValoracion()!.porCategoria; track cat.categoriaId) {
-                <div class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors text-xs border border-slate-100">
-                  <div class="flex items-center gap-2.5">
-                    <div class="w-2 h-2 rounded-full bg-sky-600"></div>
-                    <span class="font-bold text-slate-800">{{ cat.categoriaNombre }}</span>
-                    <span class="text-[11px] text-slate-400">({{ cat.stockTotal }} un.)</span>
-                  </div>
-                  <div class="text-right">
-                    <div class="font-black text-slate-900">Q{{ cat.costoTotal | number: '1.2-2' }}</div>
-                    <div class="text-[10px] text-slate-400">PVP: Q{{ cat.valorVentaTotal | number: '1.2-2' }}</div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-
-        <!-- TABLA DETALLE DE PRODUCTOS EN STOCK (SE IMPRIME) -->
-        <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
-          <div class="search-filter-row p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h3 class="text-sm font-bold text-slate-800">Desglose Individual de Inventario Valuado</h3>
-              <p class="text-xs text-slate-400">Comparativa costo de adquisición vs. retorno proyectado por producto</p>
-            </div>
-            <input
-              type="text"
-              placeholder="Buscar producto o categoría..."
-              [ngModel]="busquedaDetalle()"
-              (ngModelChange)="busquedaDetalle.set($event)"
-              class="w-full sm:w-64 text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none"
-            />
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
-                <tr>
-                  <th class="p-3">Producto</th>
-                  <th class="p-3">Categoría</th>
-                  <th class="p-3">Sucursal</th>
-                  <th class="p-3 text-right">Stock</th>
-                  <th class="p-3 text-right">Costo Unit. (Q)</th>
-                  <th class="p-3 text-right">PVP Unit. (Q)</th>
-                  <th class="p-3 text-right">Inversión Costo (Q)</th>
-                  <th class="p-3 text-right">Valor Venta (Q)</th>
-                  <th class="p-3 text-right">Margen (%)</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                @for (item of inventarioDetalleFiltrado(); track item.inventarioId) {
-                  <tr class="hover:bg-slate-50/60 transition-colors">
-                    <td class="p-3 font-semibold text-slate-800">{{ item.productoNombre }}</td>
-                    <td class="p-3 text-slate-500">{{ item.categoriaNombre }}</td>
-                    <td class="p-3 text-slate-600 font-medium">{{ item.sucursalNombre }}</td>
-                    <td class="p-3 text-right font-semibold text-slate-800">{{ item.stockActual }} un.</td>
-                    <td class="p-3 text-right text-slate-600">Q{{ item.precioCosto | number: '1.2-2' }}</td>
-                    <td class="p-3 text-right text-slate-600">Q{{ item.precioVenta | number: '1.2-2' }}</td>
-                    <td class="p-3 text-right font-bold text-sky-700">Q{{ item.costoTotal | number: '1.2-2' }}</td>
-                    <td class="p-3 text-right font-bold text-indigo-700">Q{{ item.valorVentaTotal | number: '1.2-2' }}</td>
-                    <td class="p-3 text-right">
-                      <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        {{ item.margenPct }}%
-                      </span>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <input type="text" placeholder="Buscar cliente, sucursal, ID..." [ngModel]="busquedaDetalle()"
+          (ngModelChange)="busquedaDetalle.set($event); resetearPaginas()"
+          class="w-full sm:w-64 text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none" />
       </div>
-    }
 
-    <!-- ========================================================================= -->
-    <!-- 4. TOP MEDICAMENTOS MÁS VENDIDOS (ROTACIÓN) -->
-    <!-- ========================================================================= -->
-    @if (tabActiva() === 'top' && reporteTop()) {
-      <div class="space-y-6">
-        <!-- KPIS TOP (SOLO PANTALLA) -->
-        <div class="kpis-grid grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Productos Activos Vendidos</span>
-            <div class="text-2xl sm:text-3xl font-black text-sky-600 mt-1">
-              {{ reporteTop()!.kpis.totalProductosVendidos }}
-            </div>
-            <span class="text-xs text-slate-400">Con salidas en el periodo seleccionado</span>
-          </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3"># Factura</th>
+              <th class="p-3">Fecha y Hora</th>
+              <th class="p-3">Sucursal</th>
+              <th class="p-3">Cliente</th>
+              <th class="p-3">Método de Pago</th>
+              <th class="p-3">Estado</th>
+              <th class="p-3 text-right">Total (Q)</th>
+            </tr>
+          </thead>
+          <!-- Vista interactiva en pantalla (10 registros por página) -->
+          <tbody class="divide-y divide-slate-100 no-print">
+            @for (v of ventasPaginadas(); track v.pedidoId) {
+            <tr class="hover:bg-slate-50/60 transition-colors">
+              <td class="p-3 font-semibold text-sky-700">#{{ v.pedidoId }}</td>
+              <td class="p-3 text-slate-600">{{ v.fecha | date: 'dd/MM/yyyy, hh:mm a' }}</td>
+              <td class="p-3 text-slate-800 font-medium">{{ v.sucursalNombre }}</td>
+              <td class="p-3">
+                <div class="font-medium text-slate-800">{{ v.clienteNombre }}</div>
+                <div class="text-[10px] text-slate-400">NIT: {{ v.clienteNit }}</div>
+              </td>
+              <td class="p-3">
+                <span class="px-2 py-0.5 rounded-md text-[11px] bg-slate-100 text-slate-700 border border-slate-200">
+                  {{ v.metodoPago }}
+                </span>
+              </td>
+              <td class="p-3">
+                <span
+                  class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  {{ v.estado }}
+                </span>
+              </td>
+              <td class="p-3 text-right font-black text-slate-900">
+                Q{{ v.total | number: '1.2-2' }}
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="7" class="p-8 text-center text-slate-400">
+                No se encontraron transacciones de ventas para el periodo o sucursal seleccionada.
+              </td>
+            </tr>
+            }
+          </tbody>
+          <!-- Vista completa para impresión (Imprime todas las ventas del periodo) -->
+          <tbody class="divide-y divide-slate-100 only-print">
+            @for (v of ventasDetalleFiltradas(); track v.pedidoId) {
+            <tr>
+              <td class="p-3 font-semibold text-sky-700">#{{ v.pedidoId }}</td>
+              <td class="p-3 text-slate-600">{{ v.fecha | date: 'dd/MM/yyyy, hh:mm a' }}</td>
+              <td class="p-3 text-slate-800 font-medium">{{ v.sucursalNombre }}</td>
+              <td class="p-3">
+                <div class="font-medium text-slate-800">{{ v.clienteNombre }}</div>
+                <div class="text-[10px] text-slate-400">NIT: {{ v.clienteNit }}</div>
+              </td>
+              <td class="p-3">
+                <span class="px-2 py-0.5 rounded-md text-[11px] bg-slate-100 text-slate-700 border border-slate-200">
+                  {{ v.metodoPago }}
+                </span>
+              </td>
+              <td class="p-3">
+                <span
+                  class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  {{ v.estado }}
+                </span>
+              </td>
+              <td class="p-3 text-right font-black text-slate-900">
+                Q{{ v.total | number: '1.2-2' }}
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="7" class="p-8 text-center text-slate-400">
+                No se encontraron transacciones de ventas para el periodo o sucursal seleccionada.
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
 
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Unidades Totales Despachadas</span>
-            <div class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">
-              {{ reporteTop()!.kpis.totalUnidadesVendidas | number }}
-            </div>
-            <span class="text-xs text-slate-400">Volumen físico dispensado</span>
-          </div>
-
-          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Ingresos Top 10</span>
-            <div class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">
-              Q{{ reporteTop()!.kpis.ingresosTotalesTop | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-slate-400">Total generado por líderes de ventas</span>
-          </div>
-        </div>
-
-        <!-- SELECTOR DE VISTA DEL TOP (SOLO PANTALLA) -->
-        <div class="search-filter-row flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs no-print">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Criterio:</span>
-            <button
-              type="button"
-              (click)="topModo.set('INGRESOS')"
-              [class]="topModo() === 'INGRESOS' ? 'bg-slate-900 text-white font-bold' : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer shadow-xs"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="1" x2="12" y2="23"></line>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-              </svg>
-              <span>Por Ingresos Generados (Q)</span>
+      <!-- Barra de Paginación de Ventas (Solo Pantalla) -->
+      @if (ventasDetalleFiltradas().length > 0) {
+      <div
+        class="no-print px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span>
+          Mostrando página <strong class="text-slate-700 font-semibold">{{ pageVentas() }}</strong> de <strong
+            class="text-slate-700 font-semibold">{{ totalPaginasVentas() }}</strong> ({{ ventasDetalleFiltradas().length
+          }} transacciones en total)
+        </span>
+        <div class="flex items-center gap-1.5">
+          <button (click)="cambiarPaginaVentas(-1)" [disabled]="pageVentas() <= 1"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            ← Anterior
+          </button>
+          <div class="hidden sm:flex items-center gap-1">
+            @for (p of listaPaginasVentas(); track p) {
+            <button (click)="irAPaginaVentas(p)" [class.bg-sky-600]="p === pageVentas()"
+              [class.text-white]="p === pageVentas()" [class.font-semibold]="p === pageVentas()"
+              [class.shadow-sm]="p === pageVentas()" [class.border-sky-600]="p === pageVentas()"
+              class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+              {{ p }}
             </button>
-            <button
-              type="button"
-              (click)="topModo.set('UNIDADES')"
-              [class]="topModo() === 'UNIDADES' ? 'bg-slate-900 text-white font-bold' : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer shadow-xs"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-              </svg>
-              <span>Por Unidades Vendidas (Rotación)</span>
+            }
+          </div>
+          <button (click)="cambiarPaginaVentas(1)" [disabled]="pageVentas() >= totalPaginasVentas()"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- ========================================================================= -->
+  <!-- 2. REPORTE DE CADUCIDAD Y MERMAS (AUDITORÍA FEFO) -->
+  <!-- ========================================================================= -->
+  @if (tabActiva() === 'caducidad' && reporteCaducidad()) {
+  <div class="space-y-6">
+    <!-- SEMÁFORO Y KPIS DE RIESGO FINANCIERO (SOLO PANTALLA) -->
+    <div class="kpis-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <!-- COSTO TOTAL EN RIESGO -->
+      <div class="bg-white rounded-2xl p-4 border border-rose-200 shadow-xs">
+        <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Costo Total en Riesgo</span>
+        <div class="text-2xl font-black text-rose-600 mt-1">
+          Q{{ reporteCaducidad()!.kpis.costoTotalEnRiesgo | number: '1.2-2' }}
+        </div>
+        <span class="text-xs text-slate-400">Pérdida monetaria potencial</span>
+      </div>
+
+      <!-- YA VENCIDOS -->
+      <div class="bg-rose-50/70 rounded-2xl p-4 border border-rose-200">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-rose-700 uppercase">1. Vencidos</span>
+          <span class="text-xs font-black px-1.5 py-0.5 rounded bg-rose-200 text-rose-900">
+            {{ reporteCaducidad()!.kpis.lotesVencidosCount }} lotes
+          </span>
+        </div>
+        <div class="text-xl font-black text-rose-700 mt-2">
+          Q{{ reporteCaducidad()!.kpis.costoVencidos | number: '1.2-2' }}
+        </div>
+        <span class="text-[11px] text-rose-600">Merma inmediata (Retirar)</span>
+      </div>
+
+      <!-- CRÍTICO <= 30 DÍAS -->
+      <div class="bg-amber-50/70 rounded-2xl p-4 border border-amber-200">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-amber-700 uppercase">2. Crítico (≤ 30d)</span>
+          <span class="text-xs font-black px-1.5 py-0.5 rounded bg-amber-200 text-amber-900">
+            {{ reporteCaducidad()!.kpis.lotes30DiasCount }} lotes
+          </span>
+        </div>
+        <div class="text-xl font-black text-amber-700 mt-2">
+          Q{{ reporteCaducidad()!.kpis.costo30Dias | number: '1.2-2' }}
+        </div>
+        <span class="text-[11px] text-amber-600">Devolución / Descuento</span>
+      </div>
+
+      <!-- ALERTA <= 60 DÍAS -->
+      <div class="bg-yellow-50/70 rounded-2xl p-4 border border-yellow-200">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-yellow-800 uppercase">3. Alerta (≤ 60d)</span>
+          <span class="text-xs font-black px-1.5 py-0.5 rounded bg-yellow-200 text-yellow-900">
+            {{ reporteCaducidad()!.kpis.lotes60DiasCount }} lotes
+          </span>
+        </div>
+        <div class="text-xl font-black text-yellow-800 mt-2">
+          Q{{ reporteCaducidad()!.kpis.costo60Dias | number: '1.2-2' }}
+        </div>
+        <span class="text-[11px] text-yellow-700">Prioridad dispensación FEFO</span>
+      </div>
+
+      <!-- PREVENCIÓN <= 90 DÍAS -->
+      <div class="bg-sky-50/70 rounded-2xl p-4 border border-sky-200">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-sky-800 uppercase">4. Prevención (≤ 90d)</span>
+          <span class="text-xs font-black px-1.5 py-0.5 rounded bg-sky-200 text-sky-900">
+            {{ reporteCaducidad()!.kpis.lotes90DiasCount }} lotes
+          </span>
+        </div>
+        <div class="text-xl font-black text-sky-800 mt-2">
+          Q{{ reporteCaducidad()!.kpis.costo90Dias | number: '1.2-2' }}
+        </div>
+        <span class="text-[11px] text-sky-700">Monitoreo activo</span>
+      </div>
+    </div>
+
+    <!-- AUDITORÍA FEFO TABLA (SE IMPRIME) -->
+    <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+      <div
+        class="search-filter-row p-4 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+        <div>
+          <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="text-slate-600">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Listado de Lotes en Riesgo (Orden FEFO: First Expired, First Out)</span>
+          </h3>
+          <p class="text-xs text-slate-400">Herramienta oficial para regentes farmacéuticos y administradores</p>
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <!-- FILTRO URGENCIA -->
+          <select [value]="filtroUrgenciaFefo()"
+            (change)="filtroUrgenciaFefo.set($any($event.target).value); pageLotes.set(1)"
+            class="text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none cursor-pointer">
+            <option value="TODOS">Todos los niveles</option>
+            <option value="VENCIDO">Vencidos</option>
+            <option value="CRITICO">Crítico (≤ 30d)</option>
+            <option value="ALERTA">Alerta (≤ 60d)</option>
+            <option value="PREVENCION">Prevención (≤ 90d)</option>
+          </select>
+
+          <input type="text" placeholder="Buscar medicamento, lote..." [ngModel]="busquedaDetalle()"
+            (ngModelChange)="busquedaDetalle.set($event); resetearPaginas()"
+            class="w-full sm:w-60 text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none" />
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3">Estado Urgencia</th>
+              <th class="p-3">Medicamento / Presentación</th>
+              <th class="p-3">Laboratorio</th>
+              <th class="p-3">Sucursal</th>
+              <th class="p-3">N° Lote</th>
+              <th class="p-3">Vencimiento</th>
+              <th class="p-3 text-right">Días</th>
+              <th class="p-3 text-right">Stock</th>
+              <th class="p-3 text-right">Costo Unit. (Q)</th>
+              <th class="p-3 text-right">Costo en Riesgo (Q)</th>
+              <th class="p-3">Acción Recomendada</th>
+            </tr>
+          </thead>
+          <!-- Vista interactiva en pantalla (10 lotes por página) -->
+          <tbody class="divide-y divide-slate-100 no-print">
+            @for (l of lotesPaginados(); track l.loteId) {
+            <tr class="hover:bg-slate-50/60 transition-colors">
+              <td class="p-3">
+                @if (l.estadoUrgencia === 'VENCIDO') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
+                  VENCIDO
+                </span>
+                } @else if (l.estadoUrgencia === 'CRITICO_30') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
+                  CRÍTICO ≤30D
+                </span>
+                } @else if (l.estadoUrgencia === 'ALERTA_60') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-yellow-100 text-yellow-800 border border-yellow-200">
+                  ALERTA ≤60D
+                </span>
+                } @else {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-sky-100 text-sky-800 border border-sky-200">
+                  PREVENCIÓN ≤90D
+                </span>
+                }
+              </td>
+              <td class="p-3 font-semibold text-slate-800">
+                {{ l.productoNombre }}
+              </td>
+              <td class="p-3 text-slate-500">{{ l.laboratorioNombre }}</td>
+              <td class="p-3 text-slate-600 font-medium">{{ l.sucursalNombre }}</td>
+              <td class="p-3 font-mono text-slate-700">{{ l.numeroLote }}</td>
+              <td class="p-3 font-medium text-slate-700">
+                {{ l.fechaVencimiento | date: 'dd/MM/yyyy' }}
+              </td>
+              <td class="p-3 text-right font-black" [class.text-rose-600]="l.diasRestantes <= 0"
+                [class.text-amber-600]="l.diasRestantes > 0 && l.diasRestantes <= 30">
+                {{ l.diasRestantes }} d
+              </td>
+              <td class="p-3 text-right font-bold text-slate-800">
+                {{ l.stockActual }} un.
+              </td>
+              <td class="p-3 text-right text-slate-600">
+                Q{{ l.precioCosto | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-black text-rose-600">
+                Q{{ l.costoRiesgo | number: '1.2-2' }}
+              </td>
+              <td class="p-3">
+                <span class="text-[11px] text-slate-600 italic">
+                  {{ l.accionRecomendada }}
+                </span>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="11" class="p-8 text-center text-slate-400">
+                Excelente: no se registran lotes en riesgo de caducidad para el criterio seleccionado.
+              </td>
+            </tr>
+            }
+          </tbody>
+          <!-- Vista completa para impresión (Imprime todos los lotes en riesgo) -->
+          <tbody class="divide-y divide-slate-100 only-print">
+            @for (l of lotesFiltrados(); track l.loteId) {
+            <tr>
+              <td class="p-3">
+                @if (l.estadoUrgencia === 'VENCIDO') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
+                  VENCIDO
+                </span>
+                } @else if (l.estadoUrgencia === 'CRITICO_30') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
+                  CRÍTICO ≤30D
+                </span>
+                } @else if (l.estadoUrgencia === 'ALERTA_60') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-yellow-100 text-yellow-800 border border-yellow-200">
+                  ALERTA ≤60D
+                </span>
+                } @else {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-sky-100 text-sky-800 border border-sky-200">
+                  PREVENCIÓN ≤90D
+                </span>
+                }
+              </td>
+              <td class="p-3 font-semibold text-slate-800">
+                {{ l.productoNombre }}
+              </td>
+              <td class="p-3 text-slate-500">{{ l.laboratorioNombre }}</td>
+              <td class="p-3 text-slate-600 font-medium">{{ l.sucursalNombre }}</td>
+              <td class="p-3 font-mono text-slate-700">{{ l.numeroLote }}</td>
+              <td class="p-3 font-medium text-slate-700">
+                {{ l.fechaVencimiento | date: 'dd/MM/yyyy' }}
+              </td>
+              <td class="p-3 text-right font-black" [class.text-rose-600]="l.diasRestantes <= 0"
+                [class.text-amber-600]="l.diasRestantes > 0 && l.diasRestantes <= 30">
+                {{ l.diasRestantes }} d
+              </td>
+              <td class="p-3 text-right font-bold text-slate-800">
+                {{ l.stockActual }} un.
+              </td>
+              <td class="p-3 text-right text-slate-600">
+                Q{{ l.precioCosto | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-black text-rose-600">
+                Q{{ l.costoRiesgo | number: '1.2-2' }}
+              </td>
+              <td class="p-3">
+                <span class="text-[11px] text-slate-600 italic">
+                  {{ l.accionRecomendada }}
+                </span>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="11" class="p-8 text-center text-slate-400">
+                Excelente: no se registran lotes en riesgo de caducidad para el criterio seleccionado.
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Barra de Paginación de Lotes FEFO (Solo Pantalla) -->
+      @if (lotesFiltrados().length > 0) {
+      <div
+        class="no-print px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span>
+          Mostrando página <strong class="text-slate-700 font-semibold">{{ pageLotes() }}</strong> de <strong
+            class="text-slate-700 font-semibold">{{ totalPaginasLotes() }}</strong> ({{ lotesFiltrados().length }} lotes
+          en total)
+        </span>
+        <div class="flex items-center gap-1.5">
+          <button (click)="cambiarPaginaLotes(-1)" [disabled]="pageLotes() <= 1"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            ← Anterior
+          </button>
+          <div class="hidden sm:flex items-center gap-1">
+            @for (p of listaPaginasLotes(); track p) {
+            <button (click)="irAPaginaLotes(p)" [class.bg-amber-600]="p === pageLotes()"
+              [class.text-white]="p === pageLotes()" [class.font-semibold]="p === pageLotes()"
+              [class.shadow-sm]="p === pageLotes()" [class.border-amber-600]="p === pageLotes()"
+              class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+              {{ p }}
             </button>
+            }
           </div>
-
-          <div class="text-xs text-slate-400 font-semibold">
-            Ranking Top 10
-          </div>
-        </div>
-
-        <!-- RANKING TABLA (SE IMPRIME) -->
-        <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
-                <tr>
-                  <th class="p-3 w-16 text-center">Posición</th>
-                  <th class="p-3">Medicamento / Fármaco</th>
-                  <th class="p-3">Código de Barras</th>
-                  <th class="p-3 text-right">Precio PVP (Q)</th>
-                  <th class="p-3 text-right">Unidades Vendidas</th>
-                  <th class="p-3 text-right">Ingresos Generados (Q)</th>
-                  <th class="p-3 w-48">% del Ingreso Top</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                @for (prod of (topModo() === 'INGRESOS' ? reporteTop()!.topPorIngresos : reporteTop()!.topPorUnidades); track prod.productoId; let i = $index) {
-                  <tr class="hover:bg-slate-50/60 transition-colors">
-                    <td class="p-3 text-center">
-                      <span
-                        [class]="i === 0 ? 'bg-amber-100 text-amber-900 border border-amber-300 font-black' : i === 1 ? 'bg-slate-200 text-slate-800 border border-slate-300 font-black' : i === 2 ? 'bg-amber-50 text-amber-800 border border-amber-200 font-black' : 'bg-slate-100 text-slate-600 font-bold'"
-                        class="w-6 h-6 rounded-lg inline-flex items-center justify-center text-xs"
-                      >
-                        {{ i + 1 }}
-                      </span>
-                    </td>
-                    <td class="p-3 font-bold text-slate-900">
-                      {{ prod.nombre }}
-                    </td>
-                    <td class="p-3 font-mono text-slate-400">{{ prod.codigoBarras || 'N/A' }}</td>
-                    <td class="p-3 text-right text-slate-600 font-medium">
-                      Q{{ prod.precioVentaActual | number: '1.2-2' }}
-                    </td>
-                    <td class="p-3 text-right font-black text-emerald-700">
-                      {{ prod.unidadesVendidas }} un.
-                    </td>
-                    <td class="p-3 text-right font-black text-indigo-700 text-sm">
-                      Q{{ prod.montoTotalGenerado | number: '1.2-2' }}
-                    </td>
-                    <td class="p-3">
-                      <div class="flex items-center gap-2">
-                        <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div
-                            class="h-full bg-indigo-600 rounded-full"
-                            [style.width.%]="prod.porcentajeIngresos || 0"
-                          ></div>
-                        </div>
-                        <span class="text-[11px] font-bold text-slate-600 w-10 text-right">
-                          {{ prod.porcentajeIngresos || 0 }}%
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+          <button (click)="cambiarPaginaLotes(1)" [disabled]="pageLotes() >= totalPaginasLotes()"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            Siguiente →
+          </button>
         </div>
       </div>
-    }
+      }
+    </div>
+  </div>
+  }
 
-    <!-- ========================================================================= -->
-    <!-- 5. REPORTE DE ARQUEOS Y CUADRE DE CAJAS -->
-    <!-- ========================================================================= -->
-    @if (tabActiva() === 'cajas' && reporteCajas()) {
-      <div class="space-y-6">
-        <!-- KPIS CUADRE DE CAJAS (SOLO PANTALLA) -->
-        <div class="kpis-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <!-- TOTAL SESIONES -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Turnos de Caja</span>
-            <div class="text-2xl font-black text-slate-900 mt-1">
-              {{ reporteCajas()!.kpis.totalSesiones }}
-            </div>
-            <span class="text-xs text-slate-400">
-              {{ reporteCajas()!.kpis.sesionesAbiertas }} activas | {{ reporteCajas()!.kpis.sesionesCerradas }} cerradas
-            </span>
-          </div>
-
-          <!-- TOTAL VENTAS REGISTRADAS EN CAJA -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-sky-600 uppercase tracking-wider">Total Ventas en Caja</span>
-            <div class="text-2xl font-black text-sky-600 mt-1">
-              Q{{ reporteCajas()!.kpis.montoTotalVentasCajas | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-slate-400">Cobros procesados</span>
-          </div>
-
-          <!-- DIFERENCIA NETA ACUMULADA -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Diferencia Neta Arqueo</span>
-            <div
-              class="text-2xl font-black mt-1"
-              [class.text-emerald-600]="reporteCajas()!.kpis.diferenciaNetaTotal === 0"
-              [class.text-amber-600]="reporteCajas()!.kpis.diferenciaNetaTotal > 0"
-              [class.text-rose-600]="reporteCajas()!.kpis.diferenciaNetaTotal < 0"
-            >
-              Q{{ reporteCajas()!.kpis.diferenciaNetaTotal | number: '1.2-2' }}
-            </div>
-            <span class="text-xs text-slate-400">Auditoría física de efectivo</span>
-          </div>
-
-          <!-- CAJAS CUADRADAS -->
-          <div class="bg-emerald-50/70 rounded-2xl p-4 border border-emerald-200">
-            <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Cuadres Exactos</span>
-            <div class="text-2xl font-black text-emerald-800 mt-1">
-              {{ reporteCajas()!.kpis.sesionesCuadradas }}
-            </div>
-            <span class="text-xs text-emerald-700">Sin diferencias</span>
-          </div>
-
-          <!-- CAJAS CON DISCREPANCIA -->
-          <div class="bg-rose-50/70 rounded-2xl p-4 border border-rose-200">
-            <span class="text-xs font-bold text-rose-800 uppercase tracking-wider">Discrepancias</span>
-            <div class="text-2xl font-black text-rose-800 mt-1">
-              {{ reporteCajas()!.kpis.sesionesConFaltante + reporteCajas()!.kpis.sesionesConSobrante }}
-            </div>
-            <span class="text-xs text-rose-700">
-              {{ reporteCajas()!.kpis.sesionesConFaltante }} faltantes, {{ reporteCajas()!.kpis.sesionesConSobrante }} sobrantes
-            </span>
-          </div>
+  <!-- ========================================================================= -->
+  <!-- 3. REPORTE DE VALORACIÓN GLOBAL DE INVENTARIO -->
+  <!-- ========================================================================= -->
+  @if (tabActiva() === 'valoracion' && reporteValoracion()) {
+  <div class="space-y-6">
+    <!-- KPIS VALORACION (SOLO PANTALLA) -->
+    <div class="kpis-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- INVERSIÓN TOTAL A COSTO -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Inversión Total en Costo (Q)</span>
+        <div class="text-2xl sm:text-3xl font-black text-sky-600 mt-1">
+          Q{{ reporteValoracion()!.kpis.costoTotalInventario | number: '1.2-2' }}
         </div>
+        <span class="text-xs text-slate-400">Costo de adquisición de mercadería</span>
+      </div>
 
-        <!-- TABLA AUDITORÍA DE TURNOS (SE IMPRIME) -->
-        <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
-          <div class="search-filter-row p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-600">
-                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                  <path d="M7 15h0M2 9.5h20"></path>
-                </svg>
-                <span>Auditoría Individual de Arqueos y Turnos</span>
-              </h3>
-              <p class="text-xs text-slate-400">Supervisión de cajeros, fondos de apertura y cuadre de efectivo</p>
+      <!-- VALOR TOTAL ESTIMADO PVP -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Valor Estimado de Venta PVP (Q)</span>
+        <div class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">
+          Q{{ reporteValoracion()!.kpis.valorTotalVentaPVP | number: '1.2-2' }}
+        </div>
+        <span class="text-xs text-slate-400">Retorno proyectado al público</span>
+      </div>
+
+      <!-- MARGEN DE GANANCIA PROYECTADA -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Ganancia Bruta Potencial</span>
+        <div class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">
+          Q{{ reporteValoracion()!.kpis.gananciaPotencial | number: '1.2-2' }}
+        </div>
+        <span class="text-xs text-emerald-600 font-semibold">Margen comercial: {{
+          reporteValoracion()!.kpis.margenGlobalPct }}%</span>
+      </div>
+
+      <!-- TOTAL STOCK UNIDADES -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Stock Físico Consolidado</span>
+        <div class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+          {{ reporteValoracion()!.kpis.stockTotalUnidades | number }}
+        </div>
+        <span class="text-xs text-slate-400">{{ reporteValoracion()!.kpis.totalItems }} productos en catálogo</span>
+      </div>
+    </div>
+
+    <!-- DESGLOSE SUCURSAL Y CATEGORIAS (SOLO PANTALLA) -->
+    <div class="desgloses-grid grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- VALORACION POR SUCURSAL -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-slate-600">
+            <path
+              d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4M5 21V10.85M19 21V10.85M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4">
+            </path>
+          </svg>
+          <span>Inversión por Sucursal</span>
+        </h3>
+        <div class="space-y-4">
+          @for (suc of reporteValoracion()!.porSucursal; track suc.sucursalId) {
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-bold text-slate-800 text-sm">{{ suc.nombre }}</span>
+              <span class="text-xs font-bold text-emerald-700">Margen: {{ suc.margenPct }}%</span>
             </div>
-            <input
-              type="text"
-              placeholder="Buscar caja, cajero, sucursal..."
-              [ngModel]="busquedaDetalle()"
-              (ngModelChange)="busquedaDetalle.set($event)"
-              class="w-full sm:w-64 text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none"
-            />
+            <div class="grid grid-cols-3 gap-2 text-xs text-slate-600 mt-2">
+              <div>
+                <span class="text-[10px] uppercase text-slate-400 font-bold block">Costo</span>
+                <span class="font-bold text-slate-900">Q{{ suc.costoTotal | number: '1.2-2' }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase text-slate-400 font-bold block">PVP Venta</span>
+                <span class="font-bold text-indigo-700">Q{{ suc.valorVentaTotal | number: '1.2-2' }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase text-slate-400 font-bold block">Stock</span>
+                <span class="font-semibold text-slate-700">{{ suc.stockTotal }} un.</span>
+              </div>
+            </div>
           </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
-                <tr>
-                  <th class="p-3"># Turno</th>
-                  <th class="p-3">Sucursal / Caja</th>
-                  <th class="p-3">Cajero Responsable</th>
-                  <th class="p-3">Apertura</th>
-                  <th class="p-3">Cierre</th>
-                  <th class="p-3 text-right">Fondo Apertura (Q)</th>
-                  <th class="p-3 text-right">Ventas Totales (Q)</th>
-                  <th class="p-3 text-right">Efectivo Esperado (Q)</th>
-                  <th class="p-3 text-right">Efectivo Real (Q)</th>
-                  <th class="p-3 text-right">Diferencia (Q)</th>
-                  <th class="p-3 text-center">Estado Auditoría</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                @for (s of sesionesCajasFiltradas(); track s.sesionId) {
-                  <tr class="hover:bg-slate-50/60 transition-colors">
-                    <td class="p-3 font-semibold text-slate-900">#{{ s.sesionId }}</td>
-                    <td class="p-3">
-                      <div class="font-bold text-slate-800">{{ s.cajaNombre }}</div>
-                      <div class="text-[10px] text-slate-400">{{ s.sucursalNombre }}</div>
-                    </td>
-                    <td class="p-3 text-slate-700 font-medium">{{ s.empleadoNombre }}</td>
-                    <td class="p-3 text-slate-600">{{ s.fechaApertura | date: 'dd/MM, hh:mm a' }}</td>
-                    <td class="p-3 text-slate-600">
-                      {{ s.fechaCierre ? (s.fechaCierre | date: 'dd/MM, hh:mm a') : 'En curso' }}
-                    </td>
-                    <td class="p-3 text-right text-slate-600 font-medium">
-                      Q{{ s.montoApertura | number: '1.2-2' }}
-                    </td>
-                    <td class="p-3 text-right font-medium text-slate-800">
-                      Q{{ s.montoVentasCalculado | number: '1.2-2' }}
-                    </td>
-                    <td class="p-3 text-right font-bold text-slate-900">
-                      Q{{ s.montoEfectivoEsperado | number: '1.2-2' }}
-                    </td>
-                    <td class="p-3 text-right font-bold text-sky-700">
-                      {{ s.montoEfectivoReal !== null ? ('Q' + (s.montoEfectivoReal | number: '1.2-2')) : '—' }}
-                    </td>
-                    <td
-                      class="p-3 text-right font-black"
-                      [class.text-emerald-600]="s.diferencia === 0"
-                      [class.text-amber-600]="s.diferencia !== null && s.diferencia > 0"
-                      [class.text-rose-600]="s.diferencia !== null && s.diferencia < 0"
-                    >
-                      {{ s.diferencia !== null ? ('Q' + (s.diferencia | number: '1.2-2')) : '—' }}
-                    </td>
-                    <td class="p-3 text-center">
-                      @if (s.estadoDiferencia === 'CUADRADA') {
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
-                          CUADRADA (0.00)
-                        </span>
-                      } @else if (s.estadoDiferencia === 'FALTANTE') {
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-rose-50 text-rose-800 border border-rose-200">
-                          FALTANTE DE CAJA
-                        </span>
-                      } @else if (s.estadoDiferencia === 'SOBRANTE') {
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-200">
-                          SOBRANTE (+Q)
-                        </span>
-                      } @else {
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-sky-50 text-sky-800 border border-sky-200">
-                          TURNO ACTIVO
-                        </span>
-                      }
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+          }
         </div>
       </div>
-    }
+
+      <!-- VALORACION POR CATEGORIA -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-slate-600">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span>Inversión por Categoría de Medicamentos</span>
+        </h3>
+        <div class="space-y-3">
+          @for (cat of reporteValoracion()!.porCategoria; track cat.categoriaId) {
+          <div
+            class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors text-xs border border-slate-100">
+            <div class="flex items-center gap-2.5">
+              <div class="w-2 h-2 rounded-full bg-sky-600"></div>
+              <span class="font-bold text-slate-800">{{ cat.categoriaNombre }}</span>
+              <span class="text-[11px] text-slate-400">({{ cat.stockTotal }} un.)</span>
+            </div>
+            <div class="text-right">
+              <div class="font-black text-slate-900">Q{{ cat.costoTotal | number: '1.2-2' }}</div>
+              <div class="text-[10px] text-slate-400">PVP: Q{{ cat.valorVentaTotal | number: '1.2-2' }}</div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLA DETALLE DE PRODUCTOS EN STOCK (SE IMPRIME) -->
+    <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+      <div
+        class="search-filter-row p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h3 class="text-sm font-bold text-slate-800">Desglose Individual de Inventario Valuado</h3>
+          <p class="text-xs text-slate-400">Comparativa costo de adquisición vs. retorno proyectado por producto</p>
+        </div>
+        <input type="text" placeholder="Buscar producto o categoría..." [ngModel]="busquedaDetalle()"
+          (ngModelChange)="busquedaDetalle.set($event); resetearPaginas()"
+          class="w-full sm:w-64 text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none" />
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3">Producto</th>
+              <th class="p-3">Categoría</th>
+              <th class="p-3">Sucursal</th>
+              <th class="p-3 text-right">Stock</th>
+              <th class="p-3 text-right">Costo Unit. (Q)</th>
+              <th class="p-3 text-right">PVP Unit. (Q)</th>
+              <th class="p-3 text-right">Inversión Costo (Q)</th>
+              <th class="p-3 text-right">Valor Venta (Q)</th>
+              <th class="p-3 text-right">Margen (%)</th>
+            </tr>
+          </thead>
+          <!-- Vista interactiva en pantalla (10 items por página) -->
+          <tbody class="divide-y divide-slate-100 no-print">
+            @for (item of inventarioPaginado(); track item.inventarioId) {
+            <tr class="hover:bg-slate-50/60 transition-colors">
+              <td class="p-3 font-semibold text-slate-800">{{ item.productoNombre }}</td>
+              <td class="p-3 text-slate-500">{{ item.categoriaNombre }}</td>
+              <td class="p-3 text-slate-600 font-medium">{{ item.sucursalNombre }}</td>
+              <td class="p-3 text-right font-semibold text-slate-800">{{ item.stockActual }} un.</td>
+              <td class="p-3 text-right text-slate-600">Q{{ item.precioCosto | number: '1.2-2' }}</td>
+              <td class="p-3 text-right text-slate-600">Q{{ item.precioVenta | number: '1.2-2' }}</td>
+              <td class="p-3 text-right font-bold text-sky-700">Q{{ item.costoTotal | number: '1.2-2' }}</td>
+              <td class="p-3 text-right font-bold text-indigo-700">Q{{ item.valorVentaTotal | number: '1.2-2' }}</td>
+              <td class="p-3 text-right">
+                <span
+                  class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  {{ item.margenPct }}%
+                </span>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="9" class="p-8 text-center text-slate-400">
+                No se encontró inventario en stock para la sucursal seleccionada.
+              </td>
+            </tr>
+            }
+          </tbody>
+          <!-- Vista completa para impresión (Imprime todo el inventario del periodo) -->
+          <tbody class="divide-y divide-slate-100 only-print">
+            @for (item of inventarioDetalleFiltrado(); track item.inventarioId) {
+            <tr>
+              <td class="p-3 font-semibold text-slate-800">{{ item.productoNombre }}</td>
+              <td class="p-3 text-slate-500">{{ item.categoriaNombre }}</td>
+              <td class="p-3 text-slate-600 font-medium">{{ item.sucursalNombre }}</td>
+              <td class="p-3 text-right font-semibold text-slate-800">{{ item.stockActual }} un.</td>
+              <td class="p-3 text-right text-slate-600">Q{{ item.precioCosto | number: '1.2-2' }}</td>
+              <td class="p-3 text-right text-slate-600">Q{{ item.precioVenta | number: '1.2-2' }}</td>
+              <td class="p-3 text-right font-bold text-sky-700">Q{{ item.costoTotal | number: '1.2-2' }}</td>
+              <td class="p-3 text-right font-bold text-indigo-700">Q{{ item.valorVentaTotal | number: '1.2-2' }}</td>
+              <td class="p-3 text-right">
+                <span
+                  class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  {{ item.margenPct }}%
+                </span>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="9" class="p-8 text-center text-slate-400">
+                No se encontró inventario en stock para la sucursal seleccionada.
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Barra de Paginación de Inventario (Solo Pantalla) -->
+      @if (inventarioDetalleFiltrado().length > 0) {
+      <div
+        class="no-print px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span>
+          Mostrando página <strong class="text-slate-700 font-semibold">{{ pageInventario() }}</strong> de <strong
+            class="text-slate-700 font-semibold">{{ totalPaginasInventario() }}</strong> ({{
+          inventarioDetalleFiltrado().length }} productos en inventario)
+        </span>
+        <div class="flex items-center gap-1.5">
+          <button (click)="cambiarPaginaInventario(-1)" [disabled]="pageInventario() <= 1"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            ← Anterior
+          </button>
+          <div class="hidden sm:flex items-center gap-1">
+            @for (p of listaPaginasInventario(); track p) {
+            <button (click)="irAPaginaInventario(p)" [class.bg-emerald-600]="p === pageInventario()"
+              [class.text-white]="p === pageInventario()" [class.font-semibold]="p === pageInventario()"
+              [class.shadow-sm]="p === pageInventario()" [class.border-emerald-600]="p === pageInventario()"
+              class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+              {{ p }}
+            </button>
+            }
+          </div>
+          <button (click)="cambiarPaginaInventario(1)" [disabled]="pageInventario() >= totalPaginasInventario()"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- ========================================================================= -->
+  <!-- 4. TOP MEDICAMENTOS MÁS VENDIDOS (ROTACIÓN) -->
+  <!-- ========================================================================= -->
+  @if (tabActiva() === 'top' && reporteTop()) {
+  <div class="space-y-6">
+    <!-- KPIS TOP (SOLO PANTALLA) -->
+    <div class="kpis-grid grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Productos Activos Vendidos</span>
+        <div class="text-2xl sm:text-3xl font-black text-sky-600 mt-1">
+          {{ reporteTop()!.kpis.totalProductosVendidos }}
+        </div>
+        <span class="text-xs text-slate-400">Con salidas en el periodo seleccionado</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Unidades Totales Despachadas</span>
+        <div class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">
+          {{ reporteTop()!.kpis.totalUnidadesVendidas | number }}
+        </div>
+        <span class="text-xs text-slate-400">Volumen físico dispensado</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Ingresos Top 10</span>
+        <div class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">
+          Q{{ reporteTop()!.kpis.ingresosTotalesTop | number: '1.2-2' }}
+        </div>
+        <span class="text-xs text-slate-400">Total generado por líderes de ventas</span>
+      </div>
+    </div>
+
+    <!-- SELECTOR DE VISTA DEL TOP (SOLO PANTALLA) -->
+    <div
+      class="search-filter-row flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs no-print">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Criterio:</span>
+        <button type="button" (click)="topModo.set('INGRESOS'); pageTop.set(1)"
+          [class]="topModo() === 'INGRESOS' ? 'bg-slate-900 text-white font-bold' : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer shadow-xs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <span>Por Ingresos Generados (Q)</span>
+        </button>
+        <button type="button" (click)="topModo.set('UNIDADES'); pageTop.set(1)"
+          [class]="topModo() === 'UNIDADES' ? 'bg-slate-900 text-white font-bold' : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer shadow-xs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+            </path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          <span>Por Unidades Vendidas (Rotación)</span>
+        </button>
+      </div>
+
+      <div class="text-xs text-slate-400 font-semibold">
+        Ranking de Fármacos
+      </div>
+    </div>
+
+    <!-- RANKING TABLA (SE IMPRIME) -->
+    <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3 w-16 text-center">Posición</th>
+              <th class="p-3">Medicamento / Fármaco</th>
+              <th class="p-3">Código de Barras</th>
+              <th class="p-3 text-right">Precio PVP (Q)</th>
+              <th class="p-3 text-right">Unidades Vendidas</th>
+              <th class="p-3 text-right">Ingresos Generados (Q)</th>
+              <th class="p-3 w-48">% del Ingreso Top</th>
+            </tr>
+          </thead>
+          <!-- Vista interactiva en pantalla (10 registros por página) -->
+          <tbody class="divide-y divide-slate-100 no-print">
+            @for (prod of topPaginado(); track prod.productoId; let i = $index) {
+            <tr class="hover:bg-slate-50/60 transition-colors">
+              <td class="p-3 text-center">
+                <span
+                  [class]="((pageTop() - 1) * limit + i + 1) === 1 ? 'bg-amber-100 text-amber-900 border border-amber-300 font-black' : ((pageTop() - 1) * limit + i + 1) === 2 ? 'bg-slate-200 text-slate-800 border border-slate-300 font-black' : ((pageTop() - 1) * limit + i + 1) === 3 ? 'bg-amber-50 text-amber-800 border border-amber-200 font-black' : 'bg-slate-100 text-slate-600 font-bold'"
+                  class="w-6 h-6 rounded-lg inline-flex items-center justify-center text-xs">
+                  {{ (pageTop() - 1) * limit + i + 1 }}
+                </span>
+              </td>
+              <td class="p-3 font-bold text-slate-900">
+                {{ prod.nombre }}
+              </td>
+              <td class="p-3 font-mono text-slate-400">{{ prod.codigoBarras || 'N/A' }}</td>
+              <td class="p-3 text-right text-slate-600 font-medium">
+                Q{{ prod.precioVentaActual | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-black text-emerald-700">
+                {{ prod.unidadesVendidas }} un.
+              </td>
+              <td class="p-3 text-right font-black text-indigo-700 text-sm">
+                Q{{ prod.montoTotalGenerado | number: '1.2-2' }}
+              </td>
+              <td class="p-3">
+                <div class="flex items-center gap-2">
+                  <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-600 rounded-full" [style.width.%]="prod.porcentajeIngresos || 0"></div>
+                  </div>
+                  <span class="text-[11px] font-bold text-slate-600 w-10 text-right">
+                    {{ prod.porcentajeIngresos || 0 }}%
+                  </span>
+                </div>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="7" class="p-8 text-center text-slate-400">
+                No hay registros de medicamentos vendidos para el periodo o sucursal seleccionada.
+              </td>
+            </tr>
+            }
+          </tbody>
+          <!-- Vista completa para impresión (Imprime todo el ranking del periodo) -->
+          <tbody class="divide-y divide-slate-100 only-print">
+            @for (prod of topListaActual(); track prod.productoId; let i = $index) {
+            <tr>
+              <td class="p-3 text-center">
+                <span
+                  [class]="(i + 1) === 1 ? 'bg-amber-100 text-amber-900 border border-amber-300 font-black' : (i + 1) === 2 ? 'bg-slate-200 text-slate-800 border border-slate-300 font-black' : (i + 1) === 3 ? 'bg-amber-50 text-amber-800 border border-amber-200 font-black' : 'bg-slate-100 text-slate-600 font-bold'"
+                  class="w-6 h-6 rounded-lg inline-flex items-center justify-center text-xs">
+                  {{ i + 1 }}
+                </span>
+              </td>
+              <td class="p-3 font-bold text-slate-900">
+                {{ prod.nombre }}
+              </td>
+              <td class="p-3 font-mono text-slate-400">{{ prod.codigoBarras || 'N/A' }}</td>
+              <td class="p-3 text-right text-slate-600 font-medium">
+                Q{{ prod.precioVentaActual | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-black text-emerald-700">
+                {{ prod.unidadesVendidas }} un.
+              </td>
+              <td class="p-3 text-right font-black text-indigo-700 text-sm">
+                Q{{ prod.montoTotalGenerado | number: '1.2-2' }}
+              </td>
+              <td class="p-3">
+                <div class="flex items-center gap-2">
+                  <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-600 rounded-full" [style.width.%]="prod.porcentajeIngresos || 0"></div>
+                  </div>
+                  <span class="text-[11px] font-bold text-slate-600 w-10 text-right">
+                    {{ prod.porcentajeIngresos || 0 }}%
+                  </span>
+                </div>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="7" class="p-8 text-center text-slate-400">
+                No hay registros de medicamentos vendidos para el periodo o sucursal seleccionada.
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Barra de Paginación de Top Productos (Solo Pantalla) -->
+      @if (topListaActual().length > 0) {
+      <div
+        class="no-print px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span>
+          Mostrando página <strong class="text-slate-700 font-semibold">{{ pageTop() }}</strong> de <strong
+            class="text-slate-700 font-semibold">{{ totalPaginasTop() }}</strong> ({{ topListaActual().length }}
+          medicamentos en ranking)
+        </span>
+        <div class="flex items-center gap-1.5">
+          <button (click)="cambiarPaginaTop(-1)" [disabled]="pageTop() <= 1"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            ← Anterior
+          </button>
+          <div class="hidden sm:flex items-center gap-1">
+            @for (p of listaPaginasTop(); track p) {
+            <button (click)="irAPaginaTop(p)" [class.bg-indigo-600]="p === pageTop()"
+              [class.text-white]="p === pageTop()" [class.font-semibold]="p === pageTop()"
+              [class.shadow-sm]="p === pageTop()" [class.border-indigo-600]="p === pageTop()"
+              class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+              {{ p }}
+            </button>
+            }
+          </div>
+          <button (click)="cambiarPaginaTop(1)" [disabled]="pageTop() >= totalPaginasTop()"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- ========================================================================= -->
+  <!-- 5. REPORTE DE ARQUEOS Y CUADRE DE CAJAS -->
+  <!-- ========================================================================= -->
+  @if (tabActiva() === 'cajas' && reporteCajas()) {
+  <div class="space-y-6">
+    <!-- KPIS CUADRE DE CAJAS (SOLO PANTALLA) -->
+    <div class="kpis-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <!-- TOTAL SESIONES -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Turnos de Caja</span>
+        <div class="text-2xl font-black text-slate-900 mt-1">
+          {{ reporteCajas()!.kpis.totalSesiones }}
+        </div>
+        <span class="text-xs text-slate-400">
+          {{ reporteCajas()!.kpis.sesionesAbiertas }} activas | {{ reporteCajas()!.kpis.sesionesCerradas }} cerradas
+        </span>
+      </div>
+
+      <!-- TOTAL VENTAS REGISTRADAS EN CAJA -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-sky-600 uppercase tracking-wider">Total Ventas en Caja</span>
+        <div class="text-2xl font-black text-sky-600 mt-1">
+          Q{{ reporteCajas()!.kpis.montoTotalVentasCajas | number: '1.2-2' }}
+        </div>
+        <span class="text-xs text-slate-400">Cobros procesados</span>
+      </div>
+
+      <!-- DIFERENCIA NETA ACUMULADA -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Diferencia Neta Arqueo</span>
+        <div class="text-2xl font-black mt-1" [class.text-emerald-600]="reporteCajas()!.kpis.diferenciaNetaTotal === 0"
+          [class.text-amber-600]="reporteCajas()!.kpis.diferenciaNetaTotal > 0"
+          [class.text-rose-600]="reporteCajas()!.kpis.diferenciaNetaTotal < 0">
+          Q{{ reporteCajas()!.kpis.diferenciaNetaTotal | number: '1.2-2' }}
+        </div>
+        <span class="text-xs text-slate-400">Auditoría física de efectivo</span>
+      </div>
+
+      <!-- CAJAS CUADRADAS -->
+      <div class="bg-emerald-50/70 rounded-2xl p-4 border border-emerald-200">
+        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Cuadres Exactos</span>
+        <div class="text-2xl font-black text-emerald-800 mt-1">
+          {{ reporteCajas()!.kpis.sesionesCuadradas }}
+        </div>
+        <span class="text-xs text-emerald-700">Sin diferencias</span>
+      </div>
+
+      <!-- CAJAS CON DISCREPANCIA -->
+      <div class="bg-rose-50/70 rounded-2xl p-4 border border-rose-200">
+        <span class="text-xs font-bold text-rose-800 uppercase tracking-wider">Discrepancias</span>
+        <div class="text-2xl font-black text-rose-800 mt-1">
+          {{ reporteCajas()!.kpis.sesionesConFaltante + reporteCajas()!.kpis.sesionesConSobrante }}
+        </div>
+        <span class="text-xs text-rose-700">
+          {{ reporteCajas()!.kpis.sesionesConFaltante }} faltantes, {{ reporteCajas()!.kpis.sesionesConSobrante }}
+          sobrantes
+        </span>
+      </div>
+    </div>
+
+    <!-- TABLA AUDITORÍA DE TURNOS (SE IMPRIME) -->
+    <div class="tabla-reporte-wrapper bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+      <div
+        class="search-filter-row p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="text-slate-600">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M7 15h0M2 9.5h20"></path>
+            </svg>
+            <span>Auditoría Individual de Arqueos y Turnos</span>
+          </h3>
+          <p class="text-xs text-slate-400">Supervisión de cajeros, fondos de apertura y cuadre de efectivo</p>
+        </div>
+        <input type="text" placeholder="Buscar caja, cajero, sucursal..." [ngModel]="busquedaDetalle()"
+          (ngModelChange)="busquedaDetalle.set($event); resetearPaginas()"
+          class="w-full sm:w-64 text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none" />
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3"># Turno</th>
+              <th class="p-3">Sucursal / Caja</th>
+              <th class="p-3">Cajero Responsable</th>
+              <th class="p-3">Apertura</th>
+              <th class="p-3">Cierre</th>
+              <th class="p-3 text-right">Fondo Apertura (Q)</th>
+              <th class="p-3 text-right">Ventas Totales (Q)</th>
+              <th class="p-3 text-right">Efectivo Esperado (Q)</th>
+              <th class="p-3 text-right">Efectivo Real (Q)</th>
+              <th class="p-3 text-right">Diferencia (Q)</th>
+              <th class="p-3 text-center">Estado Auditoría</th>
+            </tr>
+          </thead>
+          <!-- Vista interactiva en pantalla (10 turnos por página) -->
+          <tbody class="divide-y divide-slate-100 no-print">
+            @for (s of cajasPaginadas(); track s.sesionId) {
+            <tr class="hover:bg-slate-50/60 transition-colors">
+              <td class="p-3 font-semibold text-slate-900">#{{ s.sesionId }}</td>
+              <td class="p-3">
+                <div class="font-bold text-slate-800">{{ s.cajaNombre }}</div>
+                <div class="text-[10px] text-slate-400">{{ s.sucursalNombre }}</div>
+              </td>
+              <td class="p-3 text-slate-700 font-medium">{{ s.empleadoNombre }}</td>
+              <td class="p-3 text-slate-600">{{ s.fechaApertura | date: 'dd/MM, hh:mm a' }}</td>
+              <td class="p-3 text-slate-600">
+                {{ s.fechaCierre ? (s.fechaCierre | date: 'dd/MM, hh:mm a') : 'En curso' }}
+              </td>
+              <td class="p-3 text-right text-slate-600 font-medium">
+                Q{{ s.montoApertura | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-medium text-slate-800">
+                Q{{ s.montoVentasCalculado | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-bold text-slate-900">
+                Q{{ s.montoEfectivoEsperado | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-bold text-sky-700">
+                {{ s.montoEfectivoReal !== null ? ('Q' + (s.montoEfectivoReal | number: '1.2-2')) : '—' }}
+              </td>
+              <td class="p-3 text-right font-black" [class.text-emerald-600]="s.diferencia === 0"
+                [class.text-amber-600]="s.diferencia !== null && s.diferencia > 0"
+                [class.text-rose-600]="s.diferencia !== null && s.diferencia < 0">
+                {{ s.diferencia !== null ? ('Q' + (s.diferencia | number: '1.2-2')) : '—' }}
+              </td>
+              <td class="p-3 text-center">
+                @if (s.estadoDiferencia === 'CUADRADA') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  CUADRADA (0.00)
+                </span>
+                } @else if (s.estadoDiferencia === 'FALTANTE') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-rose-50 text-rose-800 border border-rose-200">
+                  FALTANTE DE CAJA
+                </span>
+                } @else if (s.estadoDiferencia === 'SOBRANTE') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-200">
+                  SOBRANTE (+Q)
+                </span>
+                } @else {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-sky-50 text-sky-800 border border-sky-200">
+                  TURNO ACTIVO
+                </span>
+                }
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="11" class="p-8 text-center text-slate-400">
+                No se registraron turnos o sesiones de caja en el periodo o sucursal consultada.
+              </td>
+            </tr>
+            }
+          </tbody>
+          <!-- Vista completa para impresión (Imprime todos los turnos del periodo) -->
+          <tbody class="divide-y divide-slate-100 only-print">
+            @for (s of sesionesCajasFiltradas(); track s.sesionId) {
+            <tr>
+              <td class="p-3 font-semibold text-slate-900">#{{ s.sesionId }}</td>
+              <td class="p-3">
+                <div class="font-bold text-slate-800">{{ s.cajaNombre }}</div>
+                <div class="text-[10px] text-slate-400">{{ s.sucursalNombre }}</div>
+              </td>
+              <td class="p-3 text-slate-700 font-medium">{{ s.empleadoNombre }}</td>
+              <td class="p-3 text-slate-600">{{ s.fechaApertura | date: 'dd/MM, hh:mm a' }}</td>
+              <td class="p-3 text-slate-600">
+                {{ s.fechaCierre ? (s.fechaCierre | date: 'dd/MM, hh:mm a') : 'En curso' }}
+              </td>
+              <td class="p-3 text-right text-slate-600 font-medium">
+                Q{{ s.montoApertura | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-medium text-slate-800">
+                Q{{ s.montoVentasCalculado | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-bold text-slate-900">
+                Q{{ s.montoEfectivoEsperado | number: '1.2-2' }}
+              </td>
+              <td class="p-3 text-right font-bold text-sky-700">
+                {{ s.montoEfectivoReal !== null ? ('Q' + (s.montoEfectivoReal | number: '1.2-2')) : '—' }}
+              </td>
+              <td class="p-3 text-right font-black" [class.text-emerald-600]="s.diferencia === 0"
+                [class.text-amber-600]="s.diferencia !== null && s.diferencia > 0"
+                [class.text-rose-600]="s.diferencia !== null && s.diferencia < 0">
+                {{ s.diferencia !== null ? ('Q' + (s.diferencia | number: '1.2-2')) : '—' }}
+              </td>
+              <td class="p-3 text-center">
+                @if (s.estadoDiferencia === 'CUADRADA') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  CUADRADA (0.00)
+                </span>
+                } @else if (s.estadoDiferencia === 'FALTANTE') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-rose-50 text-rose-800 border border-rose-200">
+                  FALTANTE DE CAJA
+                </span>
+                } @else if (s.estadoDiferencia === 'SOBRANTE') {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-200">
+                  SOBRANTE (+Q)
+                </span>
+                } @else {
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-black bg-sky-50 text-sky-800 border border-sky-200">
+                  TURNO ACTIVO
+                </span>
+                }
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="11" class="p-8 text-center text-slate-400">
+                No se registraron turnos o sesiones de caja en el periodo o sucursal consultada.
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Barra de Paginación de Turnos de Caja (Solo Pantalla) -->
+      @if (sesionesCajasFiltradas().length > 0) {
+      <div
+        class="no-print px-5 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span>
+          Mostrando página <strong class="text-slate-700 font-semibold">{{ pageCajas() }}</strong> de <strong
+            class="text-slate-700 font-semibold">{{ totalPaginasCajas() }}</strong> ({{ sesionesCajasFiltradas().length
+          }} turnos en total)
+        </span>
+        <div class="flex items-center gap-1.5">
+          <button (click)="cambiarPaginaCajas(-1)" [disabled]="pageCajas() <= 1"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            ← Anterior
+          </button>
+          <div class="hidden sm:flex items-center gap-1">
+            @for (p of listaPaginasCajas(); track p) {
+            <button (click)="irAPaginaCajas(p)" [class.bg-teal-600]="p === pageCajas()"
+              [class.text-white]="p === pageCajas()" [class.font-semibold]="p === pageCajas()"
+              [class.shadow-sm]="p === pageCajas()" [class.border-teal-600]="p === pageCajas()"
+              class="w-8 h-8 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center text-xs">
+              {{ p }}
+            </button>
+            }
+          </div>
+          <button (click)="cambiarPaginaCajas(1)" [disabled]="pageCajas() >= totalPaginasCajas()"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
   }
 </div>

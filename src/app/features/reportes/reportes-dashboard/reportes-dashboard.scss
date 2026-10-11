@@ -1,5 +1,5 @@
 .only-print {
-  display: none;
+  display: none !important;
 }
 
 @media print {
@@ -11,9 +11,13 @@
     display: none !important;
   }
 
-  /* Mostrar exclusivamente el encabezado de reporte formal */
+  /* Mostrar exclusivamente el encabezado de reporte formal y filas de impresión */
   .only-print {
     display: block !important;
+  }
+
+  tbody.only-print {
+    display: table-row-group !important;
   }
 
   .reportes-container {

@@ -67,24 +67,25 @@ export class ReportesDashboard implements OnInit {
   // Lotes filtrados en reporte FEFO
   protected readonly lotesFiltrados = computed(() => {
     const data = this.reporteCaducidad();
-    if (!data) return [];
+    if (!data || !data.lotes) return [];
     const query = this.busquedaDetalle().trim().toLowerCase();
     const urgencia = this.filtroUrgenciaFefo();
 
-    return data.lotes.filter((lote) => {
+    return data.lotes.filter((lote: any) => {
       const matchText =
         !query ||
-        lote.productoNombre.toLowerCase().includes(query) ||
-        lote.numeroLote.toLowerCase().includes(query) ||
-        lote.laboratorioNombre.toLowerCase().includes(query) ||
-        lote.sucursalNombre.toLowerCase().includes(query);
+        (lote.productoNombre || '').toLowerCase().includes(query) ||
+        (lote.numeroLote || '').toLowerCase().includes(query) ||
+        (lote.laboratorioNombre || '').toLowerCase().includes(query) ||
+        (lote.sucursalNombre || '').toLowerCase().includes(query);
 
+      const urg = lote.estadoUrgencia || lote.estadoRiesgo || '';
       const matchUrgencia =
         urgencia === 'TODOS' ||
-        (urgencia === 'VENCIDO' && lote.estadoUrgencia === 'VENCIDO') ||
-        (urgencia === 'CRITICO' && lote.estadoUrgencia === 'CRITICO_30') ||
-        (urgencia === 'ALERTA' && lote.estadoUrgencia === 'ALERTA_60') ||
-        (urgencia === 'PREVENCION' && lote.estadoUrgencia === 'PREVENCION_90');
+        (urgencia === 'VENCIDO' && urg === 'VENCIDO') ||
+        (urgencia === 'CRITICO' && (urg === 'CRITICO_30' || urg === 'URGENTE_30D')) ||
+        (urgencia === 'ALERTA' && (urg === 'ALERTA_60' || urg === 'ALERTA_60D')) ||
+        (urgencia === 'PREVENCION' && (urg === 'PREVENCION_90' || urg === 'PREVENTIVO_90D'));
 
       return matchText && matchUrgencia;
     });
@@ -93,53 +94,181 @@ export class ReportesDashboard implements OnInit {
   // Ventas filtradas en reporte Consolidado
   protected readonly ventasDetalleFiltradas = computed(() => {
     const data = this.reporteVentas();
-    if (!data) return [];
+    const lista = data?.detalleVentas || (data as any)?.ventasListado;
+    if (!lista) return [];
     const query = this.busquedaDetalle().trim().toLowerCase();
-    if (!query) return data.detalleVentas.slice(0, 50);
+    if (!query) return lista;
 
-    return data.detalleVentas
-      .filter(
-        (v) =>
-          v.clienteNombre.toLowerCase().includes(query) ||
-          v.sucursalNombre.toLowerCase().includes(query) ||
-          v.metodoPago.toLowerCase().includes(query) ||
-          v.pedidoId.toString().includes(query),
-      )
-      .slice(0, 50);
+    return lista.filter(
+      (v: any) =>
+        (v.clienteNombre || '').toLowerCase().includes(query) ||
+        (v.sucursalNombre || '').toLowerCase().includes(query) ||
+        (v.metodoPago || '').toLowerCase().includes(query) ||
+        (v.pedidoId?.toString() || '').includes(query),
+    );
   });
 
   // Inventario filtrado en valoración
   protected readonly inventarioDetalleFiltrado = computed(() => {
     const data = this.reporteValoracion();
-    if (!data) return [];
+    if (!data || !data.detalleInventario) return [];
     const query = this.busquedaDetalle().trim().toLowerCase();
-    if (!query) return data.detalleInventario.slice(0, 50);
+    if (!query) return data.detalleInventario;
 
-    return data.detalleInventario
-      .filter(
-        (i) =>
-          i.productoNombre.toLowerCase().includes(query) ||
-          i.categoriaNombre.toLowerCase().includes(query) ||
-          i.sucursalNombre.toLowerCase().includes(query),
-      )
-      .slice(0, 50);
+    return data.detalleInventario.filter(
+      (i: any) =>
+        (i.productoNombre || '').toLowerCase().includes(query) ||
+        (i.categoriaNombre || '').toLowerCase().includes(query) ||
+        (i.sucursalNombre || '').toLowerCase().includes(query),
+    );
   });
 
   // Sesiones filtradas en cuadre de cajas
   protected readonly sesionesCajasFiltradas = computed(() => {
     const data = this.reporteCajas();
-    if (!data) return [];
+    if (!data || !data.sesiones) return [];
     const query = this.busquedaDetalle().trim().toLowerCase();
     if (!query) return data.sesiones;
 
     return data.sesiones.filter(
-      (s) =>
-        s.cajaNombre.toLowerCase().includes(query) ||
-        s.empleadoNombre.toLowerCase().includes(query) ||
-        s.sucursalNombre.toLowerCase().includes(query) ||
-        s.estadoDiferencia.toLowerCase().includes(query),
+      (s: any) =>
+        (s.cajaNombre || s.codigoCaja || '').toLowerCase().includes(query) ||
+        (s.empleadoNombre || s.cajero || '').toLowerCase().includes(query) ||
+        (s.sucursalNombre || '').toLowerCase().includes(query) ||
+        (s.estadoDiferencia || s.resultadoCuadre || '').toLowerCase().includes(query),
     );
   });
+
+  // Configuración de Paginación (10 registros por página en cada tabla)
+  protected readonly limit = 10;
+  protected readonly pageVentas = signal<number>(1);
+  protected readonly pageLotes = signal<number>(1);
+  protected readonly pageInventario = signal<number>(1);
+  protected readonly pageTop = signal<number>(1);
+  protected readonly pageCajas = signal<number>(1);
+
+  // Top lista actual unificada (Ingresos o Unidades)
+  protected readonly topListaActual = computed(() => {
+    const data = this.reporteTop();
+    if (!data) return [];
+    const list = this.topModo() === 'INGRESOS' ? data.topPorIngresos : data.topPorUnidades;
+    return list || (data as any).topProductos || [];
+  });
+
+  // Totales de páginas computados
+  protected readonly totalPaginasVentas = computed(() =>
+    Math.max(1, Math.ceil(this.ventasDetalleFiltradas().length / this.limit)),
+  );
+  protected readonly totalPaginasLotes = computed(() =>
+    Math.max(1, Math.ceil(this.lotesFiltrados().length / this.limit)),
+  );
+  protected readonly totalPaginasInventario = computed(() =>
+    Math.max(1, Math.ceil(this.inventarioDetalleFiltrado().length / this.limit)),
+  );
+  protected readonly totalPaginasTop = computed(() =>
+    Math.max(1, Math.ceil(this.topListaActual().length / this.limit)),
+  );
+  protected readonly totalPaginasCajas = computed(() =>
+    Math.max(1, Math.ceil(this.sesionesCajasFiltradas().length / this.limit)),
+  );
+
+  // Listados Paginados (10 registros para visualización interactiva en pantalla)
+  protected readonly ventasPaginadas = computed(() => {
+    const inicio = (this.pageVentas() - 1) * this.limit;
+    return this.ventasDetalleFiltradas().slice(inicio, inicio + this.limit);
+  });
+  protected readonly lotesPaginados = computed(() => {
+    const inicio = (this.pageLotes() - 1) * this.limit;
+    return this.lotesFiltrados().slice(inicio, inicio + this.limit);
+  });
+  protected readonly inventarioPaginado = computed(() => {
+    const inicio = (this.pageInventario() - 1) * this.limit;
+    return this.inventarioDetalleFiltrado().slice(inicio, inicio + this.limit);
+  });
+  protected readonly topPaginado = computed(() => {
+    const inicio = (this.pageTop() - 1) * this.limit;
+    return this.topListaActual().slice(inicio, inicio + this.limit);
+  });
+  protected readonly cajasPaginadas = computed(() => {
+    const inicio = (this.pageCajas() - 1) * this.limit;
+    return this.sesionesCajasFiltradas().slice(inicio, inicio + this.limit);
+  });
+
+  // Ventanas de páginas numéricas para navegación
+  private calcularListaPaginas(actual: number, total: number): number[] {
+    const paginas: number[] = [];
+    const inicio = Math.max(1, actual - 2);
+    const fin = Math.min(total, actual + 2);
+    for (let i = inicio; i <= fin; i++) {
+      paginas.push(i);
+    }
+    return paginas;
+  }
+
+  protected readonly listaPaginasVentas = computed(() =>
+    this.calcularListaPaginas(this.pageVentas(), this.totalPaginasVentas()),
+  );
+  protected readonly listaPaginasLotes = computed(() =>
+    this.calcularListaPaginas(this.pageLotes(), this.totalPaginasLotes()),
+  );
+  protected readonly listaPaginasInventario = computed(() =>
+    this.calcularListaPaginas(this.pageInventario(), this.totalPaginasInventario()),
+  );
+  protected readonly listaPaginasTop = computed(() =>
+    this.calcularListaPaginas(this.pageTop(), this.totalPaginasTop()),
+  );
+  protected readonly listaPaginasCajas = computed(() =>
+    this.calcularListaPaginas(this.pageCajas(), this.totalPaginasCajas()),
+  );
+
+  // Métodos de navegación de página
+  cambiarPaginaVentas(delta: number): void {
+    const n = this.pageVentas() + delta;
+    if (n >= 1 && n <= this.totalPaginasVentas()) this.pageVentas.set(n);
+  }
+  irAPaginaVentas(p: number): void {
+    if (p >= 1 && p <= this.totalPaginasVentas()) this.pageVentas.set(p);
+  }
+
+  cambiarPaginaLotes(delta: number): void {
+    const n = this.pageLotes() + delta;
+    if (n >= 1 && n <= this.totalPaginasLotes()) this.pageLotes.set(n);
+  }
+  irAPaginaLotes(p: number): void {
+    if (p >= 1 && p <= this.totalPaginasLotes()) this.pageLotes.set(p);
+  }
+
+  cambiarPaginaInventario(delta: number): void {
+    const n = this.pageInventario() + delta;
+    if (n >= 1 && n <= this.totalPaginasInventario()) this.pageInventario.set(n);
+  }
+  irAPaginaInventario(p: number): void {
+    if (p >= 1 && p <= this.totalPaginasInventario()) this.pageInventario.set(p);
+  }
+
+  cambiarPaginaTop(delta: number): void {
+    const n = this.pageTop() + delta;
+    if (n >= 1 && n <= this.totalPaginasTop()) this.pageTop.set(n);
+  }
+  irAPaginaTop(p: number): void {
+    if (p >= 1 && p <= this.totalPaginasTop()) this.pageTop.set(p);
+  }
+
+  cambiarPaginaCajas(delta: number): void {
+    const n = this.pageCajas() + delta;
+    if (n >= 1 && n <= this.totalPaginasCajas()) this.pageCajas.set(n);
+  }
+  irAPaginaCajas(p: number): void {
+    if (p >= 1 && p <= this.totalPaginasCajas()) this.pageCajas.set(p);
+  }
+
+  resetearPaginas(): void {
+    this.pageVentas.set(1);
+    this.pageLotes.set(1);
+    this.pageInventario.set(1);
+    this.pageTop.set(1);
+    this.pageCajas.set(1);
+  }
 
   ngOnInit(): void {
     const tabParam = this.route.snapshot.queryParamMap.get('tab') as TabReporte;
@@ -162,17 +291,20 @@ export class ReportesDashboard implements OnInit {
   cambiarTab(tab: TabReporte): void {
     this.tabActiva.set(tab);
     this.busquedaDetalle.set('');
+    this.resetearPaginas();
     this.cargarReporteActual();
   }
 
   cambiarPeriodo(periodo: string): void {
     this.periodoSeleccionado.set(periodo);
+    this.resetearPaginas();
     this.cargarReporteActual();
   }
 
   onSucursalChange(event: Event): void {
     const val = (event.target as HTMLSelectElement).value;
     this.sucursalSeleccionada.set(val ? Number(val) : null);
+    this.resetearPaginas();
     this.cargarReporteActual();
   }
 

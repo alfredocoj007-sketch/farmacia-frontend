@@ -4,7 +4,9 @@
 }
 
 @media print {
-  .pedidos-vista-principal {
-    display: none !important;
+  body:not(.print-iframe-active) {
+    .pedidos-vista-principal {
+      display: none !important;
+    }
   }
 }

@@ -103,7 +103,7 @@ export class PedidosList implements OnInit {
   }
 
   protected cargarEstadisticas(): void {
-    this.pedidosService.obtenerEstadisticas().subscribe({
+    this.pedidosService.actualizarNotificaciones().subscribe({
       next: (stats) => this.estadisticas.set(stats),
     });
   }
@@ -166,6 +166,12 @@ export class PedidosList implements OnInit {
     );
   }
 
+  protected readonly pedidoSeleccionado = computed(() => {
+    const id = this.pedidoSeleccionadoId();
+    if (!id) return null;
+    return this.pedidos().find((p) => p.pedidoId === id) || null;
+  });
+
   protected abrirDetalle(pedidoId: number): void {
     this.pedidoSeleccionadoId.set(pedidoId);
   }
@@ -177,9 +183,5 @@ export class PedidosList implements OnInit {
   protected onEstadoCambiado(): void {
     this.cargarPedidos();
     this.cargarEstadisticas();
-    this.toastService.info(
-      '¡Estado actualizado!',
-      'El estado de despacho y logística del pedido ha sido actualizado.',
-    );
   }
 }

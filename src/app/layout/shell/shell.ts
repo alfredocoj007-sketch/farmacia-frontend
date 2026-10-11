@@ -2,7 +2,9 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit, computed, injec
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TransferenciasService } from '../../core/services/transferencias.service';
+import { PedidosService } from '../../core/services/pedidos.service';
 import { ToastService } from '../../shared/toast/toast.service';
+import { ConfirmService } from '../../shared/confirm/confirm.service';
 
 @Component({
   selector: 'app-shell',
@@ -13,9 +15,12 @@ import { ToastService } from '../../shared/toast/toast.service';
 export class Shell implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly transferenciasService = inject(TransferenciasService);
+  private readonly pedidosService = inject(PedidosService);
   private readonly toastService = inject(ToastService);
+  private readonly confirmService = inject(ConfirmService);
   private readonly router = inject(Router);
   private readonly menuMovil = viewChild<ElementRef<HTMLElement>>('menuMovil');
+  private readonly menuModulosRef = viewChild<ElementRef<HTMLElement>>('menuModulosRef');
   private intervaloNotificaciones: any = null;
 
   // Estado para detección de nuevos eventos en tiempo real
@@ -26,10 +31,26 @@ export class Shell implements OnInit, OnDestroy {
   private ultimaCancelacionNotificadaId: number | null = null;
   private primeraCarga = true;
 
+  // Estado para detección de nuevos pedidos de Call Center
+  protected readonly badgeCallCenter = this.pedidosService.conteoBadge;
+  private ultimoPedidoCallCenterNotificadoId: number | null = null;
+  private conteoCallCenterAnterior = 0;
+  private primeraCargaCallCenter = true;
+
   protected readonly usuario = this.authService.currentUser;
   protected readonly menuMovilAbierto = signal(false);
+  protected readonly menuModulosAbierto = signal(false);
   protected readonly horaGuatemala = signal<string>('');
   private relojIntervalo: any = null;
+
+  protected readonly sucursalUbicacionTexto = computed(() => {
+    const u = this.usuario();
+    if (!u) return 'Farmacia ProSalud';
+    if (u.sucursalNombre) {
+      return u.sucursalNombre;
+    }
+    return 'Sede Central · Red Global';
+  });
 
   // Badge reactivo de notificaciones de transferencias
   protected readonly badgeTransferencias = this.transferenciasService.conteoBadge;
@@ -64,6 +85,11 @@ export class Shell implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.actualizarReloj();
     this.relojIntervalo = setInterval(() => this.actualizarReloj(), 1000);
+
+    this.router.events.subscribe(() => {
+      this.menuModulosAbierto.set(false);
+      this.menuMovilAbierto.set(false);
+    });
 
     this.consultarNotificaciones();
     // Sondeo ligero cada 25 segundos para alertar en tiempo real
@@ -161,6 +187,47 @@ export class Shell implements OnInit, OnDestroy {
       },
       error: () => {},
     });
+
+    // Notificaciones de pedidos Call Center para la sucursal de preparación
+    if (this.puedeVerCallCenter()) {
+      this.pedidosService.actualizarNotificaciones().subscribe({
+        next: (stats) => {
+          const porDespachar =
+            stats.porDespachar !== undefined
+              ? stats.porDespachar
+              : (stats.recibidos || 0) + (stats.enPreparacion || 0);
+
+          if (!this.primeraCargaCallCenter) {
+            const nuevoPedido = stats.ultimoPedido;
+            const esNuevoPedido =
+              nuevoPedido &&
+              this.ultimoPedidoCallCenterNotificadoId !== null &&
+              nuevoPedido.pedidoId !== this.ultimoPedidoCallCenterNotificadoId;
+            const incrementoConteo = porDespachar > this.conteoCallCenterAnterior;
+
+            if (esNuevoPedido || (incrementoConteo && nuevoPedido)) {
+              this.reproducirSonidoNotificacion();
+              const sucursalTexto = nuevoPedido?.sucursalNombre
+                ? ` para ${nuevoPedido.sucursalNombre}`
+                : '';
+              const clienteTexto = nuevoPedido?.clienteNombre
+                ? ` (${nuevoPedido.clienteNombre})`
+                : '';
+              this.toastService.info(
+                '🛵 ¡Nuevo Pedido por Despachar!',
+                `Se recibió el pedido #PED-${nuevoPedido?.pedidoId ?? ''}${clienteTexto}${sucursalTexto}. Haz clic en Call Center para prepararlo.`,
+                9000,
+              );
+            }
+          }
+
+          this.ultimoPedidoCallCenterNotificadoId = stats.ultimoPedido?.pedidoId ?? null;
+          this.conteoCallCenterAnterior = porDespachar;
+          this.primeraCargaCallCenter = false;
+        },
+        error: () => {},
+      });
+    }
   }
 
   private reproducirSonidoNotificacion(): void {
@@ -224,11 +291,33 @@ export class Shell implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   protected onDocumentClick(event: MouseEvent): void {
-    if (!this.menuMovilAbierto()) return;
-    const contenedor = this.menuMovil()?.nativeElement;
-    if (contenedor && !contenedor.contains(event.target as Node)) {
-      this.menuMovilAbierto.set(false);
+    const target = event.target as Node;
+    if (this.menuMovilAbierto()) {
+      const contenedorMovil = this.menuMovil()?.nativeElement;
+      if (contenedorMovil && !contenedorMovil.contains(target)) {
+        this.menuMovilAbierto.set(false);
+      }
     }
+    if (this.menuModulosAbierto()) {
+      const contenedorModulos = this.menuModulosRef()?.nativeElement;
+      if (contenedorModulos && !contenedorModulos.contains(target)) {
+        this.menuModulosAbierto.set(false);
+      }
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscapeKey(): void {
+    this.menuMovilAbierto.set(false);
+    this.menuModulosAbierto.set(false);
+  }
+
+  protected alternarMenuModulos(): void {
+    this.menuModulosAbierto.update((abierto) => !abierto);
+  }
+
+  protected cerrarMenuModulos(): void {
+    this.menuModulosAbierto.set(false);
   }
 
   protected alternarMenuMovil(): void {
@@ -237,6 +326,28 @@ export class Shell implements OnInit, OnDestroy {
 
   protected cerrarMenuMovil(): void {
     this.menuMovilAbierto.set(false);
+  }
+
+  protected async confirmarCerrarSesion(): Promise<void> {
+    this.cerrarMenuMovil();
+    this.cerrarMenuModulos();
+
+    const confirmado = await this.confirmService.confirm({
+      title: '¿Cerrar Sesión Segura?',
+      message: '¿Estás seguro de que deseas salir del sistema? Tu sesión finalizará de manera segura.',
+      confirmText: 'Sí, Cerrar Sesión',
+      cancelText: 'Cancelar',
+      tipo: 'danger',
+    });
+
+    if (confirmado) {
+      this.toastService.info(
+        'Sesión Finalizada',
+        'Has cerrado sesión de forma segura.',
+        3000,
+      );
+      this.cerrarSesion();
+    }
   }
 
   protected cerrarSesion(): void {

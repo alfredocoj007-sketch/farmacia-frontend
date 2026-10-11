@@ -487,10 +487,12 @@ export class Ventas implements OnInit {
       montoRecibido: esEfectivo ? recibido : total,
       cajaId: this.cajaInfo()?.cajaId,
       cliente: {
-        nit: this.clienteNit() || 'CF',
-        nombre: this.clienteNombre() || 'Consumidor Final',
-        direccion: this.clienteDireccion() || 'Ciudad de Guatemala',
-        telefono: this.clienteTelefono() || '2000-0000',
+        nit: this.esConsumidorFinal() ? 'CF' : (this.clienteNit()?.trim() || 'CF'),
+        nombre: this.esConsumidorFinal()
+          ? 'Consumidor Final'
+          : (this.clienteNombre()?.trim() || 'Consumidor Final'),
+        direccion: this.clienteDireccion()?.trim() || 'Ciudad de Guatemala',
+        telefono: this.esConsumidorFinal() ? '2000-0000' : (this.clienteTelefono()?.trim() || ''),
       },
       items: this.carrito().map((item) => ({
         productoId: item.producto.productoId,
@@ -506,6 +508,7 @@ export class Ventas implements OnInit {
         this.ventaEmitida.set(resp);
         this.modalTicketAbierto.set(true);
         this.vaciarCarrito();
+        this.setConsumidorFinal(true);
         this.buscarProductos();
         this.verificarCaja(this.sucursalSeleccionadaId());
 

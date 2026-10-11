@@ -19,26 +19,26 @@ body {
     margin: 15mm 15mm 15mm 15mm;
   }
 
-  header,
-  nav,
-  aside,
-  .no-print,
-  .no-print * {
-    display: none !important;
-  }
+  body:not(.print-iframe-active) {
+    header,
+    nav,
+    aside,
+    .no-print,
+    .no-print * {
+      display: none !important;
+    }
 
-  body, html {
     background: #ffffff !important;
     color: #000000 !important;
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
-  }
 
-  main {
-    padding: 0 !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
+    main {
+      padding: 0 !important;
+      margin: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+    }
   }
 }
