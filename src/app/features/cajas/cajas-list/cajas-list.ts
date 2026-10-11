@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CajasService } from '../../../core/services/cajas.service';
@@ -35,6 +35,8 @@ export class CajasList implements OnInit, OnDestroy {
   private readonly sucursalesService = inject(SucursalesService);
   private readonly toastService = inject(ToastService);
   private readonly authService = inject(AuthService);
+  private readonly ngZone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   protected readonly sucursales = signal<Sucursal[]>([]);
   protected readonly sucursalId = signal<number | null>(null);
@@ -88,9 +90,12 @@ export class CajasList implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarSucursales();
-    this.relojTimer = setInterval(() => {
-      this.ahora.set(new Date());
-    }, 1000);
+    this.ngZone.runOutsideAngular(() => {
+      this.relojTimer = setInterval(() => {
+        this.ahora.set(new Date());
+        this.cdr.markForCheck();
+      }, 30000);
+    });
   }
 
   ngOnDestroy(): void {

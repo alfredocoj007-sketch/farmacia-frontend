@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, computed, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnDestroy, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TransferenciasService } from '../../core/services/transferencias.service';
@@ -11,6 +11,7 @@ import { ConfirmService } from '../../shared/confirm/confirm.service';
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Shell implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
@@ -19,9 +20,20 @@ export class Shell implements OnInit, OnDestroy {
   private readonly toastService = inject(ToastService);
   private readonly confirmService = inject(ConfirmService);
   private readonly router = inject(Router);
+  private readonly ngZone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly menuMovil = viewChild<ElementRef<HTMLElement>>('menuMovil');
   private readonly menuModulosRef = viewChild<ElementRef<HTMLElement>>('menuModulosRef');
   private intervaloNotificaciones: any = null;
+
+  // Formateador de hora persistente (evita crear instancias continuas cada segundo en el recolector de basura)
+  private readonly formatoHora = new Intl.DateTimeFormat('es-GT', {
+    timeZone: 'America/Guatemala',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+  });
 
   // Estado para detección de nuevos eventos en tiempo real
   private ultimoDespachoNotificadoId: number | null = null;
@@ -72,19 +84,16 @@ export class Shell implements OnInit, OnDestroy {
 
   private actualizarReloj(): void {
     const ahora = new Date();
-    const formato = new Intl.DateTimeFormat('es-GT', {
-      timeZone: 'America/Guatemala',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true,
-    }).format(ahora);
-    this.horaGuatemala.set(formato);
+    this.horaGuatemala.set(this.formatoHora.format(ahora));
+    this.cdr.markForCheck();
   }
 
   ngOnInit(): void {
     this.actualizarReloj();
-    this.relojIntervalo = setInterval(() => this.actualizarReloj(), 1000);
+    // Ejecutar reloj FUERA de NgZone para que el temporizador de 1 segundo NO dispare detección de cambios en toda la app
+    this.ngZone.runOutsideAngular(() => {
+      this.relojIntervalo = setInterval(() => this.actualizarReloj(), 1000);
+    });
 
     this.router.events.subscribe(() => {
       this.menuModulosAbierto.set(false);
@@ -92,14 +101,16 @@ export class Shell implements OnInit, OnDestroy {
     });
 
     this.consultarNotificaciones();
-    // Sondeo ligero cada 25 segundos para alertar en tiempo real
-    this.intervaloNotificaciones = setInterval(() => {
-      if (this.usuario()) {
-        this.consultarNotificaciones();
-      } else {
-        this.primeraCarga = true;
-      }
-    }, 25000);
+    // Sondeo de notificaciones cada 30 segundos fuera de Angular zone
+    this.ngZone.runOutsideAngular(() => {
+      this.intervaloNotificaciones = setInterval(() => {
+        if (this.usuario()) {
+          this.ngZone.run(() => this.consultarNotificaciones());
+        } else {
+          this.primeraCarga = true;
+        }
+      }, 30000);
+    });
   }
 
   ngOnDestroy(): void {
@@ -246,6 +257,11 @@ export class Shell implements OnInit, OnDestroy {
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
       osc.start();
       osc.stop(ctx.currentTime + 0.35);
+
+      // Cerrar el contexto de audio tras finalizar para liberar recursos del hardware y coreaudiod
+      setTimeout(() => {
+        ctx.close().catch(() => {});
+      }, 400);
     } catch {
       // Silencioso si el navegador restringe el audio antes de interacción
     }

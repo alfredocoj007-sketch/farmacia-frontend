@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -69,6 +69,7 @@ import { ReportesService } from '../../core/services/reportes.service';
   imports: [RouterLink, SlicePipe, DecimalPipe, FormsModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard implements OnInit {
   private readonly authService = inject(AuthService);
@@ -611,7 +612,7 @@ export class Dashboard implements OnInit {
     this.puntosGrafica.set(puntos);
   }
 
-  protected pathCurvaSuave(): string {
+  protected readonly pathCurvaSuave = computed<string>(() => {
     const pts = this.puntosGrafica();
     if (pts.length === 0) return '';
     if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
@@ -633,9 +634,9 @@ export class Dashboard implements OnInit {
     }
 
     return d;
-  }
+  });
 
-  protected pathAreaDegradada(): string {
+  protected readonly pathAreaDegradada = computed<string>(() => {
     const curva = this.pathCurvaSuave();
     if (!curva) return '';
     const pts = this.puntosGrafica();
@@ -643,7 +644,7 @@ export class Dashboard implements OnInit {
     const firstX = pts[0].x;
     const fondoY = 160 - 25; // Base del área
     return `${curva} L ${lastX} ${fondoY} L ${firstX} ${fondoY} Z`;
-  }
+  });
 
   private agruparPorCategoria(nombres: string[]): CategoriaBarra[] {
     const conteos = new Map<string, number>();
